@@ -1,0 +1,16 @@
+ "10% off" OR "15% off" OR "20% off" OR "25% off" OR "30% off" OR "40% off" OR "5% off" OR "50% off" OR "60% off" OR "70% off" OR 
+"75% off" OR "80% off" OR "afternoon deals" OR "bargain" OR "best deals" OR "best price" OR "best priced" OR "BOGO" OR "Bons de 
+réduction" OR "buy of the week" OR "buy one and get one" OR "buy one get" OR "buy the deal" OR "cash back" OR "cheap prices" OR 
+"clearance" OR "closeouts" OR "coupon" OR "coupons" OR "cupon" OR "Cupón" OR "cupons" OR "Cupóns" OR "CVS Ad" OR "cvs deal" 
+OR "CVS deals" OR "CVS matchups" OR "daily deals" OR "deal is brought to you" OR "deal of the day" OR "deal of the week" OR "Deals at 
+CVS" OR "deals by subscribing" OR "Deals of the Day" OR "deals of the week" OR "discount" OR "discounts" OR "dollar general deals" OR 
+"doubler" OR "ecoupon" OR "ecoupons" OR "fast shipping" OR "for as low as" OR "for sale" OR "freebie" OR "freebies" OR "Get a 12
+month" OR "get one free" OR "get one half off" OR "get the deal" OR "giant eagle deals" OR "Giveaway" OR "giveaways" OR "Go HERE to 
+get yours" OR "HOT DEALS" OR "Kroger Ad" OR "Kroger Mega Event" OR "low price" OR "low priced" OR "lowest priced" OR "lowest 
+prices" OR "Money back guarantee" OR "morning deals" OR "no prescription needed" OR "off with code" OR "on sale" OR "overnight 
+delivery" OR "overnight shipping" OR "prices won't be beat" OR "printables" OR "Promo Code" OR "promotional code" OR "rebate" OR 
+"rebates" OR "redeem your voucher" OR "rite-aid deals" OR "save $1 off" OR "save $1 on" OR "SAVE $1.00 ON" OR "save $2 off" OR 
+"save $2 on" OR "SAVE $2.00 ON" OR "save $3 off" OR "season sale" OR "send you a voucher" OR "shipping and handling" OR "shop with 
+us" OR "Staples deals" OR "Start saving today" OR "steals and deals" OR "subscribe offer" OR "target deal" OR "Target deals" OR "this 
+week at Target" OR "top deals" OR "walgreen deals" OR "Walmart Deals" OR "Walmart Gift Card" OR "weekly ad" OR "weekly ads" OR 
+"weekly wonder" OR "wowcher"

@@ -1,0 +1,14 @@
+ "8-k" OR "analyst estimate" OR "analyst estimates" OR "annual report" OR "blue chip stocks" OR "cheapest stocks" OR "Closing Price" OR 
+"common stock" OR "Consensus Estimate" OR "daily change" OR "day's biggest movers" OR "dividend" OR "dividends" OR "DJIA" OR 
+"Dow Jones" OR "earnings report" OR "financial report" OR "financial results" OR "financial transactions" OR "first quarter" OR "fiscal 
+results" OR "fiscal year" OR "form 4" OR "form 8" OR "fourth quarter" OR "FTSE" OR "gainers" OR "get quote" OR "global round-up" OR 
+"high-risk stocks" OR "insider buying" OR "investors shake off" OR "IPO" OR "large cap" OR "market  capitalization" OR "market braces" 
+OR "market stats" OR "marketwatch" OR "mid cap" OR "Morningstar" OR "NASDAQ" OR "nelson information" OR "net income" OR "NYSE" 
+OR "open slightly higher" OR "outperform" OR "p/e ratio" OR "per share" OR "performed well" OR "profitability" OR "q1" OR "q2" OR "q3" 
+OR "q4" OR "quarterly report" OR "revenue growth" OR "S and P 500" OR "S&P 500" OR "SEC filings" OR "second quarter" OR "Securities 
+and Exchange" OR "securities trading" OR "sell recommendation" OR "senior notes" OR "senior subordinated notes" OR "share gains" OR 
+"share price" OR "shareholder" OR "shareholders" OR "shares" OR "small cap" OR "smallcap" OR "stock exchange" OR "stock exchanges" 
+OR "stock investment" OR "stock market" OR "stock markets" OR "Stock Performance" OR "stock pick" OR "stock price" OR "stock prices" 
+OR "stock split" OR "stock trade" OR "stock watch" OR "stocks edged up" OR "stocks fall" OR "stocks finish positive" OR "stocks rise" OR 
+"stocks up" OR "stocks were mixed" OR "stocks were still firmer" OR "tech stock" OR "third quarter" OR "top gainer" OR "Top Risers" OR 
+"Value to Sales Ratio"

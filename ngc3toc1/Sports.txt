@@ -1,0 +1,15 @@
+ "athlete" OR "athletes" OR "athletic" OR "athletics" OR "baseball" OR "basketball" OR "bowl game" OR "bowl games" OR "boxing" OR "bull 
+riding" OR "catcher" OR "championship" OR "championships" OR "coach" OR "coached" OR "coaches" OR "coaching" OR "cornerback" OR 
+"cotton bowl" OR "county finals" OR "county semi-finals" OR "cricket" OR "cross country team" OR "defensive tackle" OR "diving" OR 
+"double double" OR "field goal" OR "field goals" OR "first base" OR "football" OR "free throw" OR "free throws" OR "futbol" OR "game high" 
+OR "game report" OR "game winning" OR "golf" OR "halfback" OR "halftime" OR "heavyweight" OR "high school games" OR "hockey" OR 
+"home run" OR "in overtime" OR "ind passing" OR "inning" OR "innings" OR "intramural" OR "intramurals" OR "kickoff" OR "lacrosse" OR 
+"little league" OR "men's Cross Country" OR "mens cross country" OR "MLB" OR "NASCAR" OR "NBA" OR "NCAA" OR "netball" OR "NFL" 
+OR "NHL" OR "orange bowl" OR "outfield" OR "pitcher" OR "pitchers" OR "punt" OR "punting" OR "quarterback" OR "rbi" OR "rbis" OR 
+"rebound" OR "rebounded" OR "rebounding" OR "rebounds" OR "rodeo" OR "rose bowl" OR "rowing" OR "rugby" OR "running back" OR 
+"salary caps" OR "scoreboard" OR "second base" OR "semifinals" OR "shortstop" OR "skiing" OR "snowboarding" OR "soccer" OR 
+"softball" OR "sports" OR "sportsnet" OR "state finals" OR "state semi-finals" OR "sugar bowl" OR "Surf league" OR "surfing" OR 
+"swimming" OR "team net" OR "team passing" OR "team rushing" OR "team turnover" OR "teammate" OR "teammates" OR "tennis" OR 
+"third base" OR "total offense" OR "touch down" OR "touchdown" OR "tournament" OR "track & field" OR "track and field" OR "trade 
+deadline" OR "triple double" OR "ultimate fighting" OR "volleyball" OR "welterweight" OR "wide reciever" OR "Women Cross Country" OR 
+"Women's Cross Country" OR "wrestler" OR "wrestling" OR "x-country"

@@ -1,0 +1,7 @@
+ "beloved husband" OR "beloved wife" OR "burial" OR "buried at" OR "buried in" OR "cemetary" OR "cemetery" OR "Condolences may be" 
+OR "cremated" OR "cremation" OR "Death Notice" OR "death notices" OR "died suddenly" OR "died unexpectedly" OR "eternal rest" OR 
+"expressions of sympathy" OR "funeral" OR "husband died" OR "in lieu of" OR "in memoriam" OR "lieu of flowers" OR "local births" OR 
+"Mausoleum" OR "memorial gathering" OR "memorial service" OR "memorial services" OR "mourners" OR "obit" OR "obits" OR "obituaries" 
+OR "obituary" OR "online guest book" OR "online guestbook" OR "Paid notice deaths" OR "passed away" OR "Preceded in death" OR "Rest 
+in Peace" OR "sign guestbook" OR "survived by her" OR "survived by his" OR "survived by husband" OR "survived by wife" OR "survivors 
+include" OR "Visitation begins" OR "Visitation will be" OR "Visitation will begin" OR "wife died" OR "with the Lord"

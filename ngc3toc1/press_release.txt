@@ -1,0 +1,11 @@
+ "1888PressRelease" OR "24-7 press release" OR "24-7 pressrelease" OR "24-7PressRelease" OR "3BL Media" OR "AB Newswire" OR 
+"abnewswire" OR "briefing.com" OR "briefingwire" OR "Business Wire" OR "Businesswire" OR "businesspress24" OR "comtex" OR 
+"datamonitor" OR "DMN Newswire" OR "DMNNewswire" OR "ein presswire" OR "einpresswire" OR "Emailwire" OR "enhanced online news" 
+OR "EPR Network" OR "forimmediaterelease" OR "globe newswire" OR "globenews" OR "globenewswire" OR "M2 PressWIRE" OR 
+"M2PressWire" OR "Market wired" OR "MarketersMedia" OR "Marketwired" OR "media newsedge" OR "mm-prreach" OR "mmd newswire" 
+OR "myprgenie" OR "news bites" OR "newsbites" OR "newsblaze" OR "Online PR News" OR "openPR" OR "PR Inside" OR "PR Newswire" 
+OR "PRNewswire" OR "PR-Gateway.de" OR "pr-usa.net" OR "pr.com" OR "PRBuzz.com" OR "press release distribution" OR "Press 
+Release Rocket" OR "press releases" OR "pressadvantage" OR "PressCable" OR "pressebox" OR "Pressemitteilung" OR "pressrelation" 
+OR "pressrelations" OR "PressReleasePoint" OR "pressreleases worldnow" OR "PRLeap" OR "PRLog" OR "PRNewswire" OR "prsync" OR 
+"PR Web" OR "PRWeb" OR "publicnow" OR "pwrnewmedia" OR "ReleaseWire" OR "sbwire" OR "TransWorldNews" OR "webwire" OR 
+"www.newswire"

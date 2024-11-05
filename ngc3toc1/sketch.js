@@ -22,17 +22,6 @@
 // is a ( or any keyword that ends in a :
  let spaceNeeded = false;
 
-// VERSION 25 CHANGES BEGIN
-// This variable is set to true if the tk_filter "Market
-// Research Reports" is encountered. This is because, this
-// filter had a *. The phrases with the * (instead of the
-// whole filter content) should be flagged as an error. 
-// And only that phrase should be printed differently: 
-// only that phrase (instead of the whole filter content)
-// should be in red in the output area.
-  let marketResearchReportsFlag = false;
-// VERSION 25 CHANGES END
-
 // **** Literal declaration region ****
 // Used to avoid hardcoding of strings, numbers and special 
 // characters. 
@@ -56,6 +45,7 @@
  const ANDToken = 'AND';
  const orToken = 'or';
  const ORToken = 'OR';
+  const OrToken = 'Or';
  const unlessToken = 'UNLESS';
  const seoToken = 'seo';
  const sentimentToken = 'sentiment';
@@ -119,10 +109,8 @@
 // to that.
  const normalMode = 'Normal';
  const errorMode = 'Error';
-// VERSION 29 CHANGES BEGIN
  const highlightMode = 'Highlight';
  const highlightErrMode = 'HighlightErr';
-// VERSION 29 CHANGES END
 
 // These are the valid values of the sentiment: NGC3 keyword
  const positiveValue = 'positive';
@@ -220,7 +208,7 @@
  const noErrors = 'No errors encountered';
  const wildcardStarMRRError = 'Wildcard * encountered in Market Research Reports Token: ';
  const unmatchedRightParenthesisError = 'Unmatched right parenthesis at token: ';
- const booleanLowercaseError = 'Boolean operator ${currentToken} should be uppercase at token: ';
+ const booleanLowercaseError = 'Boolean operator should be uppercase :';
  const tooFewTildeWordsError = 'At least 2 words expected before ~';
  const tildeNaNError = 'Whole number expected after ~';
  const nonNumericRangeError = 'Range should be numeric for ';
@@ -233,7 +221,7 @@
 // Define constants used in setup to avoid hard-coding
  const leftMargin = '100px';
  const h1PageHeading = 'NGC3 to C1 Conversion';
- const h5PageHeading = 'Version 28, Build Date August 20, 2024';
+ const h5PageHeading = 'Version 32, Build Date September 13, 2024';
  const h3InputHeading = 'Enter the NGC3 Query Here';
  const h3ErrorHeading = 'Corrections Needed';
  const h3OutputDivHeading = 'Converted C1 Query';
@@ -288,7 +276,8 @@ function setup() {
  pageHeading.style('text-align', centerAlign); 
  pageHeading.style('width', widthValue); 
 
-// Add a 2nd heading to display the version number and build date
+// Add a 2nd heading to display the version number and build
+// date
  let pageHeading5 = createElement('h5', h5PageHeading);
  pageHeading5.style('color', colorCode); 
  pageHeading5.style('text-align', centerAlign); 
@@ -318,20 +307,21 @@ function setup() {
  userInput.style('box-sizing', 'border-box');  
  userInput.style('white-space', 'pre-wrap');  
 
-// Adjust the height of the textarea dynamically. The minimum
-// size (height) of the box us 150px. But the size should increase
-// if the query is bigger. The box size should be as big as the
-// query. This event listener will wait for users to enter a
-// query in the input box, then automatically adjust the size.
+// Adjust the height of the textarea dynamically. The
+// minimum size (height) of the box us 150px. But the size
+// should increase if the query is bigger. The box size
+// should be as big as the query. This event listener will
+// wait for users to enter a query in the input box, then
+// automatically adjust the size.
  userInput.elt.addEventListener('input', adjustInputHeight);
   
  function adjustInputHeight() {
 // An inline function to adjust height
   userInput.elt.style.height = 'auto'; 
   
-// Make sure height never reduces too much. The minimum size of the
-// input box is 150 px. Set the height to the scrollHeight, as long
-// as it does not go below 150px.
+// Make sure height never reduces too much. The minimum size
+// of the input box is 150 px. Set the height to the
+// scrollHeight, as long as it does not go below 150px.
   if (userInput.elt.scrollHeight < 150) {
   userInput.elt.style.height = boxHeight; 
   }
@@ -342,8 +332,8 @@ function setup() {
 }
   
 function resetInputHeight () {
-// An inline function to reset height. This will be called when
-// "Clear Screen" is pressed.
+// An inline function to reset height. This will be called
+// when "Clear Screen" is pressed.
   userInput.elt.style.height = 'auto'; 
   userInput.elt.style.height = boxHeight; 
 }
@@ -371,7 +361,7 @@ function resetInputHeight () {
   submitButton.mousePressed(() => {
 // Tokenize input and store in NGC3_list
     NGC3_list = tokenize(userInput.value()); 
-// VERSION 26 CHANGES BEGIN
+
 // Clear the Output DIV and the Error areas
     while (Error_list.length !== 0) {
        Error_list.pop();
@@ -383,7 +373,7 @@ function resetInputHeight () {
 // Try in another way
     span = createSpan('');
     span.parent(outputDiv);
-// VERSION 26 CHANGES END
+
 // Proceed only if there was any input.
     if (userInput.value() !== "") {
        parseNGC3toC1();  
@@ -395,16 +385,16 @@ function resetInputHeight () {
 // Display the errors, if any.
     displayErrorList();  
     
-// Dispatch the custom contentChanged event. We want the output
-// box to be at least 150px, but become bigger if the output 
-// query is bigger. Dispatching this event will call a function 
-// that will adjust the output box size.
+// Dispatch the custom contentChanged event. We want the
+// output box to be at least 150px, but become bigger if 
+// the output query is bigger. Dispatching this event will
+// call a function that will adjust the output box size.
     let event = new Event('contentChanged');
     outputDiv.elt.dispatchEvent(event);
   });
  
-// Create a "Check" button for the users. This button is used to 
-// check the syntax of the NGC3 query.
+// Create a "Check" button for the users. This button is
+// used to check the syntax of the NGC3 query.
   const checkButton = createButton(checkButtonName);
   checkButton.style('margin-left', checkAndClearButtonMargin);
   
@@ -446,13 +436,11 @@ function resetInputHeight () {
     userInput.value(''); 
     errorArea.value(''); 
 // clear the contents of the error array
-// VERSION 26 CHANGES BEGIN
-//  Error_list.pop();
+
 // Erase all the contents of Error_list
     while (Error_list.length !== 0) {
        Error_list.pop();
     }
-// VERSION 26 CHANGES END
     
 // Reset the height of the input area
     resetInputHeight();
@@ -502,8 +490,8 @@ function resetInputHeight () {
   outputDivHeading.style('margin-left', leftMargin);
   
 // Creating a sample DIV area so that text with color can
-// be displayed here. A textarea will not display text in color.
-//
+// be displayed here. A textarea will not display text in
+// color.
   const outputDiv = createDiv('');
   outputDiv.id('outputDiv');
   outputDiv.style('width', boxWidth);
@@ -517,14 +505,15 @@ function resetInputHeight () {
   outputDiv.style('font-family', 'monospace');
   outputDiv.style('resize', 'none');  
  
-// Listen for custom content change event. This event is needed
-// adjust the size of the output box, depending on the size of
-// the output query.
+// Listen for custom content change event. This event is
+// needed to adjust the size of the output box, depending 
+// on the size of the output query.
   outputDiv.elt.addEventListener('contentChanged', adjustOutputHeight);
     
   function adjustOutputHeight() {
 
-// Inline function to resize the DIV area when the contents change
+// Inline function to resize the DIV area when the contents
+// change
   outputDiv.elt.style.height = 'auto'; // Reset the height
   
 // Maintain the miimum size of the box to 150px.
@@ -551,10 +540,11 @@ function resetInputHeight () {
   let copyButton = createButton(copyButtonName);
   copyButton.style('margin-left', leftMargin);
 
-// Sepcify the action to be taken when the button is pressed. 
-// In order to access the contents of the DIV area, we shoud 
-// copy it to a textarea first. Create a temporary textarea every
-// time the copy button is pressed, then delete it after use.
+// Sepcify the action to be taken when the button is
+// pressed. In order to access the contents of the DIV area,
+// we shoud copy it to a textarea first. Create a temporary
+// textarea every time the copy button is pressed, then
+// delete it after use.
   
   copyButton.mousePressed(() => {
     
@@ -569,8 +559,9 @@ function resetInputHeight () {
 // Append it to the body of the document
     document.body.appendChild(tempTextarea);   
     
-// Now select and copy the contents of the temporary textarea.
-// Note that the color will not be copied: only the content.
+// Now select and copy the contents of the temporary
+// textarea.Note that the color will not be copied: only 
+// the content.
     tempTextarea.value = textData;  
     tempTextarea.select();  
     document.execCommand('copy');  
@@ -600,14 +591,9 @@ function tokenize(input) {
 // Does not consider a . in a quoted word as a delimiter
 // Captures + and - as separate tokens
 
-// OLD REGEX WHICH DOD NOT COVER CURLY QUOTES  
-//    return input.match(/(?:[()[\]~+\-])|(?:"[^"]*"|'[^']*')|\w+(:?\.\w+)*|\d*\.?\d+/g);
-// VERSION 24 CHANGES BEGIN
 // Ensure * does not get stripped when not enclosed in
 // quotes
-//    return input.match(/(?:[()[\]~+\-])|(?:"[^"]*"|'[^']*'|“[^”]*”|‘[^’]*’)|\w+(:?\.\w+)*|\d*\.?\d+/g);
     return input.match(/(?:[()[\]~+\-])|(?:"[^"]*"|'[^']*'|“[^”]*”|‘[^’]*’)|\w+(\.\w+)*[\*?]?|\d*\.?\d+/g);
-// VERSION 24 CHANGES END
 
 }
 
@@ -641,6 +627,7 @@ function parseNGC3toC1() {
 // phrase between double quotes doesn't have a ~ next to
 // it, no processing is needed. That's the code in this
 // nested IF.
+    
 // Note that these words can be enclosed in single, double,
 // single curly or double curly quotes too.
   
@@ -649,12 +636,9 @@ function parseNGC3toC1() {
        (token.startsWith('‘') && token.endsWith('’')) ||
        (token.startsWith('“') && token.endsWith('”'))) {
 
-// Check if the next token is a tilde. If not, just push the word
-// to the output without processing.
-// VERSION 24 CHANGES BEGIN
-//         if (NGC3_list[NGC3_counter+1] !== '~') {
+// Check if the next token is a tilde. If not, just push the
+// word to the output without processing.
          if (NGC3_list[NGC3_counter+1] !== tildeToken) {
-// VERSION 24 CHANGES END
             wordTokenProcessing(NGC3_counter);
          }
       
@@ -663,73 +647,51 @@ function parseNGC3toC1() {
     }
     
 // Some tokens may have 1 or more - (hyphens), but may not
-// be enclosed in single or double quotes. These are considered
-// hyphenated words. String these tokens together as a single word.
-// No processing needed.
+// be enclosed in single or double quotes. These are
+// considered hyphenated words. String these tokens together
+// as a single word. No processing needed.
 // - (hyphen) should be treated carefully: because when it
-// appears between numbers, it represents a range and it will be
-// enclosed in square brackets.
+// appears between numbers, it represents a range and it
+// will be enclosed in square brackets.
 //
 
 // Check for a hypen first.
-// VERSION 24 CHANGES BEGIN hyphenToken
-//    if (NGC3_list[NGC3_counter+1] === '-') {
     if (NGC3_list[NGC3_counter+1] === hyphenToken) {
-// VERSION 24 CHANGES END
 // If the current token and the token after the hyphen are
 // not numbers, string these 3 as a word, then skip the
 // processing of all 3 tokens.
 
 // If the function hyphenWordProcessing finds a hyphenated 
-// word, it will push it to the output. If a stray number range
-// is detected, it will push it to the output and flag an error.
+// word, it will push it to the output. If a stray number
+// range is detected, it will push it to the output and 
+// flag an error.
 // This function has 2 modes: Parse and Check. In the 
 // Parse mode, it will also write to the output list.
 //
-// VERSION 24 CHANGES BEGIN
-//        numericOrString = hyphenWordProcessing(token, //NGC3_counter, "Parse");
-//        if (numericOrString === "String") {
-// stray range not connected to a keyword encountered, Flag an
-// error, but push the numbers out.
-//        NGC3_counter+=3;
-//        continue;
-//        }
       hyphenWordProcessing(token, NGC3_counter, parseMode);
 // Skip 3 tokens. These have been processed.
         NGC3_counter+=3;
         continue;
       }
-// VERSION 24 CHANGES END
 
     switch (token) {
-// VERSION 24 CHANGES BEGIN
- //     case 'AND':
- //     case 'and':
       case andToken:
       case ANDToken:
-// VERSION 24 CHANGES BEGIN
-// Check if the next token is a NOT. In that case, it will become
-// an UNLESS. If a NOT is encountered, valCount will be 2. 
-// Otherwise, it will be 1.
+// Check if the next token is a NOT. In that case, it will
+// become an UNLESS. If a NOT is encountered, valCount will
+// be 2. Otherwise, it will be 1.
         valCount = unlessProcessing(NGC3_counter);
         NGC3_counter = NGC3_counter + valCount;
         break;
-// VERSION 24 CHANGES BEGIN
-//      case '(':
-//      case ')':
-//      case 'OR':
-//      case 'NOT':
+
       case leftParenthesisValue:
       case rightParenthesisValue:
       case ORToken:
       case NOTToken:
-// VERSION 24 CHANGES END
-// VERSION 27 CHANGES BEGIN
-// No processing needed for parenthesis, AND, NOT. Just add 
+// No processing needed for parenthesis, OR, NOT. Just add 
 // them to the DIV area. But if it is a nested OR string, 
 // further checking is needed.
-//        populateDiv(token, normalMode);
-//        NGC3_counter++;
+
 // valCount returns the number of tokens involved in a
 // nested OR.
 // A nested OR is when all words within parenthesis have
@@ -746,122 +708,72 @@ function parseNGC3toC1() {
 // Contents have already been moved to the output DIV.
           NGC3_counter = NGC3_counter+ valCount;
         }
-// VERSION 27 CHANGES END
         break;
-// VERSION 24 CHANGES BEGIN
-//     case 'or':
-//     case 'not':
+
      case orToken:
      case notToken:
-// VERSION 24 CHANGES END
 // Syntax errors. Convert these to uppercase and push it
 // in without flagging as errors.
         populateDiv(token.toUpperCase(0), normalMode);
         NGC3_counter++;
         break;
-// VERSION 24 CHANGES BEGIN
-//     case '+':
+
      case plusToken:
-// VERSION 24 CHANGES END
 // This should be treated as AND. Make an information
 // statement.
         populateDiv(ANDToken, normalMode);
         NGC3_counter++;
         Error_list.push(plusError + token);
         break;
-// VERSION 24 CHANGES BEGIN
-//     case '~':
-      case tildeToken:
-// VERSION 24 CHANGES END       
+
+      case tildeToken:      
 // If you encounter a ~, proceed with NEAR conversion.
 // moveIndex is the value returned by the function 
-// checkTildestorm. It indicates how many tokens have already
-// been processed. The +2 indicates the current token ~ and the
-// number that comes after that.
+// checkTildestorm. It indicates how many tokens have
+// already been processed. The +2 indicates the current
+// token ~ and the number that comes after that.
 //
        let moveIndex = nearProcessing(NGC3_counter);
         
        if (moveIndex !== 0) {
-// WARNING: Should this not be NGC3_counter+moveindex+2?
-// DEBUG BEGIN
           NGC3_counter = moveIndex+2;
-// Fix not working
-//          NGC3_counter = NGC3_counter+moveIndex+2;
-// DEBUG END
         }
         else {
           NGC3_counter+=2;
         }
         break;
         
-// VERSION 24 CHANGES BEGIN
-//      case 'site_urls_ll:':
-//      case 'site_urls_ll':
-//      case 'url_direct:':
-//      case 'url_direct':
-//      case 'url':
-//      case 'url:':
       case url_directToken:
       case site_urls_llToken:
       case urlToken:
-// VERSION 24 CHANGES END
 // These will be converted to url:
 // Sometimes the NGC3 query has url instead of site_urls_ll
-// Letting it pass thru without displaying an error.
-// VERSION 24 CHANGES BEGIN
-//        populateDiv('url:', normalMode);  
+// Letting it pass thru without displaying an error. 
         populateDiv(urlTokenC1, normalMode);  
-// VERSION 24 CHANGES END
         NGC3_counter++;
         break;
-// VERSION 24 CHANGES BEGIN
-//      case 'tk_language':
-//      case 'tk_language:':
-//      case 'language':
-//      case 'language:':
-//      case 'lang':
-//      case 'lang:':
+        
         case tk_languageToken:
         case languageToken:
         case langToken:
-// VERSION 24 CHANGES END
 // Convert languages to C1 codes
-// Sometimes the language code may be enclosed in parenthesis.
-// In that case, a total of 4 tokens should be skipped. Else,
-// only 2 tokens should be skipped.
-//        languageProcessing(NGC3_counter);
+// Sometimes the language code may be enclosed in
+// parenthesis. In that case, a total of 4 tokens should be
+// skipped. Else, only 2 tokens should be skipped.
         valCount = languageProcessing(NGC3_counter);
 // Skip the tokens already processed
-//        NGC3_counter += 2; 
           NGC3_counter = NGC3_counter + valCount;
         break;
-// VERSION 24 CHANGES BEGIN
-//      case  'frequent_terms:':
-//      case  'frequent_terms':
+
       case frequent_termsToken:
-// VERSION 24 CHANGES END
 // Convert frequent_terms to ATLEAST.
-// frequent_terms may have multiple values enclosed in parenthesis
-// but C1's ATLEAST/X can not handle this. Check how many values
-// are present after frequent_terms.
+// frequent_terms may have multiple values enclosed in
+// parenthesis. but C1's ATLEAST/X can not handle this. 
+// Check how many values are present after frequent_terms.
          valCount = frequentProcessing(NGC3_counter);
          NGC3_counter = NGC3_counter+ valCount;
          break;
-// VERSION 24 CHANGES BEGIN
-//      case 'tk_location':
-//      case 'location':
-//      case 'country':
-//      case 'city':
-//      case 'state':
-//      case 'sourcelocationcountry':
-//      case 'sourcelocationstate':
-//      case 'tk_location:':
-//      case 'location:':
-//      case 'country:':
-//      case 'city:':
-//      case 'state:':
-//      case 'sourcelocationcountry:':
-//      case 'sourcelocationstate:':
+         
       case tk_locationToken:
       case locationToken:
       case countryToken:
@@ -869,163 +781,105 @@ function parseNGC3toC1() {
       case stateToken:
       case sourcelocationcountryToken:
       case sourcelocationstateToken:
-// VERSION 24 CHANGES END
 // All these will be converted to location: in C1.
 	     locationProcessing(NGC3_counter);
          NGC3_counter+=2;
          break;
-// VERSION 24 CHANGES BEGIN
-//       case 'text':
-//       case 'text.case_sensitive':
-//       case 'text:':
-//       case 'text.case_sensitive:':
+         
        case textToken:
        case textcase_sensitiveToken:
-// VERSION 24 CHANGES END
 // Convert text: to text.case_sensitive: in C1.
 // Sometimes the input NGC3 query has errors and it has
 // text.case_sensitive instead of text. Just letting it
-// pass thru. 
-// VERSION 24 CHANGES BEGIN
-//        populateDiv('text.case_sensitive:', 'Normal'); 
-        populateDiv(textcase_sensitiveTokenC1, normalMode);  
-// VERSION 24 CHANGES END
+// pass thru.  
+        populateDiv(textcase_sensitiveTokenC1, normalMode); 
         NGC3_counter++;
         break;
+        
 // author will be retained as such 
-// VERSION 24 CHANGES BEGIN
-//       case 'author':
-//       case 'author:':
        case authorToken:
-//        populateDiv('author:', 'Normal');
-//        populateDiv(NGC3_list[NGC3_counter+1], 'Normal');
         populateDiv(authorTokenC1, normalMode);
         populateDiv(NGC3_list[NGC3_counter+1], normalMode);
-// VERSION 24 CHANGES END
         NGC3_counter+=2;
         break;
-// VERSION 24 CHANGES BEGIN
-//       case 'mediatype:':
-//       case 'mediatype':
-//       case 'medium':
-//       case 'medium:':
-//       case 'broadcast_mediatype_l:':
-//       case 'broadcast_mediatype_l':
+        
        case mediatypeToken:
        case mediumToken:
        case broadcast_mediatype_lToken:
 // mediatype and broadcast_mediatype become medium in C1.
 // Sometimes the input NGC3 query has medium instead of
 // mediatype. Letting it pass thru without flagging an
-// error. broadcast_mediatype_l will also be converted to medium
-// but it has an additional token of 1 or 2.
-// Call the media_type_processing function. valCount is the number
-// of tokens that have been processed
+// error. broadcast_mediatype_l will also be converted to
+// medium but it has an additional token of 1 or 2.
+// Call the media_type_processing function. valCount is the
+// number of tokens that have been processed
         valCount = media_Type_Processing(NGC3_counter);  
         NGC3_counter = NGC3_counter+valCount;
-// VERSION 24 CHANGES END
         break;
-// VERSION 24 CHANGES BEGIN
-//      case 'sentiment':
-//      case 'sentiment:':
+        
       case sentimentToken:
-// VERSION 24 CHANGES END
 // As of now, no changes will be made to this keyword or
-// its values. This is wrong according to Kathryn Howell. C1 has
-// no equivalent to this.
-// VERSION 24 CHANGES BEGIN 
-//        populateDiv('sentiment:', 'Error'); 
+// its values. This is wrong according to Kathryn Howell. 
+// C1 has no equivalent to this.
         populateDiv(sentimentTokenC1, errorMode); 
-//        Error_list.push(`No equivalent exists for token: 
-// ${token}`);
         Error_list.push(sentimentError);
 // the sentiment value will also be pushed without changes
-//        populateDiv(NGC3_list[NGC3_counter+1], 'Error');
         populateDiv(NGC3_list[NGC3_counter+1], errorMode);
-// VERSION 24 CHANGES END
         NGC3_counter+=2;
         break;
-// VERSION 24 CHANGES BEGIN
-//      case 'impact:':
-//      case 'impact':
+
       case impactToken:
-// VERSION 24 CHANGES END
 // GU-CisionOne vs. NGC3 BOOLEAN Comparison-250524-015152
 // With that as reference, impact will be converted to
 // impact_score_grade.
-// 
-// VERSION 24 CHANGES BEGIN
-//        populateDiv('impact_score_grade:', 'Normal');
-//        populateDiv(NGC3_list[NGC3_counter+1], normalMode);
+
 // Check if correct impact codes have been used
-        impactProcessing(NGC3_counter+1);
-// VERSION 24 CHANGES END
-        NGC3_counter+=2;
+// Impact processing can also have multiple codes enclosed 
+// in a parenthesis.
+        valCount = impactProcessing(NGC3_counter+1);
+// valCount is the number of tokens that have been processed
+// in the function impactProcessing. +1 is for the token
+// impact:
+        NGC3_counter=NGC3_counter+valCount+1;
         break;
-// VERSION 24 CHANGES BEGIN
-//      case 'seo:':
-//      case 'seo':
+
       case seoToken:
 // According to Kathryn Howell, seo has no equivalent in C1.
-//        populateDiv('seo:', 'Error');
-//        Error_list.push(`No equivalent exists for token: ${token}`);
         populateDiv(seoTokenC1, errorMode);
         Error_list.push(seoError);
-// VERSION 24 CHANGES END
+
 // the seo value will also be pushed without changes
         populateDiv(NGC3_list[NGC3_counter+1], errorMode);
         NGC3_counter+=2;
         break;
-// VERSION 24 CHANGES BEGIN
-//      case 'headline:':
-//      case 'headline':
-      case headlineToken:
-// VERSION 24 CHANGES END        
+
+      case headlineToken:       
 // This will be converted to a combination of title: and 
 // text.case_sensitive: in C1
 // valCount is the number of tokens to skip
         valCount = headlineProcessing(NGC3_counter+1);
         NGC3_counter = NGC3_counter+ valCount+1;
         break;
-// VERSION 24 CHANGES BEGIN
-//      case 'title:':
-//      case 'title':
+
       case titleToken:
 // This will be translated as title
-//        populateDiv('title:', 'Normal');
         populateDiv(titleTokenC1, normalMode);
-// VERSION 24 CHANGES END   
-// the title/headline will also be pushed without changes
-// VERSION 28 CHANGES BEGIN
-// Let us do a nestedOR processing of the title elements
-//        populateDiv(NGC3_list[NGC3_counter+1], 
-// normalMode);
-//        NGC3_counter+=2;
         NGC3_counter++;
-// VERSION 28 CHANGES END
         break;
-// VERSION 24 CHANGES BEGIN
-//      case 'tk_filter':
-//      case 'tk_filter:':
-//      case 'filter':
-//      case 'filter:':
+        
       case tk_filterToken:
       case filterToken:
-// VERSION 24 CHANGES BEGIN
 // filter considered a synonym of tk_filter
-// Usually, valCount = 2. 1 for tk_filter and 1 for the filter 
-// after that. But if paterns like tk_filter:"WM Heartland | 
-// Exclusions"  OR "11340208 is WM Heartland | Exclusions" is 
-// encountered, valCount will be 4.
+// Usually, valCount = 2. 1 for tk_filter and 1 for the
+// filter after that. But if paterns like tk_filter:"WM
+// Heartland | Exclusions"  OR "11340208 is WM Heartland |
+// Exclusions" is encountered, valCount will be 4.
 //
         valCount = TK_Filter_Processing(NGC3_counter);
         NGC3_counter = NGC3_counter + valCount;  
         break;
-// VERSION 24 CHANGES BEGIN
-//      case 'tk_custom':
-//      case 'tk_custom:':
-      case tk_customToken:
-// VERSION 24 CHANGES END       
+        
+      case tk_customToken:       
 // Usually, valCount = 2. 1 for tk_custom and 1 for the
 // filter after that. But if tk_custom:"Keywords" or  
 // patterns like tk_custom:'WM Phoenix Open'" OR "820742 
@@ -1034,11 +888,8 @@ function parseNGC3toC1() {
         valCount = TK_Custom_Processing(NGC3_counter);
         NGC3_counter = NGC3_counter + valCount;  
         break;
-// CHANGES FOR VERSION 24 BEGIN
-//      case 'tk_company:':
-//      case 'tk_company':
+        
       case tk_companyToken:
-// CHANGES FOR VERSION 24 END
 // tk_company may have 1 value or be in the format:
 // tk_company:"WM: Earned Media Coverage" OR "498518 = WM | 
 // All Coverage" 
@@ -1048,23 +899,7 @@ function parseNGC3toC1() {
         valCount = TK_Company_Processing(NGC3_counter);
         NGC3_counter = NGC3_counter + valCount;  
         break;
-// VERSION 24 CHANGES BEGIN
-//      case 'tk_competitor':
-//      case 'tk_competitor:':
-//      case 'publisher':
-//      case 'publisher:':
-//      case 'search_id:':
-//      case 'search_id':
-//      case 'seq_id':
-//      case 'seq_id:':
-//      case 'article_id:':
-//      case 'article_id':
-//      case 'data_source_s':
-//      case 'data_source_s:':
-//      case 'tag:':
-//      case 'tag':
-//      case 'url_path_sections':
-//      case 'url_path_sections:':
+        
         case tk_competitorToken:
         case publisherToken:
         case searchIdToken:
@@ -1076,33 +911,23 @@ function parseNGC3toC1() {
 // Details of how to process these keywords has not yet
 // been shared for all the above keywords. 
 // 
-//        Error_list.push(`Conversion method not shared for token: ${token}`);
           Error_list.push(conversionError + token);
-// VERSION 24 CHANGES END
 // There maybe more than 1 value, maybe a stream of tokens
         valueCount = checkTokenStream(token,NGC3_counter);
-// Display keywords for which there is no conversion in C1 as
-// an error in the DIV area.
+// Display keywords for which there is no conversion in C1
+// as an error in the DIV area.
         populateTokenStream(NGC3_counter, valueCount);
 // Adding + 1 for the currentToken also
         NGC3_counter = NGC3_counter+valueCount+1;
         break;
-// VERSION 24 CHANGES BEGIN
-//      case 'seo_impact:':
-//      case 'seo_impact':
-//      case 'tk_readership:':
-//      case 'tk_readership':
+        
       case seoImpactToken:
       case tkReadershipToken:
-// VERSION 24 CHANGES END
 // Details of how to process these keywords has not yet
 // been shared for all the above keywords.These 2 have a
 // range specified in square brackets.
 //
-// VERSION 24 CHANGES BEGIN
-//        Error_list.push(`Conversion method not shared for token: //${token}`);
         Error_list.push(conversionError + token);
-// VERSION 24 CHANGES END
 // At NGC3_counter: seo_impact or tk_readership
 // NGC3_counter+1: [ (opening square bracket)
 // NGC3_counter+ 2: low number for the range
@@ -1110,11 +935,12 @@ function parseNGC3toC1() {
 // NGC3_counter+4: high number of the range
 // NGC3_counter+5: ] (closing square bracket)
 //
-// Display keywords for which there is no conversion in C1 as
-// an error in the DIV area.
+// Display keywords for which there is no conversion in C1
+// as an error in the DIV area.
         populateTokenStream(NGC3_counter, 5);
         NGC3_counter+=6;
         break;
+        
       default:
 // This is not a known token. This could still be valid,
 // since websites and single word searches may not be
@@ -1127,26 +953,32 @@ function parseNGC3toC1() {
   }
 }
 
-// Near processing. In NGC3, 2 or more words in double quotes 
-// followed by a ~ and a number is converted to NEAR in C1.
-// - 2 words in doubles quotes "First Second"~n will be converted
-// to ("First" NEAR/n "Second")
+// Near processing. In NGC3, 2 or more words in double
+// quotes followed by a ~ and a number is converted to 
+// NEAR in C1.
+// - 2 words in doubles quotes "First Second"~n will be
+// converted to ("First" NEAR/n "Second")
 //
-// - If there are 3-4 words before a ~, the query will  be checked 
-// for a tilde stream. A tilde stream is a query like this:
-// "Common Phrase Word1 Word2"~n OR "Common Phrase Word3"~n OR 
+// - If there are 3-4 words before a ~, the query will be
+// checked for a tilde stream. A tilde stream is a query
+// like this:
+// "Common Phrase Word1 Word2"~n OR "Common Phrase Word3"~n
+// OR 
 // "Common Phrase Word4 Word5 Word6"~n
 // Or:
-// "Word1 Word2 Common Phrase"~n OR "Word3 Common Phrase"~n OR 
+// "Word1 Word2 Common Phrase"~n OR "Word3 Common Phrase"~n
+// OR 
 // "Word4 Word5 Word6 Common Phrase"~n
 //
-// To be a tilde stream, query segments with ~ should be unbroken
-// and continuous, have same number "n" after the ~ and all of them
-// must have the same "Common Phrase". 
+// To be a tilde stream, query segments with ~ should be
+// unbroken and continuous, have same number "n" after the
+// ~ and all of them must have the same "Common Phrase". 
 //
-// - A tilde stream will be converted as: ("Commomon Phrase" NEAR/n // ("Word1 Word2" OR "Word3" OR "Word4 Word5"))
-// - If a phrase is 3-4 characters long, has a ~ but it is not 
-// part of a tilde stream, it will be converted differently.
+// - A tilde stream will be converted as: ("Commomon Phrase"
+// NEAR/n ("Word1 Word2" OR "Word3" OR "Word4 Word5"))
+// - If a phrase is 3-4 characters long, has a ~ but it is
+// not part of a tilde stream, it will be converted
+// differently.
 //
 
 function nearProcessing(index) {
@@ -1165,7 +997,8 @@ function nearProcessing(index) {
   let moveIndex =0;
   
 // Find the number of words in the wordToken 
-// Split the string at each space and find the number of words
+// Split the string at each space and find the number of
+// words
   let words = wordToken.split(' ');  
   let wordCount = words.length;
 
@@ -1179,7 +1012,6 @@ function nearProcessing(index) {
     firstWord = firstWord.replace(/["'“”‘’]/g, '');
     secondWord = secondWord.replace(/["'“”‘’]/g, '');
   
-// VERSION 24: Complex Function Note:
 // Leaving the hard-coding as it is for now. 
     let nearString = '("' + firstWord + '"' + " NEAR/" + numberToken + ' "' + secondWord + '")';
     
@@ -1194,8 +1026,8 @@ function nearProcessing(index) {
 // If there are more than 2 words, check if there's a tilde
 // stream.
  else if (wordCount > 2) {
-// moveIndex is the number of tokens already processed by the
-// function checkTildeStorm.   
+// moveIndex is the number of tokens already processed by
+// the function checkTildeStorm.   
    moveIndex = checkTildeStorm(index, wordToken, numberToken);
  }
  
@@ -1203,8 +1035,8 @@ function nearProcessing(index) {
 }
 
 function checkTildeStorm(index, wordToken, numberToken) {
-// Here is where the presence of a tilde storm is detected and
-// processed
+// Here is where the presence of a tilde storm is detected
+// and processed
 
 // Declare list that will hold the possible tilde storm
    let tildeStorm = [];
@@ -1218,15 +1050,17 @@ function checkTildeStorm(index, wordToken, numberToken) {
   let printBooleanOperator = true;
   
 // This matrix will have 1 flag per phrase. It will indicate
-// which of the phrases have the common words and which do not.
+// which of the phrases have the common words and which do
+// not.
   let commonPhraseMatrix=[];
 
-// Loop as long as you find the ~ in the same spot, the number
-// token next to the ~ is the same and the end of tokens in
-// NGC3_list is not reached.
+// Loop as long as you find the ~ in the same spot, the
+// number token next to the ~ is the same and the end of
+// tokens in NGC3_list is not reached.
 //
   while ((index+5) < NGC3_list.length && NGC3_list[index + 4] === '~' && NGC3_list[index + 5] === numberToken) {
-// Push this wordToken, ~ and numberToken to a list. This could
+// Push this wordToken, ~ and numberToken to a list. This
+// could be a tilde storm.
 // We will process the storm later.
 // Index -1 points to the phrase
 // index points to the ~
@@ -1245,10 +1079,10 @@ function checkTildeStorm(index, wordToken, numberToken) {
     index += 4;
   }  // Looping thru tokens in NGC3_list ends here
 
-// End of loop reached. We still haven't pushed the last entry
-// to the tildeStorm list. We can push it if there are other 
-// entries in the list. Otherwise, this could be a lone ~ and
-// should be parsed differently. 
+// End of loop reached. We still haven't pushed the last
+// entry to the tildeStorm list. We can push it if there 
+// are other entries in the list. Otherwise, this could be 
+// a lone ~ and should be parsed differently. 
 //
   if (tildeStorm.length !== 0) {
     tildeStorm.push (NGC3_list[index - 1]);
@@ -1264,8 +1098,8 @@ function checkTildeStorm(index, wordToken, numberToken) {
    let results = findCommonWordsMaster(phrases);
    commonPhrase = results.commonWords;
    commonPhraseMatrix = results.commonWordsMatrix;
-// Push common words to an array for later use in the function
-// parseLongPhrases
+// Push common words to an array for later use in the
+// function parseLongPhrases
     encounteredCommonPhrases.push(commonPhrase);   
 }
   else {
@@ -1281,9 +1115,9 @@ function checkTildeStorm(index, wordToken, numberToken) {
 // Check if commonPhrase is empty. If yes, tildeStorm has a
 // series of long phrases.
     if (!commonPhrase) {
-// This could be multiple tilde entries or a lone tilde entry.
-// But they don't have any phrases in common, even if there are
-// multiple entries.
+// This could be multiple tilde entries or a lone tilde
+// entry.But they don't have any phrases in common, even if
+// there are multiple entries.
 //
 // longPhraseCounter points to the ~
 //
@@ -1294,8 +1128,8 @@ function checkTildeStorm(index, wordToken, numberToken) {
 // number token
           parseLongPhrases(index, tildeStorm[longPhraseCounter-1], tildeStorm[longPhraseCounter+1]);
 
-// Push the boolean query operator. Do not push it if this is
-// the last phrase
+// Push the boolean query operator. Do not push it if this
+// is the last phrase
          if ((longPhraseCounter+4) < tildeStorm.length) {
             populateDiv(tildeStorm[longPhraseCounter+2], 'Normal');          
          }
@@ -1335,12 +1169,13 @@ function checkTildeStorm(index, wordToken, numberToken) {
       
              else { 
                populateDiv(`${tildeStorm[tildeLoopCounter +3]} "${wordTokenRemaining}" `, 'Normal'); 
-// Add a )) if the next phrase does not have the common phrase or
-// if this is the last phrase
+// Add a )) if the next phrase does not have the common
+// phrase or if this is the last phrase
                  if (commonPhraseMatrix[loopCounter+1] === 'N' || typeof commonPhraseMatrix[loopCounter+1] === 'undefined') {
                   populateDiv(`))`, 'Normal');
                }
-// Add a boolean operator if there's a long phrase after this
+// Add a boolean operator if there's a long phrase after
+// this
                  if (commonPhraseMatrix[loopCounter+1] === 'N') {
                   populateDiv(` ${tildeStorm[tildeLoopCounter +3]} `, 'Normal');
                }
@@ -1369,19 +1204,17 @@ function checkTildeStorm(index, wordToken, numberToken) {
 // In tildeStorm[], the boolean operator is in position 
 // tildeLoopCounter+3. Before the final tildeLoopCounter = 
 // tildeLoopCounter+4, that is. So we have to look for OR 
-// at position tildeLoopCounter+3-4. Which is tildeLoopCounter - 1.
+// at position tildeLoopCounter+3-4. Which is
+// tildeLoopCounter - 1.
 //
       if (tildeStorm[tildeLoopCounter - 1] === 'OR' && printBooleanOperator) {
-// DEBUG BEGIN
-//        printBooleanOperator = true;
         printBooleanOperator = false;
-// DEBUG END
         populateDiv(tildeStorm[tildeLoopCounter -1], 'Normal');
       }
   }
   
-// Return the difference between the final value of the index and
-// the entry value. 
+// Return the difference between the final value of the
+// index and the entry value. 
   return(index +1);
 }   
 
@@ -1416,8 +1249,8 @@ function parseLongPhrases(index, wordToken, numberToken) {
 // Constructed output string
   let outputString;
   
-// First check if a part of the phrase under scrutiny was used
-// as a commonPhrase thus far.
+// First check if a part of the phrase under scrutiny was
+// used as a commonPhrase thus far.
   loopCounter = 0;
 
 // Strip single quotes, double quotes and curly quotes 
@@ -1427,8 +1260,8 @@ function parseLongPhrases(index, wordToken, numberToken) {
   let matchFound = false;
   
   while (loopCounter < encounteredCommonPhrases.length) {
-// Check if the wordToken starts with or ends with any of the
-// encountered common phrases
+// Check if the wordToken starts with or ends with any of
+// the encountered common phrases
     if (newWordToken.startsWith(encounteredCommonPhrases[loopCounter])) {
 // Match with a prior common phrase found
     secondPart = removeCommonWords(newWordToken,encounteredCommonPhrases[loopCounter]);
@@ -1450,7 +1283,6 @@ function parseLongPhrases(index, wordToken, numberToken) {
   if (matchFound) {
     populateDiv(`("${encounteredCommonPhrases[loopCounter]}" NEAR/${numberToken} "${secondPart}")`);
   }
-//  if (wordCount === 3) {
   else if (wordCount === 3) {
     firstPart = words[0]; 
     secondPart = words[1] + " " + words[2]; 
@@ -1462,36 +1294,23 @@ function parseLongPhrases(index, wordToken, numberToken) {
   else if (wordCount === 4) {
     firstPart = words[0] + " " + words[1]; 
     secondPart = words[2] + " " + words[3]; 
-// VERSION 26 CHANGES BEGIN
-// Incorrect placement of double quotes corrected
-//    populateDiv(`"(${firstPart}" NEAR/${numberToken} //${secondPart})`, 'Normal');
 // Construct the output string
     outputString = '(' + firstPart + '" NEAR/' + numberToken + ' "'+ secondPart + ')';
     populateDiv(outputString, 'Normal');
-// VERSION 26 CHANGES END
   } 
   
   else if (wordCount === 5) {
     firstPart = words[0] + " " + words[1];
     secondPart = words[2] + " " + words[3] + " " + words[4]; 
-// VERSION 26 CHANGES BEGIN
-// Incorrect placement of double quotes corrected
-//    populateDiv(`"(${firstPart}" NEAR/${numberToken} //${secondPart})`, 'Normal');
     outputString = '(' + firstPart + '" NEAR/' + numberToken + ' "'+ secondPart + ')';
     populateDiv(outputString, 'Normal');
-// VERSION 26 CHANGES END
   } 
   
   else if (wordCount === 6) {
     firstPart = words[0] + " " + words[1] + " " + words[2];
     secondPart = words[3] + " " + words[4] + " " + words[5]; 
-// VERSION 26 CHANGES BEGIN
-// Incorrect placement of double quotes corrected
-//    populateDiv(`"(${firstPart}" NEAR/${numberToken} 
-// ${secondPart})`, 'Normal');
     outputString = '(' + firstPart + '" NEAR/' + numberToken + ' "'+ secondPart + ')';
     populateDiv(outputString, 'Normal');
-// VERSION 26 CHANGES END
   } 
   
   else {
@@ -1508,13 +1327,15 @@ let firstWords = [];
 // This array will hold all the 1st two words of each phrase
 let firstTwoWords = [];
 
-// This array will hold all the 1st three words of each phrase
+// This array will hold all the 1st three words of each
+// phrase
 let firstThreeWords = [];
 
 // This array will hold all the last words of each phrase
 let lastWords = [];
   
-// This array will hold all the last two words of each phrase
+// This array will hold all the last two words of each
+// phrase
 let lastTwoWords = [];
 
 // temporary word
@@ -1570,8 +1391,8 @@ let commonFirstThreeWords;
 let commonLastWord;
 let commonLastTwoWords;
   
-// Loop thru the first words. We are trying to see which word
-// was used the most.
+// Loop thru the first words. We are trying to see which
+// word was used the most.
 loopIndex = 0;
 
 while (loopIndex < firstWords.length) {
@@ -1598,8 +1419,8 @@ while (loopIndex < firstWords.length) {
 
 commonFirstWord = maxString;
   
-// Loop thru the first two words. We are trying to see which word
-// was used the most.
+// Loop thru the first two words. We are trying to see which
+// word was used the most.
 loopIndex = 0;
 
 maxCount = 0;
@@ -1629,8 +1450,8 @@ while (loopIndex < firstTwoWords.length) {
 
 commonFirstTwoWords = maxString;
 
-// Loop thru the first three words. We are trying to see which word
-// was used the most.
+// Loop thru the first three words. We are trying to see
+// which word was used the most.
 loopIndex = 0;
 
 maxCount = 0;
@@ -1763,15 +1584,14 @@ function languageProcessing(index) {
 // index+ 1 points to the NGC3 language.
   let NGC3_language = NGC3_list[index + 1];
 
-// VERSION 24 CHANGES BEGIN
-// Sometimes, language maybe enclosed in parenthesis. Skip that.
+// Sometimes, language maybe enclosed in parenthesis. Skip
+// that.
   if (NGC3_language === leftParenthesisValue) {
     NGC3_language = NGC3_list[index + 2];
 
 // 4 tokens should be skipped in this case.
     valCount = 4;
   }
-// VERSION 24 CHANGES END
   
 // Strip single quotes, double quotes and curly quotes 
   let NGC3_languageNoQuotes = NGC3_language.replace(/["'“”‘’]/g, "");
@@ -1779,9 +1599,9 @@ function languageProcessing(index) {
 // This will hold the result from the function
   let C1_language;
   
-// NGC3_languageNGC3 language will will be converted to C1 language
-// codes. The function readLanguageCodesCSV reads the CSV file
-// that lists NGC3 and its C1 equivalent.
+// NGC3_languageNGC3 language will will be converted to C1
+// language codes. The function readLanguageCodesCSV reads
+// the CSV file that lists NGC3 and its C1 equivalent.
 //
   C1_language = readLanguageCodesCSV(NGC3_languageNoQuotes);
   
@@ -1821,7 +1641,6 @@ function frequentProcessing(index) {
 // Check if the token is a parenthesis.
   if (termToken === leftParenthesisValue ) {
     
-// VERSION 28 CHANGES BEGIN
 // Check how many values are enclosed between parenthesis. 
 // If there is only 1 value, process it. Otherwise,
 // Flag everything as an error.
@@ -1835,7 +1654,6 @@ function frequentProcessing(index) {
         valCount = valCount+3;
      }
      else {
-// VERSION 28 CHANGES END
         while (termToken !== rightParenthesisValue) {
            populateDiv(termToken, errorMode);
            index++;
@@ -1855,9 +1673,8 @@ function frequentProcessing(index) {
 // its C1 equivalent.
         Error_list.push(frequent_termsError);
      }
-// VERSION 28 CHANGES BEGIN
   }
-// VERSION 28 CHANGES END
+
   else {
 // Push a left parenthesis
       populateDiv(leftParenthesisValue, normalMode);
@@ -1887,16 +1704,16 @@ function locationProcessing(index) {
   
 // No processing will be done. We will translate the NGC3
 // keyword to C1. But the location value will be pushed as
-// it is.
-// VERSION 29 CHANGES BEGIN
-//  populateDiv(locationTokenC1, normalMode);
-//  populateDiv(locationValue, normalMode);
+// it is. All keywords and values of location will be 
+// highlighted.
   populateDiv(locationTokenC1, highlightMode);
   populateDiv(locationValue, highlightMode);
-// VERSION 29 CHANGES END
 }
 
 function Media_Type_Detailed_Processing(index) {
+// All keywords and values related to medium will be
+// highlighted.
+  
 // Load and process mediatype settings
   const thisMediaType = NGC3_list[index + 1];
   
@@ -1905,46 +1722,28 @@ function Media_Type_Detailed_Processing(index) {
   
   switch (thisMediaTypeNoQuotes) {
       case NewsValue:
-// VERSION 29 CHANGES BEGIN
-//          populateDiv(onlineValue, normalMode);
           populateDiv(onlineValue, highlightMode);
-// VERSION 29 CHANGES END
           break;
       case PodcastValue:
       case podcastValue:
-// VERSION 29 CHANGES BEGIN
-//          populateDiv(PodcastValue, normalMode);
           populateDiv(PodcastValue, highlightMode);
-// VERSION 29 CHANGES END
           break;
       case BroadcastValue:
       case broadcastValue:
-// VERSION 29 CHANGES BEGIN      
-//          populateDiv(TVOrRadioValue, normalMode);
           populateDiv(TVOrRadioValue, highlightMode);
-// VERSION 29 CHANGES END
           break;  
       case PrintValue:
       case NewsLicensedValue:
       case PrintLicensedValue:
-// VERSION 29 CHANGES BEGIN  
-//          populateDiv(printOrMagazineValue, normalMode);
-          populateDiv(printOrMagazineValue, highlightMode);
-// VERSION 29 CHANGES END      
+          populateDiv(printOrMagazineValue, highlightMode); 
           break;
       case number1:
 // This means the previous token was broadcast_mediatype
-// VERSION 29 CHANGES BEGIN       
-//          populateDiv(TVValue, normalMode);
-          populateDiv(TVValue, highlightMode);
-// VERSION 29 CHANGES END       
+          populateDiv(TVValue, highlightMode);     
           break;
       case number2:
 // This means the previous token was broadcast_mediatype
-// VERSION 29 CHANGES BEGIN       
-//          populateDiv(radioValue, normalMode);
-          populateDiv(radioValue, highlightMode);
-// VERSION 29 CHANGES END       
+          populateDiv(radioValue, highlightMode);   
           break;
         case BlogValue:
         case BlogsValue:
@@ -1953,33 +1752,27 @@ function Media_Type_Detailed_Processing(index) {
         case BlogLicensedValue:
         case blogLicensedValue:
           Error_list.push(mediatypeC1Error + thisMediaType);
-// VERSION 29 CHANGES BEGIN 
-//          populateDiv(thisMediaType, errorMode);
           populateDiv(thisMediaType, highlightErrMode);
-// VERSION 29 CHANGES END  
           break;
       default: 
           Error_list.push(mediatypeError + thisMediaType);
-// VERSION 29 CHANGES BEGIN     
-//          populateDiv(thisMediaType, errorMode);
-          populateDiv(thisMediaType, highlightErrMode);
-// VERSION 29 CHANGES END  
+          populateDiv(thisMediaType, highlightErrMode); 
       break;
   }
 }
 
 function TK_Filter_Processing(index) {
-// Process filters based on the type. There are a few anomalies.
-// For example:
+// Process filters based on the type. There are a few
+// anomalies. For example:
 // tk_filter:"WM Heartland | Exclusions"  OR "11340208 
 // is WM Heartland | Exclusions" 
 // Such cases should be flagged as errors.
 //
   const filterType = NGC3_list[index + 1];
   
-// Initialize return value. This is the number of tokens to skip.
-// 1 for tk_filter and 1 for the token. However, for variants,
-// the number of tokens to skip will be higher.
+// Initialize return value. This is the number of tokens to
+// skip. 1 for tk_filter and 1 for the token. However, for
+// variants, the number of tokens to skip will be higher.
   let valCount = 2;
   
 // Initialize array that will hold the variant's value.
@@ -1989,40 +1782,27 @@ function TK_Filter_Processing(index) {
   const filterTypeNoQuotes = filterType.replace(/["'“”‘’]/g, '');
   
   switch (filterTypeNoQuotes) {
-// VERSION 24 CHANGES BEGIN
-//    case 'Master Exclusive':
     case masterExclusiveValue:
-// VERSION 24 CHANGES END
       populateDiv(masterExclusiveContent.join(' '), normalMode); 
       break;
-// VERSION 24 CHANGES BEGIN
-//    case 'Deals & Coupons':
+
     case dealsCouponsValue:
-// VERSION 24 CHANGES END
       populateDiv(dealsCouponsContent.join(' '), normalMode);
       break;
-// VERSION 24 CHANGES BEGIN      
-//    case 'Earnings & Stock News':
+
     case earningsStockNewsValue:
-// VERSION 24 CHANGES END
       populateDiv(earningsStockNewsContent.join(' '), normalMode);
       break;
-// VERSION 24 CHANGES BEGIN        
-//    case 'Job Postings':
-    case jobPostingsValue:
-// VERSION 24 CHANGES END     
+
+    case jobPostingsValue:    
       populateDiv(jobPostingsContent.join(' '), normalMode); 
       break;
-// VERSION 24 CHANGES BEGIN       
-//    case 'Press Release':
-    case pressReleaseValue:
-// VERSION 24 CHANGES END        
+
+    case pressReleaseValue:      
       populateDiv(pressReleaseContent.join(' '), normalMode); 
       break;
+      
     case marketResearchReportsValue:
-// VERSION 25 CHANGES BEGIN
-      marketResearchReportsFlag = true;
-// VERSION 25 CHANGES END
       populateDiv(marketResearchReportsContent.join(' '), normalMode); 
       break;
     default:
@@ -2033,10 +1813,8 @@ function TK_Filter_Processing(index) {
 // Load index+3 into a temporary string. Then, strip single
 // quotes, double quotes and curly quotes from the token.
 //
-// VERSION 25 CHANGES BEGIN
 // Check if there is a valid value at NGC3_list[index+3]
       if (NGC3_list[index+3]) {
-// VERSION 25 CHANGES END
         tempToken = NGC3_list[index+3].replace(/["'“”‘’]/g, '');
       
 // Now, if this is a variant, tempToken will have something
@@ -2044,9 +1822,7 @@ function TK_Filter_Processing(index) {
 // split at blank spaces and load to the array.
         finalToken = tempToken.split(' ');
 
-// VERSION 25 CHANGES BEGIN
       }
-// VERSION 25 CHANGES BEGIN
 // Move to a constant for typecasting to avoid run-time
 // errors in the next if.
       const numValue = Number(finalToken[0]);
@@ -2089,8 +1865,8 @@ function TK_Custom_Processing(index) {
 // Initialize the value of the return variable.
 // This will usually be 2. 1 for tk_custom and 1 for the
 // filter. But if the filter is "Keywords", there are 2
-// extra values that appear after that. Then, tk_custom looks 
-// like this:
+// extra values that appear after that. Then, tk_custom
+// looks like this:
 // tk_custom:'Keywords' OR "3655606 = Keywords"
 // There are a few more anomalies:
 // tk_custom:'WM Phoenix Open'" OR "820742 = WM Phoenix 
@@ -2100,47 +1876,36 @@ function TK_Custom_Processing(index) {
 // All these should be flagged as errors.
   let valCount = 2;
   
-// Initialize array that will hold the values, in the check for a
-// variant.
+// Initialize array that will hold the values, in the check
+// for a variant.
   let finalToken = [];
   
   switch (filterTypeNoQuotes) {
-// VERSION 24 CHANGES BEGIN
-//    case 'Obituaries Filter':
     case obituariesFilterValue:
-// VERSION 24 CHANGES END
       populateDiv(obituariesContent.join(' '), normalMode); 
       break;
-// VERSION 24 CHANGES BEGIN
-//    case 'Sports Filter': 
+      
     case sportsFilterValue:
-// VERSION 24 CHANGES END
       populateDiv(sportsContent.join(' '), normalMode);  
       break;
-// VERSION 24 CHANGES BEGIN
-//    case 'Keywords:':
-//    case 'Keywords':
+
     case keywordsValue:
-// VERSION 24 CHANGES END
     default:
-// These are errors. Check what kind of error first. if index+3 
-// has a number, we have a variant.
+// These are errors. Check what kind of error first. if
+// index+3 has a number, we have a variant.
       
 // Load index+3 into a temporary string. Then, strip single
 // quotes, double quotes and curly quotes from the token.
 //
-// VERSION 25 CHANGES BEGIN
 // Check if there is a valid value at NGC3_list[index+3]
        if (NGC3_list[index+3]) {
-// VERSION 25 CHANGES END
           tempToken = NGC3_list[index+3].replace(/["'“”‘’]/g, '');
       
 // split at blank spaces and load to the array.
           finalToken = tempToken.split(' ');
-// VERSION 25 CHANGES BEGIN
        }
-// VERSION 25 CHANGES BEGIN
-// Move to a constant for typecasting to avoud run-time errors
+// Move to a constant for typecasting to avoud run-time
+// errors
        const numValue = Number(finalToken[0]);
       
 // Check if numValue is an integer
@@ -2150,18 +1915,18 @@ function TK_Custom_Processing(index) {
         
 // The return value this time will be 4.
          valCount = 4;
-// Push the erroneous keywords to the output and flag it as an
-// error.
+// Push the erroneous keywords to the output and flag it as
+// an error.
          populateTokenStream(index, 3);
       }
       
       else {
-// There was no variant. Just a single token after tk_custom, 
-// but that's an unrecognized token.
+// There was no variant. Just a single token after
+// tk_custom, but that's an unrecognized token.
          Error_list.push(tk_customError + filterTypeNoQuotes);
 
-// Push the erroneous keywords to the output and flag it as an
-// error.
+// Push the erroneous keywords to the output and flag it as
+// an error.
          populateTokenStream(index, 1);
       }
       break;
@@ -2183,7 +1948,8 @@ function displayErrorList() {
   }
   
 // Join the list's contents into a single string with a 
-// space as separator. Join with a comma for clear separation
+// space as separator. Join with a comma for clear
+// separation
     const errorString = Error_list.join(', ');  
   
 // Display the current date and time in the error window
@@ -2192,45 +1958,28 @@ function displayErrorList() {
   let timeString = now.toLocaleTimeString();  // Format the time
   let dateTimeString = dateTimePrefix + dateString + " " + timeString
 
-// VERSION 25 CHANGES BEGIN
-// Contents are getting overwritten. Try something new.
-//  select('#errorArea').value(dateTimeString);
-// VERSION 25 CHANGES END
-
 // Display the current version of the program
   let programName = h1PageHeading + versionPrefix + h5PageHeading;
   
-// VERSION 25 CHANGES BEGIN
-// Contents are getting overwritten. Try something new.
-//  select('#errorArea').value(programName);
     consolidatedString = dateTimeString + '\n' + programName + '\n';
-// VERSION 25 CHANGES END
   
-// VERSION 26 CHANGES BEGIN
 // Add a hard return
   consolidatedString = consolidatedString + '\n';
-// VERSION 26 CHANGES END
 
 // See if there were any errors
   if (errorString === "") {
-// VERSION 25 CHANGES BEGIN
-//    select('#errorArea').value(noErrors);
     consolidatedString = consolidatedString + noErrors;
-// VERSION 25 CHANGES END
   } 
   else {
-// VERSION 25 CHANGES BEGIN
-//    select('#errorArea').value(errorString);
     consolidatedString = consolidatedString + errorString;
   }
   
   select('#errorArea').value(consolidatedString);
-// VERSION 25 CHANGES END
 }
 
  function wordTokenProcessing(index) {
-// Directly add word tokens to DIV area. No further processing
-// needed
+// Directly add word tokens to DIV area. No further
+// processing needed
  populateDiv(NGC3_list[index], normalMode);
  }
 
@@ -2264,8 +2013,8 @@ function hyphenWordProcessing(token, index, mode) {
   
   else {
     
-// This is a possible range. String it together and push it to the
-// output. Flag it as an error.
+// This is a possible range. String it together and push it
+// to the output. Flag it as an error.
     consolidatedToken = token + hyphenToken + nextNextToken;
     
     if (mode === parseMode) {
@@ -2275,7 +2024,6 @@ function hyphenWordProcessing(token, index, mode) {
 // Flag an error
       Error_list.push(strayRangeError + consolidatedToken);
   }
-// VERSION 24 CHANGES - COMPLETE REWRITE - END
 }
 
 function checkSyntax() {
@@ -2296,25 +2044,20 @@ function checkSyntax() {
     const currentToken = NGC3_list[NGC3_counter];
     const nextToken = NGC3_list[NGC3_counter+1];
  
-// Handling tokens that are words enclosed in double quotes, single
-// quotes, single curly or double curly quotes.
+// Handling tokens that are words enclosed in double quotes,
+// single quotes, single curly or double curly quotes.
 // Skip all such words. No checking needed.
-// VERSION 25 CHANGES BEGIN
-//    if (currentToken.startsWith('"') && //currentToken.endsWith('"'))     {
+
     if 
       ((currentToken.startsWith('"') && currentToken.endsWith('"')) ||
        (currentToken.startsWith("'") && currentToken.endsWith("'")) || 
        (currentToken.startsWith('‘') && currentToken.endsWith('’')) ||
       (currentToken.startsWith('“') && currentToken.endsWith('”')))     {
-// VERSION 25 CHANGES END
       NGC3_counter++;
       continue; // Skip to the next token
     }
 
-// VERSION 25 CHANGES BEGIN    
-//    if (NGC3_list[NGC3_counter+1] === '-') {
     if (NGC3_list[NGC3_counter+1] === hyphenToken) {
-// VERSION 25 CHANGES END
 // If the current token and the token after the hyphen are
 // not numbers, string these 3 as a word, then skip the
 // processing of all 3 tokens. 
@@ -2322,32 +2065,18 @@ function checkSyntax() {
 // This function has 2 modes: Parse and Check. In the 
 // Parse mode, it will also write to the output list.
 //
-// VERSION 24 CHANGES BEGIN
-//        numericOrString = hyphenWordProcessing(currentToken, //NGC3_counter, "Check");
         hyphenWordProcessing(currentToken, NGC3_counter, checkMode);
-//        if (numericOrString === "String") {
            NGC3_counter+=2;
         continue;
-//        }
-// VERSION 24 CHANGES END
     }
 
     switch (currentToken) {
-// VERSION 25 CHANGES BEGIN
-//      case '(':
-//      case ')':
       case leftParenthesisValue:
       case rightParenthesisValue:
-// VERSION 25 CHANGES END
 // Check if the parenthesis match
         checkParenthesis(currentToken,NGC3_counter);
         break;
-// VERSION 25 CHANGES BEGIN
-//      case 'or':
-//      case 'and':
-//      case 'not':
-//      case 'OR':
-//      case 'AND':
+        
       case 'NOT':
       case orToken:
       case andToken:
@@ -2355,11 +2084,9 @@ function checkSyntax() {
       case ORToken:
       case ANDToken:
       case NOTToken:
-//        if (['or','and','not'].includes(currentToken)) {
         if ([orToken,andToken,notToken].includes(currentToken)) {
-// VERSION 25 CHANGES END 
 // These should be in uppercase
-          Error_list.push(booleanLowercaseError + NGC3_counter);
+          Error_list.push(booleanLowercaseError + currentToken);
         }
 // Check if there's a valid token after these. Otherwise
 // its an error.
@@ -2367,96 +2094,57 @@ function checkSyntax() {
 // Not adding 1 to NGC3_counter here, since we need to
 // parse the next token
         break;
-// VERSION 25 CHANGES BEGIN 
-//      case '~':
-      case tildeToken:
-// VERSION 25 CHANGES END 
+        
+      case tildeToken: 
         checkTilde(NGC3_counter);
         NGC3_counter++;
         break;
-// VERSION 24 CHANGES BEGIN
-//      case 'tk_filter':
-//      case 'tk_filter:':
-//      case 'filter:':
-//      case 'filter':
+        
       case tk_filterToken:
       case filterToken:
-// VERSION 24 CHANGES END
 // Check if the next token is valid
 // tk_filter and filter are considered synonyms.
-// valCount is usually 1. If variants like tk_filter:"WM Heartland
-// | Exclusions"  OR "11340208 is WM  Heartland | Exclusions"  are
-// encountered, it will be 3.
+// valCount is usually 1. If variants like tk_filter:"WM
+// Heartland | Exclusions"  OR "11340208 is WM  Heartland |
+// Exclusions"  are encountered, it will be 3.
         valCount = checkTKFilter(nextToken, NGC3_counter);
         NGC3_counter=NGC3_counter+valCount;
         break;
-// VERSION 24 CHANGES BEGIN
-//      case 'tk_custom':
-//      case 'tk_custom:':
+        
       case tk_customToken:
-// VERSION 24 CHANGES END
 // Check if the next token is valid. 
-// valCount is usually 1. if tk_custom:"Keywords" or variants like
-// tk_custom:'WM Phoenix Open'" OR "820742 = WM Phoenix Open" are
-// encountered, it will be 3.
+// valCount is usually 1. if tk_custom:"Keywords" or
+// variants like tk_custom:'WM Phoenix Open'" OR "820742 =
+// WM Phoenix Open" are encountered, it will be 3.
         valCount = checkTKCustom(nextToken, NGC3_counter);
         NGC3_counter=NGC3_counter+valCount;
         break;
-// VERSION 24 CHANGES BEGIN
+        
 // broadcast_mediatype_l will also be converted to medium
 // but it has an additional token of 1 or 2.
 // Even though medium: is an error in NGC3, let us process
-// the values after that in the input stream.It will be flagged as
-// an error too.
-//      case 'mediatype':
-//      case 'mediatype:':
-//      case 'medium':
-//      case 'medium:':
-//      case 'broadcast_mediatype_l':
-//      case 'broadcast_mediatype_l:'
+// the values after that in the input stream.It will be
+// flagged as an error too.
       case mediatypeToken:
       case mediumToken:
       case broadcast_mediatype_lToken:
-//        if (currentToken === 'medium') {
         if (currentToken === mediumToken) {
-// VERSION 24 CHANGES END
 // mediatype is the correct keyword for NGC3
           Error_list.push(mediatypeMediumError, NGC3_counter);
         }
-// Check if the next token is valid. Sometimes, there could be
-// multiple values of mediatype enclosed in parenthesis.
+// Check if the next token is valid. Sometimes, there could
+// be multiple values of mediatype enclosed in parenthesis.
         valCount = checkMediatype(nextToken,NGC3_counter+1);
         NGC3_counter = NGC3_counter+valCount;
         break;
-// VERSION 24 CHANGES BEGIN
-//      case 'tk_language':
-//      case 'tk_language:':
-//      case 'language':
-//      case 'language:':
-//      case 'lang':
-//      case 'lang:':
+        
       case tk_languageToken:
       case languageToken:
       case langToken:
-// VERSION 24 CHANGES END
         checkTKLanguage(nextToken);
         NGC3_counter++;
         break;
-// VERSION 24 CHANGES BEGIN
-//      case 'tk_location':
-//      case 'location':
-//      case 'country':
-//      case 'state':
-//      case 'city':
-//      case 'sourcelocationcountry':
-//      case 'sourcelocationstate':
-//      case 'tk_location:':
-//      case 'location:':
-//      case 'country:':
-//      case 'state:':
-//      case 'city:':
-//      case 'sourcelocationcountry:':
-//      case 'sourcelocationstate:':
+        
       case tk_locationToken:
       case locationToken:
       case countryToken:
@@ -2464,44 +2152,29 @@ function checkSyntax() {
       case stateToken:
       case sourcelocationcountryToken:
       case sourcelocationstateToken:
-// VERSION 24 CHANGES END
 // Expecting 1 or several values in parenthesis after
 // these tokens
         valueCount = checkTokenStream(currentToken, NGC3_counter);
         NGC3_counter = NGC3_counter +valueCount;
         break;
-// VERSION 24 CHANGE BEGINS        
-//      case 'impact':
-//      case 'impact:':
-      case impactToken:
-// VERSION 24 CHANGE ENDS        
+
+      case impactToken:     
         checkImpact(nextToken);
         NGC3_counter++;
         break;
-// VERSION 24 CHANGE BEGINS
-//      case 'seo':
-//      case 'seo:':
+        
       case seoToken:
-// VERSION 24 CHANGE ENDS
         checkSEO(nextToken);
         NGC3_counter++;
         break;
-// VERSION 24 CHANGE BEGINS
-//      case 'sentiment':
-//      case 'sentiment:':
+        
       case sentimentToken:
-// VERSION 24 CHANGE ENDS
         checkSentiment(nextToken);
         NGC3_counter++;
         break;
-// VERSION 24 CHANGE BEGINS
-//      case 'seo_impact':
-//      case 'seo_impact:':
-//      case 'tk_readership':
-//      case 'tk_readership:':
+        
       case seoImpactToken:
       case tkReadershipToken:
-// VERSION 24 CHANGE ENDS
 // At NGC3_counter: seo_impact or tk_readership
 // NGC3_counter+1: [ (opening square bracket)
 // NGC3_counter+ 2: low number for the range
@@ -2511,21 +2184,7 @@ function checkSyntax() {
         checkRange(currentToken, NGC3_counter);
         NGC3_counter+=5;
         break;
-// VERSION 24 CHANGE BEGINS
-//      case 'title:':
-//      case 'title':
-//      case 'headline':
-//      case 'headline:':
-//      case 'seq_id':
-//      case 'seq_id:':
-//      case 'article_id:':
-//      case 'article_id':
-//      case 'data_source_s:':
-//      case 'data_source_s':
-//      case 'tag:':
-//      case 'tag':
-//      case 'url_path_sections':
-//      case 'url_path_sections:':
+        
       case titleToken:
       case headlineToken:
       case seqIdToken:
@@ -2533,49 +2192,32 @@ function checkSyntax() {
       case dataSourceToken:
       case tagToken:
       case url_path_sectionsToken:
-// VERSION 24 CHANGE ENDS
 // Expecting 1 or several values in parenthesis after
 // these tokens
         valueCount = checkTokenStream(currentToken, NGC3_counter);
         NGC3_counter = NGC3_counter +valueCount;
         break;
-// tk_company handled differently, since it may have multiple
-// values
-// VERSION 24 CHANGES BEGIN
-//      case 'tk_company':
-//      case 'tk_company:':
+        
+// tk_company handled differently, since it may have
+// multiple values
       case tk_companyToken:
-// VERSION 24 CHANGES END
         valueCount = checkTKCompany(currentToken, NGC3_counter);
         NGC3_counter = NGC3_counter +valueCount;
         break;
-// VERSION 24 CHANGES BEGIN
-//      case 'publisher':
-//      case 'publisher:':
-//      case 'author':
-//      case 'author:':
+        
       case publisherToken:
       case authorToken:
-// VERSION 24 CHANGES END
         checkNextToken(currentToken, NGC3_counter);
         NGC3_counter++;
         break;
-// VERSION 24 CHANGES BEGIN
-//      case 'text':
-//      case 'text:':
-//      case 'text.case_sensitive':
-//      case 'text.case_sensitive:':
+        
       case textToken:
       case textcase_sensitiveToken:
-// VERSION 24 CHANGES END
 // Even though text.case_sensitive: is an error in NGC3,
 // let us process the values after that in the input 
 // stream. The keyword will be flagged as an error first.
 // 
-// VERSION 24 CHANGES BEGIN
-//        if (currentToken === 'text.case_sensitive') {
         if (currentToken === textcase_sensitiveToken) {
-// VERSION 24 CHANGES END
 // text is the correct keyword for NGC3
           Error_list.push(textCaseSensitiveError);
         }
@@ -2584,48 +2226,31 @@ function checkSyntax() {
         valueCount = checkTokenStream(currentToken, NGC3_counter);
         NGC3_counter = NGC3_counter +valueCount;
         break;
-// VERSION 24 CHANGES BEGIN
-//      case 'frequent_terms':
-//      case 'frequent_terms:':
+        
       case frequent_termsToken:
-// VERSION 24 CHANGES END
 // Expecting 1 or several values in parenthesis after
 // these tokens
         valueCount = checkTokenStream(currentToken, NGC3_counter);
         NGC3_counter = NGC3_counter +valueCount;
         break;
-// VERSION 24 CHANGES BEGIN
-//      case 'search_id':
-//      case 'search_id:':
+        
       case searchIdToken:
-// VERSION 24 CHANGES END
         checkNextToken(currentToken, NGC3_counter);
         NGC3_counter++;
         break;
-// VERSION 24 CHANGES BEGIN
-//      case 'url_direct':
-//      case 'url_direct:':
+        
       case url_directToken:
-// VERSION 24 CHANGES END
 // Check if this is a valid URL
         checkURL(currentToken, NGC3_counter);
         NGC3_counter++;
         break;
-// VERSION 24 CHANGES BEGIN
-//      case 'site_urls_ll':
-//      case 'site_urls_ll:':
-//      case 'url':
-//      case 'url:':
+        
       case site_urls_llToken:
       case urlToken:
-// VERSION 24 CHANGES ENurlTokenD
 // Even though url: is an error in NGC3, let us process
 // the values after that in the input stream.The keyword
 // will be flagged as an error first.
-// VERSION 24 CHANGES BEGIN
-//        if (currentToken === 'url') {
         if (currentToken === urlToken) {
-// VERSION 24 CHANGES END
 // site_urls_ll is the correct keyword for NGC3
           Error_list.push(urlTokenError);
         }
@@ -2634,6 +2259,7 @@ function checkSyntax() {
         valueCount = checkDomainStream(currentToken, NGC3_counter);
         NGC3_counter = NGC3_counter +valueCount;
         break;
+        
       default:
 // This is not a known token. This could still be valid,
 // since websites and single word searches may not be
@@ -2682,9 +2308,9 @@ function checkNextToken(token, index) {
 
 function checkTokenStream(token, index) {
 // Check if there's a valid token after the current token. 
-// Otherwise its an error. Also, instead of a single value, there
-// could be multiple values separated by NOT AND or OR provided
-// within parenthesis.
+// Otherwise its an error. Also, instead of a single value,
+// there could be multiple values separated by NOT AND or 
+// OR provided within parenthesis.
   
   let nextToken = NGC3_list[index+1];
   
@@ -2698,17 +2324,11 @@ function checkTokenStream(token, index) {
 // If the next token is a parenthesis, see how many values
 // are provided.
   
-// VERSION 24 CHANGES BEGIN
-//  if (nextToken === '(') {
   if (nextToken === leftParenthesisValue) {
-// VERSION 24 CHANGES END
 // Push the position in the stack
     stack.push(index);
     
-// VERSION 24 CHANGES BEGIN
-//    while (nextToken !== ')') {
     while (nextToken !== rightParenthesisValue) {
-// VERSION 24 CHANGES END
       valueCount++;
       index++;
       nextToken = NGC3_list[index];
@@ -2716,10 +2336,7 @@ function checkTokenStream(token, index) {
     
 // Check if a right parenthesis was found. If yes, pop
 // the stack.
-// VERSION 24 CHANGES BEGIN
-//    if (nextToken === ')') {
     if (nextToken === rightParenthesisValue) {
-// VERSION 24 CHANGES END
       stack.pop();
     }
   }
@@ -2776,41 +2393,35 @@ function checkTKFilter(token, index) {
 // The default number of tokens after tk_filter is 1.
     let valueCount = 1;
   
-// This differs when vafriants like tk_filter:"WM Heartland |
-// Exclusions"  OR "11340208 is WM Heartland | Exclusions"  are 
-// encountered.
+// This differs when vafriants like tk_filter:"WM Heartland
+// | Exclusions"  OR "11340208 is WM Heartland | Exclusions"
+// are encountered.
   
 // First check if known, standard filters are used.
 
-// VERSION 24 CHANGES BEGIN
-//if (!['Master Exclusive','Deals & Coupons', 'Earnings & Stock //News', 'Job Postings', 'Market Research Reports', 'TV Shows', //'Press Release', 'Top Tier Readership'].includes(strippedToken)) //{
 if (![masterExclusiveValue, dealsCouponsValue, earningsStockNewsValue, jobPostingsValue, marketResearchReportsValue, tvShowsValue, pressReleaseValue, topTierReadershipValue].includes(strippedToken)) {
-// VERSION 24 CHANGES END
   
 // Find out if this is a variant of this kind:
 // tk_filter:"WM Heartland"  OR "11340208 is WM Heartland"
-// For such variants, index+3 has a number. We need to do this
-// because we should find out how many tokens to skip.
+// For such variants, index+3 has a number. We need to do
+// this because we should find out how many tokens to skip.
   
 // Load index+3 into a temporary string. Then, strip single
 // quotes, double quotes and curly quotes from the token.
-// Now tempToken will have something like 11340208 is WM Heartland.
-// Note that the above is an example syntax.
-//
-// VERSION 25 CHANGES BEGIN
+// Now tempToken will have something like 11340208 is WM
+// Heartland. Note that the above is an example syntax.
+
 // Check if there is a valid value at NGC3_list[index+3]
   if (NGC3_list[index+3]) {
-// VERSION 25 CHANGES END
      tempToken = NGC3_list[index+3].replace(/["'“”‘’]/g, '');
   
 // split at blank spaces and load to the array.
      finalToken = tempToken.split(' ');
-// VERSION 25 CHANGES BEGIN
   }
-// VERSION 25 CHANGES BEGIN
   
-// Now finalToken[0] will have the number, if this is a variant.
-// Move to a constant for typecasting to avoid run-time errors.
+// Now finalToken[0] will have the number, if this is a
+// variant. Move to a constant for typecasting to avoid 
+// run-time errors.
   const numValue = Number(finalToken[0]);
   
 // Find out if finalToken[0] is a number. 
@@ -2842,34 +2453,28 @@ let strippedToken = token.replace(/["'“”‘’]/g, '');
   let finalToken = [];
   
 // This is the default number of tokens after tk_custom.
-// This differs when tk_custom:"Keywords" is encountered. And
-// when instances like tk_custom:"WM Phoenix Open'" OR 
+// This differs when tk_custom:"Keywords" is encountered.
+// And when instances like tk_custom:"WM Phoenix Open'" OR 
 // "820742 = WM Phoenix Open" are encountered.
 
 let valueCount = 1;
   
-// VERSION 24 CHANGES BEGIN
-// if (!["Sports Filter","Real Estate Listings","Obituaries 
-// Filter", "Keywords"].includes(strippedToken)) {
   if (![sportsFilterValue,realEstateListingsValue,obituariesFilterValue, keywordsValue].includes(strippedToken)) {
-// VERSION 24 CHANGES END
   
 // If this is a variant, index+3 will be a number. 
 // Load index+3 into a temporary string. Then, strip single
 // quotes, double quotes and curly quotes from the token.
-// VERSION 25 CHANGES BEGIN
+    
 // Check if there is a valid value at NGC3_list[index+3]
   if (NGC3_list[index+3]) {
-// VERSION 25 CHANGES END
      tempToken = NGC3_list[index+3].replace(/["'“”‘’]/g, '');
   
 // split at blank spaces and load to the array.
      finalToken = tempToken.split(' ');
-  
-// VERSION 25 CHANGES BEGIN
   }
-// VERSION 25 CHANGES BEGIN
-// Move to a constant for typecasting to avoid run-time errors.
+    
+// Move to a constant for typecasting to avoid run-time
+// errors.
   const numValue = Number(finalToken[0]);
   
 // Find out if finalToken[0] is a number. 
@@ -2890,11 +2495,11 @@ let valueCount = 1;
 function checkMediatype(token, index) {
   
 // This function checks if approved mediatypes are used.
-// This is 1 of the functions called when the "Check Query" button
-// is pressed.
+// This is 1 of the functions called when the "Check Query"
+// button is pressed.
   
-// token points to the mediatype. It could also point to a (,
-// if multiple mediatypes are mentioned together.
+// token points to the mediatype. It could also point to a
+// (, if multiple mediatypes are mentioned together.
   
 // Strip single quotes, double quotes and curly quotes
   let strippedToken = token.replace(/["'“”‘’]/g, '');
@@ -2935,9 +2540,9 @@ function checkMediatype(token, index) {
 // Return the appropriate value
   return(valCount);
 
-// Define inline function. We are using an inline function because
-// we want to access the variables of the main function. Also, this
-// is not a generic function.
+// Define inline function. We are using an inline function
+// because we want to access the variables of the main
+// function. Also, this is not a generic function.
 //
   function  checkMediaTypeToken() {
 
@@ -2957,10 +2562,6 @@ function checkTKLanguage(token) {
 // At this point, token has the NGC3 language code used.
 // Strip single quotes, double quotes and curly quotes 
   let strippedToken = token.replace(/["'“”‘’]/g, '');
- 
-// VERSION 24 CHANGES BEGIN
-//  if (!["English",'French',"Spanish", "Greek", "Korean", //"Chinese", "Japanese", "German", "Italian", "Danish", 
-// "Portuguese"].includes(strippedToken)) {
     
 // The function readLanguageCodesCSV reads the CSV file
 // that lists NGC3 and its C1 equivalent.
@@ -2972,7 +2573,6 @@ function checkTKLanguage(token) {
   
   if (!C1_language) {
     Error_list.push(languageCodeError, token);
-// VERSION 24 CHANGES END
   }
 }
 
@@ -3010,7 +2610,8 @@ function checkSentiment(token) {
 // Strip single quotes, double quotes and curly quotes 
   let strippedToken = token.replace(/["'“”‘’]/g, '');
 
-// Check if a valid value is used for the sentiment: keyword.
+// Check if a valid value is used for the sentiment: 
+// keyword.
   if (![positiveValue,neutralValue, negativeValue].includes(strippedToken)) {
     Error_list.push(sentimentCodeError + token);
   }
@@ -3090,28 +2691,20 @@ function checkDomainStream(token, index) {
 // If the next token is a parenthesis, see how many values
 // are provided.
   
-// VERSION 24 CHANGES BEGIN
-//  if (nextToken === '(') {
   if (nextToken === leftParenthesisValue) {
-// VERSION 24 CHANGES END
 // Push the position in the stack
     stack.push(index);
     
-// VERSION 24 CHANGES BEGIN
-//    while (nextToken !== ')') {
     while (nextToken !== rightParenthesisValue) {
-// VERSION 24 CHANGES END
       valueCount++;
       index++;
       nextToken = NGC3_list[index];
       checkDomain(nextToken);
     }
+    
 // Check if a right parenthesis was found. If yes, pop
 // the stack.
-// VERSION 24 CHANGES BEGIN
-//    if (nextToken === ')') {
     if (nextToken === rightParenthesisValue) {
-// VERSION 24 CHANGES END
       stack.pop();
     }
   }
@@ -3137,19 +2730,13 @@ function checkDomain(token) {
 // Strip single quotes, double quotes and curly quotes 
   let strippedToken = urlString.replace(/["'“”‘’]/g, '');
   
-// VERSION 25 CHANGES BEGIN
-// Proceed only when the token is not a parenthesis or a boolean
-// keword
+// Proceed only when the token is not a parenthesis or a
+// boolean keyword
   if (![leftParenthesisValue, rightParenthesisValue, ORToken, orToken, ANDToken, andToken, NOTToken, notToken].includes(strippedToken)) {
-//     const secureURL = "https://".concat(strippedToken);
      const secureURL = urlPrefix.concat(strippedToken);
-// VERSION 25 CHANGES END
   
      try {
-// VERSION 25 CHANGES BEGIN
-//       result = new URL(strippedToken);
        result = new URL(secureURL);
-// VERSION 25 CHANGES END
      } 
      catch(e) {
        result = false;
@@ -3158,9 +2745,7 @@ function checkDomain(token) {
      if (!result) {
        Error_list.push(invalidURLError + token + ":" + urlString);
      }
-// VERSION 25 CHANGES BEGIN
   }
-// VERSION 25 CHANGES END
 }
 
 function singleWordProcessing(index) {
@@ -3175,8 +2760,8 @@ function singleWordProcessing(index) {
 // are boolean keywords; Or they can be an opening or a 
 // closing parenthesis; Or this is the last word in the
 // query. Sometimes this can be the only word in the query.
-// In all these cases, declare this a valid word, enclose it in
-// double quotes and push it to DIV area.
+// In all these cases, declare this a valid word, enclose it
+// in double quotes and push it to DIV area.
 //
   prevToken = NGC3_list[index-1];
 // If this is the first word, prevToken will be undefined.
@@ -3194,23 +2779,7 @@ function singleWordProcessing(index) {
     nextToken = "";
   }
   
-// VERSION 24 CHANGES BEGIN
-//  switch (prevToken, nextToken) {
   switch (prevToken.toUpperCase(), nextToken.toUpperCase()) {
-//    case '(', ')':
-//    case '(', 'NOT':
-//    case '(', 'AND':
-//    case '(', 'OR':
-//    case 'NOT', ')':
-//    case 'AND', ')':
-//    case 'OR', ')':
-//    case "", "":
-//    case "", 'NOT':
-//    case "", 'AND':
-//    case "", 'OR':
-//    case 'NOT', "":
-//    case 'AND', "":
-//    case 'OR', "":
     case leftParenthesisValue, rightParenthesisValue:
     case leftParenthesisValue, NOTToken:
     case leftParenthesisValue, ANDToken:
@@ -3225,16 +2794,14 @@ function singleWordProcessing(index) {
     case NOTToken, "":
     case ANDToken, "":
     case ORToken, "":
-// VERSION 24 CHANGES END 
       let quotedToken = "\"" + currentToken + "\"";  // Escaping double quotes
       populateDiv(quotedToken, normalMode);
       break;
+      
     default:
-// VERSION 25 CHANGES BEGIN
-// We must push the wrong token to the output, and pad it with a 
-// space.
+// We must push the wrong token to the output, and pad it
+// with a space.
       populateDiv(currentToken+' ', errorMode);
-// VERSION 25 CHANGES END
       Error_list.push(unknownTokenError + currentToken);
       break;
   }
@@ -3269,21 +2836,6 @@ function checkSingleWord(index) {
   }
   
   switch (prevToken.toUpperCase(), nextToken.toUpperCase()) {
-// VERSION 24 CHANGES BEGIN
-//    case '(', ')':
-//    case '(', 'NOT':
-//    case '(', 'AND':
-//    case '(', 'OR':
-//    case 'NOT', ')':
-//    case 'AND', ')':
-//    case 'OR', ')':
-//    case "", "":
-//    case "", 'NOT':
-//    case "", 'AND':
-//    case "", 'OR':
-//    case 'NOT', "":
-//    case 'AND', "":
-//    case 'OR', "":
     case leftParenthesisValue, rightParenthesisValue:
     case leftParenthesisValue, NOTToken:
     case leftParenthesisValue, ANDToken:
@@ -3298,9 +2850,9 @@ function checkSingleWord(index) {
     case NOTToken, "":
     case ANDToken, "":
     case ORToken, "":
-// VERSION 24 CHANGES END
 // Do nothing
       break;
+      
     default:
       Error_list.push(unknownTokenError + currentToken);
       break;
@@ -3332,11 +2884,9 @@ function populateDiv(printText, mode) {
   
   const wildcardStar = '*';
   const wildcardQmark = '?';
-  let normalColor = 'black';
+  let normalColor = 'black'; 
   let errorColor = 'red';
-// VERSION 29 CHANGES BEGIN
   let highlightColor = 'cyan';
-// VERSION 29 CHANGES END
   let tempArray = [];
   
   if (printText === undefined || printText === null) {
@@ -3347,44 +2897,8 @@ function populateDiv(printText, mode) {
 // Check if the token has a wildcard
       if (printText.includes(wildcardStar)) {
 // Wildcard found, signal error.
-        mode = errorMode;
-        
-// VERSION 29 CHANGES BEGIN
-// The following code has been commented out on VERSION 29
-// Quick and dirty fix: Market Research Reports has 1 token
-// with a star. Makes no sense to tag entire content of that
-// tk_filter in red in the output area. Also makes no sense
-// to tag the entire content of that tk_filter as an error
-// in the error area.
-        
-// Check if the flag marketResearchReportsFlag is set to
-// true. This means the current token is Market Research
-// Reports.
-//
-//        if (marketResearchReportsFlag) {
-// Turn the flag to false, the tk_filter has been handled.
-//          marketResearchReportsFlag = false;
-
-// Tokenize the contents of the current token into array
-// elements.
-//          tempArray = tokenize(printText);
-
-// Find the element in the array that contains '*'
-//          let elementWithAsterisk = tempArray.find(element => element.includes('*'));
-          
-// Find the index of the element with '*'
-//          let index = tempArray.indexOf(elementWithAsterisk);
-
-// Indicate that a wildcard was encountered in the narket
-// research reports filter.       
-//          Error_list.push(wildcardStarMRRError + elementWithAsterisk);
-//        }
-//        else {
-// No special processing needed if that tk_filter was not 
-// encountered
-           Error_list.push(wildcardStarError + printText);
-//        }
-// VERSION 29 CHANGES END
+        mode = errorMode;    
+        Error_list.push(wildcardStarError + printText);
       }
   
 // Check if wildcard ? is present
@@ -3393,6 +2907,18 @@ function populateDiv(printText, mode) {
         mode = errorMode;
         Error_list.push(wildcardQmarkError+ printText);
       }
+
+// Replace curly quotes with simple double quotes.
+// We do not want to strip single quotes inside words. Which
+// is what the statement below does.
+//      printText = printText.replace(/[‘’“”]/g, '"');
+// Replace curly double quotes with simple double quotes
+        printText = printText.replace(/[“”]/g, '"');
+
+// To replace curly single quotes, but not within words
+        printText = printText.replace(/(^|[\s“”])‘|’([\s“”]|$)/g, '"');
+        printText = printText.replace(/‘|’/g, "'");
+
     
 // Declare variable for printing
      let spacedText;
@@ -3418,30 +2944,21 @@ function populateDiv(printText, mode) {
     let span = createSpan(spacedText);
     let color = normalColor;
   
-// VERSION 29 CHANGES BEGIN
     let highlight = 'highlight-none';
     
 // Check if a highlight color was specified
     if (mode === highlightMode || mode === highlightErrMode) {
       highlight = highlightColor;
     }
-// VERSION 29 CHANGES END
     
-// If mode is normal, the default value of color
-// will remain black.
-// otherwise, the color will be red.
-// VERSION 29 CHANGES BEGIN
-//    if (mode === errorMode) {
-// highlightErrMode = highlight + error
+// If mode is normal, the default value of color will 
+// remain black. Otherwise, the color will be red.
     if (mode === errorMode || mode === highlightErrMode) {
-// VERSION 29 CHANGES END
        color = errorColor;
     }
     
     span.style('color', color);
-// VERSION 29 CHANGES BEGIN
     span.style('background-color', highlight); 
-// VERSION 29 CHANGES END
     span.parent(outputDiv);
   }
 }
@@ -3472,8 +2989,8 @@ function findCommonWordsMaster(phrases) {
     let commonWords;  
     let commonWordsMatrix = [];
   
-// To indicate which of the phrases have the common words and
-// which do not.
+// To indicate which of the phrases have the common words
+// and which do not.
     let commonFirstWordMatrix = [];  
     let commonFirstTwoWordsMatrix = [];  
     let commonFirstThreeWordsMatrix = [];  
@@ -3659,30 +3176,28 @@ function TK_Company_Processing(index) {
 // Find the token next to tk_company
   let nextToken = NGC3_list[index+1];
   
-// Initialize return token. This indicates how many tokens should
-// be skipped.
+// Initialize return token. This indicates how many tokens
+// should be skipped.
   let valCount = 2;
 
-// This will hold the final token, in case tk_company has variants
+// This will hold the final token, in case tk_company has
+// variants
   let finalToken = [];
   
 // In case of a variant, index+3 will have a numeric value.
 // Load index+3 into a temporary string. Then, strip single
 // quotes, double quotes and curly quotes from the token.
-// VERSION 25 CHANGES BEGIN
+
 // Check if there is a valid value at NGC3_list[index+3]
   if (NGC3_list[index+3]) {
-// VERSION 25 CHANGES END
      tempToken = NGC3_list[index+3].replace(/["'“”‘’]/g, '');
   
 // split at blank spaces and load to the array.
      finalToken = tempToken.split(' ');
-
-// VERSION 25 CHANGES BEGIN
   }
-// VERSION 25 CHANGES BEGIN
-// Move to a constant for typecasting to avoid run-time errors.
-// Position 0 has the number.
+
+// Move to a constant for typecasting to avoid run-time
+// errors. Position 0 has the number.
   const numValue = Number(finalToken[0]);
   
 // Find out if finalToken[0] is a number. 
@@ -3724,8 +3239,8 @@ function checkTKCompany(token, index) {
   let finalToken = [];
   
 // This is the default number of tokens after tk_company.
-// This differs when instances like tk_company:"WM Phoenix Open" 
-// OR "820742 = WM Phoenix Open" are encountered.
+// This differs when instances like tk_company:"WM Phoenix 
+// Open" OR "820742 = WM Phoenix Open" are encountered.
 //
   let valueCount = 1;
   
@@ -3733,20 +3248,16 @@ function checkTKCompany(token, index) {
 // index+3 into a temporary string. Then, strip single
 // quotes, double quotes and curly quotes from the token.
 
-// VERSION 25 CHANGES BEGIN
 // Check if there is a valid value at NGC3_list[index+3]
   if (NGC3_list[index+3]) {
-// VERSION 25 CHANGES END
      tempToken = NGC3_list[index+3].replace(/["'“”‘’]/g, '');
   
 // split at blank spaces and load to the array.
      finalToken = tempToken.split(' ');
-  
-// VERSION 25 CHANGES BEGIN
   }
-// VERSION 25 CHANGES BEGIN
-// Move to a constant for typecasting to avoid run-time errors
-// at the next if.
+
+// Move to a constant for typecasting to avoid run-time
+// errors at the next if.
   const numValue = Number(finalToken[0]);
   
 // Find out if finalToken[0] is a number. If yes, tk_company
@@ -3797,113 +3308,23 @@ function headlineProcessing(index) {
   
 // Check if the token is a parenthesis.
   if (token === leftParenthesisValue) {
-  
-// VERSION 28 CHANGES BEGIN
-// This means there are multiple values for headline
-// We should move each value to an array.
-//    token = NGC3_list[index+1];
-
-//    while (token !== rightParenthesisValue) {
-      
-// Check if this is an OR. Push only when it is not a
-// boolean operator
-//      if (token !== ORToken && token !== orToken) {
-//         valuesArray.push(token);
-      
-// Move all values in lower case to the
-// valuesLowerCaseArray. We will use this for title: 
-// down the line.
-//         valuesLowerCaseArray.push(token.toLowerCase());
-//      }
-// Increment index
-//      index++;
-      
-// Get the next array value into the token
-//      token = NGC3_list[index+1];
-      
-// Increment return value
-//      valCount++;
-//    }
-    
-// 1 more for the closing parenthesis
-//    valCount++;
-
-// Now we need to find the unique values for 
-// text.case_sensitive
-//   let uniqueTextCaseSet = valuesArray.reduce((unique, //item) => {
-//      if (!unique.includes(item)) {
-//        unique.push(item);
-//      }
-//   return unique;
-//   }, []);
     
 // Invoke the function nestedORProcessing to find the 
 // values for the title: keyword
     populateDiv(titleTokenC1, normalMode);
-    valCount = nestedORProcessing(token, index, "Mixed");
-    
-// Let us find the unique values for title:
-// Now we need to find the unique values for
-// text.case_sensitive
-//   let uniqueTitleSet = //valuesLowerCaseArray.reduce((unique, item) => {
-//      if (!unique.includes(item)) {
-//        unique.push(item);
-//      }
-//   return unique;
-//   }, []);
+// VERSION 32 CHANGES BEGIN
+//    valCount = nestedORProcessing(token, index, "Mixed");
+    valCount = nestedORProcessing(token, index, "LowerCase");
+// VERSION 32 CHANGES END
     
 // Invoke the function nestedORProcessing to find the 
 // values for the text.case_sensitive keyword
     populateDiv(ANDToken, normalMode);
     populateDiv(textcase_sensitiveTokenC1, normalMode);
-    valCount = nestedORProcessing(token, index, "LowerCase");
-
-// Populate the output titles first
-//    populateDiv(leftParenthesisValue, normalMode);
-//    populateDiv(titleTokenC1, normalMode);
-//    populateDiv(leftParenthesisValue, normalMode);
-    
-// Initialize the array counter
-//    loopCounter = 0;
-    
-//    while (loopCounter < uniqueTitleSet.length) {
-//      populateDiv(uniqueTitleSet[loopCounter], 
-//normalMode);
-//      loopCounter++;
-      
-// Do not push the OR if this is the last entry
-//      if (loopCounter !== uniqueTitleSet.length) {
-//         populateDiv(ORToken, normalMode);
-//      }
-//    }
-
-// Push the final parenthesis
-//    populateDiv(rightParenthesisValue, normalMode);
-    
-// Populate the output text.case_sensitive values now. 
-// Push the AND first.
-//    populateDiv(ANDToken, normalMode);
-//    populateDiv(textcase_sensitiveTokenC1, normalMode);
-//    populateDiv(leftParenthesisValue, normalMode);
-    
-// Initialize the array counter
-//    loopCounter = 0;
-    
-//    while (loopCounter < uniqueTextCaseSet.length) {
-//      populateDiv(uniqueTextCaseSet[loopCounter], 
-// normalMode);
-//      loopCounter++;
-      
-// Do not push the OR if this is the last entry
-//      if (loopCounter !== uniqueTextCaseSet.length) {
-//         populateDiv(ORToken, normalMode);
-//      }
-//    }
-    
-// Push the final parentheses
-//    populateDiv(rightParenthesisValue, normalMode);
-//    populateDiv(rightParenthesisValue, normalMode);
-// VERSION 28 CHANGES END
+// VERSION 32 CHANGES BEGIN
+//    valCount = nestedORProcessing(token, index, "LowerCase");
+    valCount = nestedORProcessing(token, index, "Mixed");
+// VERSION 32 CHANGES END
   }
   else {
 
@@ -3978,22 +3399,17 @@ function media_Type_Processing(index) {
 // media_Type_Detailed_Processing is called.
 
 // Push the C1 token to the output.
-// VERSION 29 CHANGES BEGIN
-// populateDiv(mediumTokenC1, normalMode);
  populateDiv(mediumTokenC1, highlightMode);
-// VERSION 29 CHANGES END
 
 // Save the entry value of index
  const entryIndex = index;
 
-// Sometimes, there could be multiple mediatypes within parenthesis
-// Check if the next character is a '('
+// Sometimes, there could be multiple mediatypes within
+// parenthesis. Check if the next character is a '('
  if (NGC3_list[index+1] === leftParenthesisValue) {
 // First, push this parenthesis
-// VERSION 29 CHANGES BEGIN
-//    populateDiv(leftParenthesisValue, normalMode);
     populateDiv(leftParenthesisValue, highlightMode);
-// VERSION 29 CHANGES END
+   
 // Continue conversion till all mediatype tokens have been
 // exhausted
     index++;
@@ -4005,18 +3421,12 @@ function media_Type_Processing(index) {
 // Check the next token. If it is OR, push it to Div.
         if (NGC3_list[index+1] === ORToken) {
 // Push this OR
-// VERSION 29 CHANGES BEGIN
-//           populateDiv(NGC3_list[index+1], normalMode);
            populateDiv(NGC3_list[index+1], highlightMode);
-// VERSION 29 CHANGES END
            index++;
         }
     }
 // Add the final right parenthesis
-// VERSION 29 CHANGES BEGIN
-//    populateDiv(rightParenthesisValue, normalMode);
     populateDiv(rightParenthesisValue, highlightMode);
-// VERSION 29 CHANGES END
     index++;
  }
  else {
@@ -4029,34 +3439,86 @@ function media_Type_Processing(index) {
  }
 
 function impactProcessing(index) {
-
-// index points to the impact code used. Strip all kinds of quotes.
+// VERSION 30 - Function rewriten
+// impact: can also have multiple codes enclosed in
+// parenthesis.
+  
+// index points to the impact code used. Strip all kinds of
+// quotes.
  let impactCode = NGC3_list[index].replace(/["'“”‘’]/g, '');
 
-// VERSION 26 CHANGES BEGIN
-// This variable will have the impact code in sentence case
-   let impactCodeSentenceCase = impactCode.charAt(0).toUpperCase() + impactCode.slice(1);
-// VERSION 26 CHANGES END
+// Initialize the return value.
+  valCount = 0;
+  
 // Push the C1 token to the output
- populateDiv(impact_score_gradeTokenC1, normalMode);
+  populateDiv(impact_score_gradeTokenC1, normalMode);
+  
+// Check if the 1st code is a left parenthesis. That means
+// there will be a series of impact codes.
+   if (impactCode ===leftParenthesisValue) {
 
+// Push left parenthesis value to the output
+        populateDiv(leftParenthesisValue, normalMode);
+     
+// Increment return value. ( has been processed.
+        valCount++;
+     
+// Increment index
+     index++;
+     
+     while (NGC3_list[index] !== rightParenthesisValue) {
+// Format impact code
+       impactCode = NGC3_list[index].replace(/["'“”‘’]/g, '');
+
+// Skip processing for ORs
+       if (impactCode === ORToken || impactCode === orToken || impactCode === OrToken) {
+          populateDiv(ORToken, normalMode);
+       }
+       else {
 // Check if the impact code is valid
- if ([highValue, HighValue, mediumValue, MediumValue, lowValue, LowValue].includes(impactCode)) {
+          checkImpactCodeValue(impactCode);
+       }
+     
+// Increment return value. ( has been processed.
+       valCount++;
+       
+// Increment index.
+       index++;
+     }
+     
+// End of while loop reached. Push the right parenthesis and
+// increment valCount.
+     populateDiv(rightParenthesisValue, normalMode);
+     valCount++;
+   }
+  
+   else {  
+// Check if the impact code is valid
+      checkImpactCodeValue(impactCode);
+      valCount++;
+   }
+
+// Return the number of tokens that have been processed
+  return(valCount);
+}
+
+function checkImpactCodeValue(code) {
+// Check if the impact code is valid
+  
+ if ([highValue, HighValue, mediumValue, MediumValue, lowValue, LowValue].includes(code)) {
 // Push the impact code to the output
-// VERSION 26 CHANGES BEGIN
-//   populateDiv(impactCode, normalMode); 
 // Ensure the output is uppercase
-   populateDiv(impactCodeSentenceCase, normalMode); 
-// VERSION 26 CHANGES END
+// This variable will have the impact code in sentence case
+    let impactCodeSentenceCase = code.charAt(0).toUpperCase() + code.slice(1);
+    populateDiv(impactCodeSentenceCase, normalMode); 
  }
  else {
 // Push the impact code to the output and flag an error
-  populateDiv(impactCode, errorMode); 
+    populateDiv(code, errorMode); 
 
 // Push error message
-  Error_list.push(impactCodeError + impactCode);
+    Error_list.push(impactCodeError + code);
  }
-
 }
 
 function nestedORProcessing(token, index, conversionCase) {
@@ -4113,7 +3575,9 @@ function nestedORProcessing(token, index, conversionCase) {
    index++;
     
 // Reload token and nextToken and strip the quotes.
-   token = NGC3_list[index].replace(/["'“”‘’]/g, '');
+// We do not want to remove single quotes inside words.
+   token = NGC3_list[index].replace(/[“”"“”]/g, '');
+
    nextToken = NGC3_list[index+1];
     
 // Loop till the right parenthesis is found
@@ -4178,9 +3642,6 @@ function nestedORProcessing(token, index, conversionCase) {
       
 // Initialize the loopcounter for the array foundWords
        loopCounter = 0;
-      
-// Initialize smallestWord
-//       smallestWord = foundWords[loopCounter];
       
 // Loop thru the array elements
        while(loopCounter < foundWords.length) {

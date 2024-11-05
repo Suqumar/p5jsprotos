@@ -221,7 +221,7 @@
 // Define constants used in setup to avoid hard-coding
  const leftMargin = '100px';
  const h1PageHeading = 'NGC3 to C1 Conversion';
- const h5PageHeading = 'Version 32, Build Date September 13, 2024';
+ const h5PageHeading = 'Version 33, Build Date November 5, 2024';
  const h3InputHeading = 'Enter the NGC3 Query Here';
  const h3ErrorHeading = 'Corrections Needed';
  const h3OutputDivHeading = 'Converted C1 Query';
@@ -734,7 +734,7 @@ function parseNGC3toC1() {
 // token ~ and the number that comes after that.
 //
        let moveIndex = nearProcessing(NGC3_counter);
-        
+
        if (moveIndex !== 0) {
           NGC3_counter = moveIndex+2;
         }
@@ -1004,17 +1004,17 @@ function nearProcessing(index) {
 
   if (wordCount === 2) {
 // This means there were exactly 2 words before the ~
+    
   let firstWord = words[0];  // Assign the first word
   let secondWord = words[1];  // Assign the second word
 
 // Construct the NEAR query and push it into the DIV area
 // Strip single quotes, double quotes and curly quotes 
     firstWord = firstWord.replace(/["'“”‘’]/g, '');
-    secondWord = secondWord.replace(/["'“”‘’]/g, '');
-  
+    secondWord = secondWord.replace(/["'“”‘’]/g, ''); 
+
 // Leaving the hard-coding as it is for now. 
     let nearString = '("' + firstWord + '"' + " NEAR/" + numberToken + ' "' + secondWord + '")';
-    
     populateDiv(nearString, normalMode);
   }
   
@@ -1024,8 +1024,8 @@ function nearProcessing(index) {
   }
   
 // If there are more than 2 words, check if there's a tilde
-// stream.
- else if (wordCount > 2) {
+// stream. 
+  else if (wordCount > 2) {
 // moveIndex is the number of tokens already processed by
 // the function checkTildeStorm.   
    moveIndex = checkTildeStorm(index, wordToken, numberToken);
@@ -1058,7 +1058,8 @@ function checkTildeStorm(index, wordToken, numberToken) {
 // number token next to the ~ is the same and the end of
 // tokens in NGC3_list is not reached.
 //
-  while ((index+5) < NGC3_list.length && NGC3_list[index + 4] === '~' && NGC3_list[index + 5] === numberToken) {
+  while ((index+5) < NGC3_list.length && NGC3_list[index + 4] === '~' && NGC3_list[index + 5] === numberToken) { 
+    
 // Push this wordToken, ~ and numberToken to a list. This
 // could be a tilde storm.
 // We will process the storm later.
@@ -1100,7 +1101,7 @@ function checkTildeStorm(index, wordToken, numberToken) {
    commonPhraseMatrix = results.commonWordsMatrix;
 // Push common words to an array for later use in the
 // function parseLongPhrases
-    encounteredCommonPhrases.push(commonPhrase);   
+    encounteredCommonPhrases.push(commonPhrase); 
 }
   else {
 // lone tilde entry. Parse it as a long phrase
@@ -1168,7 +1169,18 @@ function checkTildeStorm(index, wordToken, numberToken) {
              }
       
              else { 
-               populateDiv(`${tildeStorm[tildeLoopCounter +3]} "${wordTokenRemaining}" `, 'Normal'); 
+// VERSION 33 CHANGES BEGIN
+// Quick and dirty fix to avoid "undefined" in the output
+// as well as untimely parenthesis
+//                populateDiv(`${tildeStorm[tildeLoopCounter +3]} "${wordTokenRemaining}" `, 'Normal'); 
+               if (tildeStorm[tildeLoopCounter +3] === undefined || tildeStorm[tildeLoopCounter +3] === rightParenthesisValue) {
+               populateDiv(`${ORToken} "${wordTokenRemaining}" `, 'Normal');  
+               }
+               else {
+                 populateDiv(`${tildeStorm[tildeLoopCounter +3]} "${wordTokenRemaining}" `, 'Normal');  
+               }
+// VERSION 33 CHANGES END
+                  
 // Add a )) if the next phrase does not have the common
 // phrase or if this is the last phrase
                  if (commonPhraseMatrix[loopCounter+1] === 'N' || typeof commonPhraseMatrix[loopCounter+1] === 'undefined') {
@@ -1186,6 +1198,7 @@ function checkTildeStorm(index, wordToken, numberToken) {
 // This entry does not have the common phrase
 // Treat this as a long phrase. 
             parseLongPhrases(index, tildeStorm[tildeLoopCounter], tildeStorm[tildeLoopCounter+2]);
+
 // Push the boolean query operator. 
             populateDiv(tildeStorm[tildeLoopCounter+3], 'Normal');
             
@@ -1283,6 +1296,7 @@ function parseLongPhrases(index, wordToken, numberToken) {
   if (matchFound) {
     populateDiv(`("${encounteredCommonPhrases[loopCounter]}" NEAR/${numberToken} "${secondPart}")`);
   }
+  
   else if (wordCount === 3) {
     firstPart = words[0]; 
     secondPart = words[1] + " " + words[2]; 
@@ -1548,7 +1562,7 @@ while (loopIndex < lastTwoWords.length) {
 }
 
 commonLastTwoWords = maxString;
-  
+
 return {
 mostCommonFirstWord: commonFirstWord,
 mostCommonFirstTwoWords: commonFirstTwoWords, 
@@ -1978,8 +1992,7 @@ function displayErrorList() {
 }
 
  function wordTokenProcessing(index) {
-// Directly add word tokens to DIV area. No further
-// processing needed
+// Directly add word tokens to DIV area. No further processing needed
  populateDiv(NGC3_list[index], normalMode);
  }
 
@@ -3108,6 +3121,7 @@ function findCommonWordsMaster(phrases) {
         const countFirstThreeWords = countConsecutiveYs(commonFirstThreeWordsMatrix);
     const countLastWord = countConsecutiveYs(commonLastWordMatrix);
     const countLastTwoWords = countConsecutiveYs(commonLastTwoWordsMatrix);
+   
 
 // Send in whichever is bigger
     if (countFirstThreeWords >= countFirstWord && countFirstThreeWords >= countFirstTwoWords && countFirstThreeWords >= countLastWord && countFirstThreeWords >= countLastTwoWords && countFirstThreeWords > 0) {
@@ -3135,7 +3149,7 @@ function findCommonWordsMaster(phrases) {
       commonWordsMatrix = "";
     }
   }
-  
+
   return {
     commonWords: commonWords,
     commonWordsMatrix: commonWordsMatrix

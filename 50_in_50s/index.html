@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>50 in Their 50s - Wisdom Mining Initiative</title>
+    <style>
+        :root {
+            --health-color: #7D9D7F;
+            --career-color: #304C70;
+            --relationships-color: #C67C5D;
+            --regrets-color: #8A6B99;
+            --joy-color: #D9B166;
+            --humor-color: #5D9ED0;
+            --background-color: #f7f5f2;
+            --text-dark: #333333;
+            --text-medium: #666666;
+            --border-light: #e0e0e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica', Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            padding: 40px 0 20px;
+            border-bottom: 1px solid var(--border-light);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .header-left {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .main-nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-item {
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: block; /* Ensure div takes space */
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        .nav-item.active {
+            font-weight: bold;
+        }
+
+        /* --- Style Reset for Links --- */
+        /* Reset link styles within specific components */
+        .main-nav .nav-item a,
+        .theme-legend .theme-item-link,
+        .contributors-grid .contributor-card-link,
+        .contributors-list .contributor-list-item-link, /* Added for list view links */
+        .view-options .view-option a,
+        .alphabet-filter .letter a,
+        .pagination .page-number a,
+        .breadcrumb a,
+        .profile-back-button { /* Style back button like a link */
+            color: inherit; /* Use parent's text color */
+            text-decoration: none; /* Remove underline */
+            cursor: pointer;
+        }
+
+        /* Ensure links fill their containers */
+        .main-nav .nav-item a,
+        .view-options .view-option a,
+        .alphabet-filter .letter a,
+        .pagination .page-number a {
+            display: block; /* Make link fill the parent div */
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Specific styles for link wrappers */
+        .theme-item-link {
+            display: flex; /* Maintain flex layout for theme items */
+            align-items: center;
+            padding: 5px 10px; /* Move padding from div to link */
+            border-radius: 20px;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        .theme-item-link:hover,
+        .theme-item-link.active { /* Apply active style to the link */
+             background-color: rgba(0,0,0,0.1);
+        }
+         .theme-item-link.active {
+             font-weight: bold;
+         }
+
+        .contributor-card-link {
+            display: block; /* Make the link a block element */
+            background-color: white; /* Move styles from div to link */
+            border-radius: 5px;
+            border: 1px solid var(--border-light);
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            padding: 15px; /* Move padding from div to link */
+            height: 100%; /* Make cards equal height in grid */
+        }
+        .contributor-card-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+        }
+
+        /* Ensure letters and page numbers center content */
+        .alphabet-filter .letter a,
+        .pagination .page-number a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Breadcrumb link specific style */
+        .breadcrumb a {
+            display: inline; /* Keep breadcrumb links inline */
+            text-decoration: underline; /* Optionally add underline on hover */
+        }
+        .breadcrumb a:hover {
+            color: var(--text-dark); /* Darken on hover */
+        }
+        /* --- End Style Reset for Links --- */
+
+
+        h1, h2, h3, h4, h5, h6, .serif {
+            font-family: Georgia, 'Times New Roman', Times, serif;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            font-weight: normal;
+            color: var(--text-medium);
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .theme-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .theme-item {
+            /* Styles moved to .theme-item-link */
+        }
+
+        .theme-count {
+            background-color: rgba(0,0,0,0.1);
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 0.8rem;
+            margin-left: 8px;
+        }
+
+        .color-box {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+
+        #currentFilterDisplay {
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            margin: 20px 0;
+            font-style: italic;
+            color: var(--text-medium);
+        }
+
+        .connect-button {
+            margin-left: auto;
+            background: var(--background-color);
+            border: 1px solid var(--border-light);
+            border-radius: 15px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .connect-button:hover {
+            background-color: var(--border-light);
+        }
+
+        /* Profile View Styles */
+        #profileView {
+            background-color: white;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 40px;
+            margin-top: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .profile-info .name {
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+        }
+        .profile-info .age {
+             font-size: 1.2rem;
+             color: var(--text-medium);
+             font-style: italic;
+        }
+
+        .profile-back-button {
+             background: var(--background-color);
+             border: 1px solid var(--border-light);
+             padding: 8px 15px;
+             border-radius: 15px;
+             font-size: 0.9rem;
+             transition: background-color 0.2s;
+        }
+        .profile-back-button:hover {
+             background-color: var(--border-light);
+        }
+
+        .profile-answers .question-block {
+            margin-bottom: 35px;
+        }
+
+        .profile-answers .question-text {
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            color: var(--text-medium);
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .profile-answers .answer-text {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            padding-left: 20px;
+            border-left: 3px solid var(--border-light); /* Default border */
+        }
+        /* --- End Profile View Styles --- */
+
+
+        .breadcrumb {
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            font-style: italic;
+            color: var(--text-medium);
+            margin-bottom: 20px;
+        }
+
+        .contributors-section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .view-options {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .view-option {
+            padding: 0; /* Remove padding from div, link handles it */
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: var(--background-color);
+            border: 1px solid var(--border-light);
+            overflow: hidden; /* Ensure link stays within border */
+        }
+        .view-option a {
+             padding: 5px 10px; /* Add padding to link */
+        }
+
+        .view-option.active {
+            background-color: white;
+            font-weight: bold;
+            border-color: var(--text-medium); /* Highlight active border */
+        }
+
+        .alphabet-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        .letter {
+            width: 30px;
+            height: 30px;
+            display: flex; /* Centering handled by link inside */
+            background-color: white;
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            cursor: pointer;
+            overflow: hidden; /* Ensure link stays within border */
+        }
+        .letter a {
+            padding: 5px; /* Adjust padding if needed */
+        }
+
+        .letter:hover, .letter.active {
+            background-color: var(--border-light);
+            font-weight: bold;
+        }
+        .letter.active {
+             border-color: var(--text-medium); /* Highlight active border */
+        }
+
+        .search-box {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid var(--border-light);
+            border-right: none;
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+            font-size: 1rem;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: var(--text-medium);
+            box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+        }
+
+        .search-button {
+            padding: 10px 15px;
+            background-color: var(--text-dark);
+            color: white;
+            border: none;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .search-button:hover {
+            background-color: #555;
+        }
+
+        .contributors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Adjusted minmax */
+            gap: 20px;
+            align-items: stretch; /* Ensure cards stretch to fill height */
+        }
+
+        .contributor-card {
+            /* Styles moved to .contributor-card-link */
+        }
+
+        .contributor-initial {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--background-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 1.5rem;
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            flex-shrink: 0; /* Prevent shrinking in list view */
+        }
+
+        .contributor-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .contributor-age {
+            color: var(--text-medium);
+            font-size: 0.9rem;
+        }
+
+        .contributor-themes {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .theme-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        /* List View Styles */
+        .contributors-list {
+            display: flex; /* Use flex for list layout */
+            flex-direction: column;
+            gap: 15px; /* Space between list items */
+        }
+
+        .contributor-list-item-link {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border-radius: 5px;
+            border: 1px solid var(--border-light);
+            padding: 15px;
+            cursor: pointer;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .contributor-list-item-link:hover {
+            background-color: var(--background-color);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .contributor-list-item-link .contributor-initial {
+            margin: 0 15px 0 0; /* Adjust margin for list view */
+        }
+
+        .contributor-details {
+            flex: 1;
+            text-align: left; /* Align text left in list */
+        }
+
+        .contributor-preview {
+            color: var(--text-medium);
+            font-style: italic;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            /* Truncate long previews */
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .contributor-themes-list { /* Renamed for clarity */
+            display: flex;
+            gap: 8px; /* Slightly more space for pills */
+            margin-top: 8px;
+            flex-wrap: wrap; /* Allow themes to wrap */
+        }
+
+        .theme-pill {
+            font-size: 0.75rem; /* Smaller pills */
+            padding: 3px 10px;
+            border-radius: 12px; /* More rounded */
+            color: white;
+            white-space: nowrap; /* Prevent wrapping within a pill */
+        }
+        /* --- End List View Styles --- */
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 30px; /* More space before pagination */
+        }
+
+        .page-number {
+            width: 30px;
+            height: 30px;
+            display: flex; /* Centering handled by link inside */
+            background-color: white;
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            cursor: pointer;
+            overflow: hidden; /* Ensure link stays within border */
+        }
+        .page-number a {
+            padding: 5px; /* Adjust padding if needed */
+        }
+
+        .page-number:hover, .page-number.active {
+            background-color: var(--border-light);
+            font-weight: bold;
+        }
+         .page-number.active {
+             border-color: var(--text-medium); /* Highlight active border */
+         }
+
+        /* Featured Wisdom Styles */
+        .featured-wisdom {
+            background-color: white;
+            border-radius: 5px;
+            border: 1px solid var(--border-light);
+            padding: 30px;
+            margin-bottom: 40px;
+            position: relative; /* Needed for absolute positioning if used */
+            overflow: hidden; /* Hide non-active quotes */
+        }
+
+        .featured-quote-item {
+            /* Styles applied by JS - initially hidden except first */
+        }
+
+        .featured-quote {
+            font-size: 1.5rem;
+            font-style: italic;
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .featured-attribution {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center; /* Align items vertically */
+        }
+
+        .featured-name {
+            font-weight: bold;
+        }
+
+        .featured-theme {
+            display: inline-flex; /* Use inline-flex for alignment */
+            align-items: center;
+            color: var(--text-medium);
+            font-style: italic;
+            margin-left: 10px;
+            font-size: 0.9em; /* Slightly smaller */
+        }
+         .featured-theme .color-box { /* Add color box to featured theme */
+            width: 12px;
+            height: 12px;
+            margin-right: 6px;
+         }
+
+        .featured-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 8px; /* More space between dots */
+            margin-top: 25px; /* More space above dots */
+        }
+
+        .featured-dot {
+            width: 10px; /* Larger dots */
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--border-light);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .featured-dot:hover {
+             background-color: #ccc; /* Hover effect */
+        }
+
+        .featured-dot.active {
+            background-color: var(--text-medium);
+        }
+        /* --- End Featured Wisdom Styles --- */
+
+        #mainContent {
+            min-height: 500px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 30px 0;
+            border-top: 1px solid var(--border-light);
+            font-style: italic;
+            color: var(--text-medium);
+        }
+
+        .hidden {
+            display: none !important; /* Use important to override other display styles */
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: var(--text-medium);
+            font-style: italic;
+        }
+
+        /* Media Queries */
+        @media (max-width: 768px) {
+            .contributors-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); /* Adjusted */
+            }
+            .connect-button {
+                margin: 15px auto 0;
+            }
+            #profileView {
+                padding: 25px;
+            }
+            .profile-info .name {
+                font-size: 1.8rem;
+            }
+            .profile-answers .question-text {
+                font-size: 1rem;
+            }
+             .profile-answers .answer-text {
+                font-size: 1rem;
+            }
+            .featured-quote {
+                font-size: 1.3rem;
+            }
+        }
+         @media (max-width: 480px) {
+             .contributors-grid {
+                grid-template-columns: 1fr; /* Single column on very small screens */
+            }
+            .theme-legend {
+                gap: 10px; /* Reduce gap */
+            }
+            .theme-item-link {
+                padding: 4px 8px;
+            }
+            .alphabet-filter {
+                gap: 3px;
+            }
+            .letter {
+                width: 26px;
+                height: 26px;
+            }
+         }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-left">
+                <h1>50 in Their 50s</h1>
+                <h2>A Wisdom Mining Initiative</h2>
+            </div>
+            <nav class="main-nav">
+                <div class="nav-item" data-view="home"><a href="#">Home</a></div>
+                <div class="nav-item active" data-view="browse"><a href="#">Browse All</a></div>
+                <div class="nav-item" data-view="themes"><a href="#">Themes</a></div>
+                <div class="nav-item" data-view="about"><a href="#">About</a></div>
+            </nav>
+        </header>
+
+        <main id="mainContent">
+            <div id="browseView">
+                <div class="breadcrumb">
+                    <a href="#">Home</a> / Browse All Contributors
+                </div>
+
+                <div class="featured-wisdom">
+                    <div id="featuredQuoteContainer">
+                         </div>
+                    <div class="featured-indicator" id="featuredIndicator">
+                         </div>
+                </div>
+                <div class="theme-legend">
+                     <a href="#" class="theme-item-link active" data-theme="all">
+                        <div class="color-box" style="background: linear-gradient(to right, var(--health-color), var(--career-color), var(--relationships-color), var(--regrets-color), var(--humor-color), var(--joy-color));"></div>
+                        <span>All Themes</span>
+                        <span class="theme-count" data-theme-count="all">0</span>
+                    </a>
+                    <a href="#" class="theme-item-link" data-theme="health">
+                        <div class="color-box" style="background-color: var(--health-color);"></div>
+                        <span>Health & Body</span>
+                        <span class="theme-count" data-theme-count="health">0</span>
+                    </a>
+                    <a href="#" class="theme-item-link" data-theme="career">
+                        <div class="color-box" style="background-color: var(--career-color);"></div>
+                        <span>Career & Money</span>
+                        <span class="theme-count" data-theme-count="career">0</span>
+                    </a>
+                    <a href="#" class="theme-item-link" data-theme="relationships">
+                        <div class="color-box" style="background-color: var(--relationships-color);"></div>
+                        <span>Relationships & Parenting</span>
+                        <span class="theme-count" data-theme-count="relationships">0</span>
+                    </a>
+                    <a href="#" class="theme-item-link" data-theme="regrets">
+                        <div class="color-box" style="background-color: var(--regrets-color);"></div>
+                        <span>Regrets & Redemptions</span>
+                        <span class="theme-count" data-theme-count="regrets">0</span>
+                    </a>
+                    <a href="#" class="theme-item-link" data-theme="humor">
+                        <div class="color-box" style="background-color: var(--humor-color);"></div>
+                        <span>Humor, Fun & Adventure</span>
+                        <span class="theme-count" data-theme-count="humor">0</span>
+                    </a>
+                    <a href="#" class="theme-item-link" data-theme="joy">
+                        <div class="color-box" style="background-color: var(--joy-color);"></div>
+                        <span>Joy, Meaning & Legacy</span>
+                        <span class="theme-count" data-theme-count="joy">0</span>
+                    </a>
+                </div>
+                <section class="contributors-section">
+                    <div class="section-header">
+                        <h3>Browse All Contributors</h3>
+                        <div class="view-options">
+                             <div class="view-option active" data-view-target="grid"><a href="#">Grid View</a></div>
+                            <div class="view-option" data-view-target="list"><a href="#">List View</a></div>
+                        </div>
+                    </div>
+
+                    <div class="alphabet-filter">
+                         <div class="letter active" data-letter="All"><a href="#">All</a></div>
+                        <div class="letter" data-letter="A"><a href="#">A</a></div>
+                        <div class="letter" data-letter="B"><a href="#">B</a></div>
+                        <div class="letter" data-letter="C"><a href="#">C</a></div>
+                        <div class="letter" data-letter="D"><a href="#">D</a></div>
+                        <div class="letter" data-letter="E"><a href="#">E</a></div>
+                        <div class="letter" data-letter="F"><a href="#">F</a></div>
+                        <div class="letter" data-letter="G"><a href="#">G</a></div>
+                        <div class="letter" data-letter="H"><a href="#">H</a></div>
+                        <div class="letter" data-letter="I"><a href="#">I</a></div>
+                        <div class="letter" data-letter="J"><a href="#">J</a></div>
+                        <div class="letter" data-letter="K"><a href="#">K</a></div>
+                        <div class="letter" data-letter="L"><a href="#">L</a></div>
+                        <div class="letter" data-letter="M"><a href="#">M</a></div>
+                        <div class="letter" data-letter="N"><a href="#">N</a></div>
+                        <div class="letter" data-letter="O"><a href="#">O</a></div>
+                        <div class="letter" data-letter="P"><a href="#">P</a></div>
+                        <div class="letter" data-letter="Q"><a href="#">Q</a></div>
+                        <div class="letter" data-letter="R"><a href="#">R</a></div>
+                        <div class="letter" data-letter="S"><a href="#">S</a></div>
+                        <div class="letter" data-letter="T"><a href="#">T</a></div>
+                        <div class="letter" data-letter="U"><a href="#">U</a></div>
+                        <div class="letter" data-letter="V"><a href="#">V</a></div>
+                        <div class="letter" data-letter="W"><a href="#">W</a></div>
+                        <div class="letter" data-letter="X"><a href="#">X</a></div>
+                        <div class="letter" data-letter="Y"><a href="#">Y</a></div>
+                        <div class="letter" data-letter="Z"><a href="#">Z</a></div>
+                    </div>
+                    <div class="search-box">
+                        <input type="text" id="searchInput" class="search-input" placeholder="Search keywords in answers...">
+                        <button id="searchButton" class="search-button">Search</button>
+                    </div>
+                    <div class="contributors-grid" id="contributorsGrid">
+                        <a href="#" class="contributor-card-link" data-id="1">
+                            <div class="contributor-initial" style="background-color: var(--health-color);">C</div>
+                            <div class="contributor-name">Claire Michaels</div>
+                            <div class="contributor-age">54</div>
+                            <div class="contributor-themes">
+                                <div class="theme-dot" style="background-color: var(--health-color);"></div>
+                                <div class="theme-dot" style="background-color: var(--relationships-color);"></div>
+                                <div class="theme-dot" style="background-color: var(--joy-color);"></div>
+                                <div class="theme-dot" style="background-color: var(--humor-color);"></div>
+                            </div>
+                        </a>
+                        <a href="#" class="contributor-card-link" data-id="2">
+                            <div class="contributor-initial" style="background-color: var(--career-color);">M</div>
+                            <div class="contributor-name">Marcus Thompson</div>
+                            <div class="contributor-age">57</div>
+                            <div class="contributor-themes">
+                                <div class="theme-dot" style="background-color: var(--career-color);"></div>
+                                <div class="theme-dot" style="background-color: var(--joy-color);"></div>
+                            </div>
+                        </a>
+                         <a href="#" class="contributor-card-link" data-id="3">
+                            <div class="contributor-initial" style="background-color: var(--relationships-color);">P</div>
+                            <div class="contributor-name">Priya Kapoor</div>
+                            <div class="contributor-age">52</div>
+                            <div class="contributor-themes">
+                                <div class="theme-dot" style="background-color: var(--relationships-color);"></div>
+                                <div class="theme-dot" style="background-color: var(--joy-color);"></div>
+                            </div>
+                        </a>
+                        <a href="#" class="contributor-card-link" data-id="4">
+                            <div class="contributor-initial" style="background-color: var(--humor-color);">D</div>
+                            <div class="contributor-name">David Liu</div>
+                            <div class="contributor-age">55</div>
+                            <div class="contributor-themes">
+                                <div class="theme-dot" style="background-color: var(--humor-color);"></div>
+                                <div class="theme-dot" style="background-color: var(--career-color);"></div>
+                            </div>
+                        </a>
+                         <a href="#" class="contributor-card-link" data-id="5">
+                            <div class="contributor-initial" style="background-color: var(--regrets-color);">J</div>
+                            <div class="contributor-name">James Wilson</div>
+                            <div class="contributor-age">58</div>
+                            <div class="contributor-themes">
+                                <div class="theme-dot" style="background-color: var(--regrets-color);"></div>
+                            </div>
+                        </a>
+                        <a href="#" class="contributor-card-link" data-id="6">
+                            <div class="contributor-initial" style="background-color: var(--health-color);">S</div>
+                            <div class="contributor-name">Sarah Johnson</div>
+                            <div class="contributor-age">51</div>
+                            <div class="contributor-themes">
+                                <div class="theme-dot" style="background-color: var(--health-color);"></div>
+                                <div class="theme-dot" style="background-color: var(--relationships-color);"></div>
+                            </div>
+                        </a>
+                         <a href="#" class="contributor-card-link" data-id="7">
+                            <div class="contributor-initial" style="background-color: var(--career-color);">R</div>
+                            <div class="contributor-name">Robert Chen</div>
+                            <div class="contributor-age">57</div>
+                            <div class="contributor-themes">
+                                <div class="theme-dot" style="background-color: var(--career-color);"></div>
+                                <div class="theme-dot" style="background-color: var(--regrets-color);"></div>
+                                <div class="theme-dot" style="background-color: var(--joy-color);"></div>
+                            </div>
+                        </a>
+                        <a href="#" class="contributor-card-link" data-id="8">
+                            <div class="contributor-initial" style="background-color: var(--relationships-color);">E</div>
+                            <div class="contributor-name">Elena Rodriguez</div>
+                            <div class="contributor-age">53</div>
+                            <div class="contributor-themes">
+                                <div class="theme-dot" style="background-color: var(--relationships-color);"></div>
+                                <div class="theme-dot" style="background-color: var(--humor-color);"></div>
+                            </div>
+                        </a>
+                        <a href="#" class="contributor-card-link" data-id="9">
+                            <div class="contributor-initial" style="background-color: var(--joy-color);">T</div>
+                            <div class="contributor-name">Thomas Wright</div>
+                            <div class="contributor-age">59</div>
+                            <div class="contributor-themes">
+                                <div class="theme-dot" style="background-color: var(--joy-color);"></div>
+                                <div class="theme-dot" style="background-color: var(--health-color);"></div>
+                            </div>
+                        </a>
+                        <a href="#" class="contributor-card-link" data-id="10">
+                            <div class="contributor-initial" style="background-color: var(--humor-color);">N</div>
+                            <div class="contributor-name">Naomi Parker</div>
+                            <div class="contributor-age">56</div>
+                            <div class="contributor-themes">
+                                <div class="theme-dot" style="background-color: var(--humor-color);"></div>
+                                <div class="theme-dot" style="background-color: var(--health-color);"></div>
+                            </div>
+                        </a>
+                        <a href="#" class="contributor-card-link" data-id="11">
+                            <div class="contributor-initial" style="background-color: var(--regrets-color);">K</div>
+                            <div class="contributor-name">Kevin Foster</div>
+                            <div class="contributor-age">54</div>
+                            <div class="contributor-themes">
+                                <div class="theme-dot" style="background-color: var(--regrets-color);"></div>
+                                <div class="theme-dot" style="background-color: var(--career-color);"></div>
+                            </div>
+                        </a>
+                        <a href="#" class="contributor-card-link" data-id="12">
+                            <div class="contributor-initial" style="background-color: var(--relationships-color);">A</div>
+                            <div class="contributor-name">Anisha Patel</div>
+                            <div class="contributor-age">52</div>
+                            <div class="contributor-themes">
+                                <div class="theme-dot" style="background-color: var(--relationships-color);"></div>
+                                <div class="theme-dot" style="background-color: var(--career-color);"></div>
+                            </div>
+                        </a>
+                        </div>
+                    <div class="contributors-list hidden" id="contributorsList">
+                        <a href="#" class="contributor-list-item-link" data-id="1">
+                            <div class="contributor-initial" style="background-color: var(--health-color);">C</div>
+                            <div class="contributor-details">
+                                <div class="contributor-name">Claire Michaels</div>
+                                <div class="contributor-age">54</div>
+                                <div class="contributor-themes-list">
+                                    <span class="theme-pill" style="background-color: var(--health-color)">Health</span>
+                                    <span class="theme-pill" style="background-color: var(--relationships-color)">Relationships</span>
+                                    <span class="theme-pill" style="background-color: var(--joy-color)">Joy</span>
+                                    <span class="theme-pill" style="background-color: var(--humor-color)">Humor</span>
+                                </div>
+                                <div class="contributor-preview">The body doesn't just age—it keeps score...</div>
+                            </div>
+                        </a>
+                         <a href="#" class="contributor-list-item-link" data-id="2">
+                            <div class="contributor-initial" style="background-color: var(--career-color);">M</div>
+                            <div class="contributor-details">
+                                <div class="contributor-name">Marcus Thompson</div>
+                                <div class="contributor-age">57</div>
+                                <div class="contributor-themes-list">
+                                     <span class="theme-pill" style="background-color: var(--career-color)">Career</span>
+                                     <span class="theme-pill" style="background-color: var(--joy-color)">Joy</span>
+                                </div>
+                                <div class="contributor-preview">That 'success' isn't a destination you arrive at...</div>
+                            </div>
+                        </a>
+                         <a href="#" class="contributor-list-item-link" data-id="3">
+                            <div class="contributor-initial" style="background-color: var(--relationships-color);">P</div>
+                            <div class="contributor-details">
+                                <div class="contributor-name">Priya Kapoor</div>
+                                <div class="contributor-age">52</div>
+                                <div class="contributor-themes-list">
+                                     <span class="theme-pill" style="background-color: var(--relationships-color)">Relationships</span>
+                                     <span class="theme-pill" style="background-color: var(--joy-color)">Joy</span>
+                                </div>
+                                <div class="contributor-preview">How much unresolved grief we carry...</div>
+                            </div>
+                        </a>
+                         <a href="#" class="contributor-list-item-link" data-id="4">
+                            <div class="contributor-initial" style="background-color: var(--humor-color);">D</div>
+                            <div class="contributor-details">
+                                <div class="contributor-name">David Liu</div>
+                                <div class="contributor-age">55</div>
+                                <div class="contributor-themes-list">
+                                     <span class="theme-pill" style="background-color: var(--humor-color)">Humor</span>
+                                     <span class="theme-pill" style="background-color: var(--career-color)">Career</span>
+                                </div>
+                                <div class="contributor-preview">Placeholder preview...</div>
+                            </div>
+                        </a>
+                         <a href="#" class="contributor-list-item-link" data-id="5">
+                            <div class="contributor-initial" style="background-color: var(--regrets-color);">J</div>
+                            <div class="contributor-details">
+                                <div class="contributor-name">James Wilson</div>
+                                <div class="contributor-age">58</div>
+                                <div class="contributor-themes-list">
+                                     <span class="theme-pill" style="background-color: var(--regrets-color)">Regrets</span>
+                                </div>
+                                <div class="contributor-preview">Placeholder preview...</div>
+                            </div>
+                        </a>
+                         <a href="#" class="contributor-list-item-link" data-id="6">
+                            <div class="contributor-initial" style="background-color: var(--health-color);">S</div>
+                            <div class="contributor-details">
+                                <div class="contributor-name">Sarah Johnson</div>
+                                <div class="contributor-age">51</div>
+                                <div class="contributor-themes-list">
+                                     <span class="theme-pill" style="background-color: var(--health-color)">Health</span>
+                                     <span class="theme-pill" style="background-color: var(--relationships-color)">Relationships</span>
+                                </div>
+                                <div class="contributor-preview">Placeholder preview...</div>
+                            </div>
+                        </a>
+                         <a href="#" class="contributor-list-item-link" data-id="7">
+                            <div class="contributor-initial" style="background-color: var(--career-color);">R</div>
+                            <div class="contributor-details">
+                                <div class="contributor-name">Robert Chen</div>
+                                <div class="contributor-age">57</div>
+                                <div class="contributor-themes-list">
+                                     <span class="theme-pill" style="background-color: var(--career-color)">Career</span>
+                                     <span class="theme-pill" style="background-color: var(--regrets-color)">Regrets</span>
+                                     <span class="theme-pill" style="background-color: var(--joy-color)">Joy</span>
+                                </div>
+                                <div class="contributor-preview">Placeholder preview...</div>
+                            </div>
+                        </a>
+                         <a href="#" class="contributor-list-item-link" data-id="8">
+                            <div class="contributor-initial" style="background-color: var(--relationships-color);">E</div>
+                            <div class="contributor-details">
+                                <div class="contributor-name">Elena Rodriguez</div>
+                                <div class="contributor-age">53</div>
+                                <div class="contributor-themes-list">
+                                     <span class="theme-pill" style="background-color: var(--relationships-color)">Relationships</span>
+                                     <span class="theme-pill" style="background-color: var(--humor-color)">Humor</span>
+                                </div>
+                                <div class="contributor-preview">Placeholder preview...</div>
+                            </div>
+                        </a>
+                         <a href="#" class="contributor-list-item-link" data-id="9">
+                            <div class="contributor-initial" style="background-color: var(--joy-color);">T</div>
+                            <div class="contributor-details">
+                                <div class="contributor-name">Thomas Wright</div>
+                                <div class="contributor-age">59</div>
+                                <div class="contributor-themes-list">
+                                     <span class="theme-pill" style="background-color: var(--joy-color)">Joy</span>
+                                     <span class="theme-pill" style="background-color: var(--health-color)">Health</span>
+                                </div>
+                                <div class="contributor-preview">Placeholder preview...</div>
+                            </div>
+                        </a>
+                         <a href="#" class="contributor-list-item-link" data-id="10">
+                            <div class="contributor-initial" style="background-color: var(--humor-color);">N</div>
+                            <div class="contributor-details">
+                                <div class="contributor-name">Naomi Parker</div>
+                                <div class="contributor-age">56</div>
+                                <div class="contributor-themes-list">
+                                     <span class="theme-pill" style="background-color: var(--humor-color)">Humor</span>
+                                     <span class="theme-pill" style="background-color: var(--health-color)">Health</span>
+                                </div>
+                                <div class="contributor-preview">Placeholder preview...</div>
+                            </div>
+                        </a>
+                         <a href="#" class="contributor-list-item-link" data-id="11">
+                            <div class="contributor-initial" style="background-color: var(--regrets-color);">K</div>
+                            <div class="contributor-details">
+                                <div class="contributor-name">Kevin Foster</div>
+                                <div class="contributor-age">54</div>
+                                <div class="contributor-themes-list">
+                                     <span class="theme-pill" style="background-color: var(--regrets-color)">Regrets</span>
+                                     <span class="theme-pill" style="background-color: var(--career-color)">Career</span>
+                                </div>
+                                <div class="contributor-preview">Placeholder preview...</div>
+                            </div>
+                        </a>
+                         <a href="#" class="contributor-list-item-link" data-id="12">
+                            <div class="contributor-initial" style="background-color: var(--relationships-color);">A</div>
+                            <div class="contributor-details">
+                                <div class="contributor-name">Anisha Patel</div>
+                                <div class="contributor-age">52</div>
+                                <div class="contributor-themes-list">
+                                     <span class="theme-pill" style="background-color: var(--relationships-color)">Relationships</span>
+                                     <span class="theme-pill" style="background-color: var(--career-color)">Career</span>
+                                </div>
+                                <div class="contributor-preview">Placeholder preview...</div>
+                            </div>
+                        </a>
+                        </div>
+                    </section>
+                </div> <div id="profileView" class="hidden">
+                 <div class="profile-header">
+                     <div class="profile-info">
+                         <div id="profileName" class="name">Contributor Name</div>
+                         <div id="profileAge" class="age">Age</div>
+                     </div>
+                     <button id="backButton" class="profile-back-button">&larr; Back to Browse</button>
+                 </div>
+                 <div id="profileAnswers" class="profile-answers">
+                     <div class="question-block">
+                         <p class="question-text">"What is a truth you've learned that most people your age don't talk about?"</p>
+                         <p id="profileAnswer1" class="answer-text">Answer 1 goes here...</p>
+                     </div>
+                     <div class="question-block">
+                         <p class="question-text">"If you could whisper one sentence to your 30-year-old self, what would it be?"</p>
+                         <p id="profileAnswer2" class="answer-text">Answer 2 goes here...</p>
+                     </div>
+                     <div class="question-block">
+                         <p class="question-text">"What small decision changed your life in a big way?"</p>
+                         <p id="profileAnswer3" class="answer-text">Answer 3 goes here...</p>
+                     </div>
+                 </div>
+            </div> </main>
+
+        <footer class="footer">
+             <p>&copy; 2025 Wisdom Mining Initiative | <a href="#" style="color: inherit;">Privacy Policy</a></p>
+        </footer>
+    </div> <script>
+        // --- Data ---
+        // Theme slugs: health, career, relationships, regrets, joy, humor
+        const contributorsData = [
+             { id: 1, name: "Claire Michaels", age: 54, initial: "C", themes: ["health", "relationships", "joy", "humor"], colorVar: "--health-color", answers: { q1: "The body doesn't just age—it keeps score. Every all-nighter, every skipped meal, every emotional trauma lives somewhere in your tissue. What people don't talk about is how forgiveness—of yourself and others—can be physically healing.", q2: "\"The silence between your words matters more than you think.\"", q3: "Saying yes to a dinner invitation I almost declined—I met my wife that night, and twenty years later, that chance encounter reshaped everything from my career to my spirituality." } },
+             { id: 2, name: "Marcus Thompson", age: 57, initial: "M", themes: ["career", "joy"], colorVar: "--career-color", answers: { q1: "That 'success' isn't a destination you arrive at, but the quality of your attention on the journey. I spent too long chasing the next promotion instead of savoring the craft.", q2: "\"Don't just network, build real friendships. They'll sustain you far longer than any title.\"", q3: "Learning to code basic Python in my late 40s. It seemed small, but it opened up a whole new way of thinking and led to my current fulfilling (and unexpected) career chapter." } },
+             { id: 3, name: "Priya Kapoor", age: 52, initial: "P", themes: ["relationships", "joy"], colorVar: "--relationships-color", answers: { q1: "How much unresolved grief we carry from our younger years. It doesn't vanish, it just changes shape and affects our current relationships until we consciously address it.", q2: "\"Your children need your presence more than your perfection.\"", q3: "Starting a weekly 'artist date' just for myself, inspired by Julia Cameron's book. It reconnected me to my own creativity and joy outside of my roles as wife and mother." } },
+             { id: 4, name: "David Liu", age: 55, initial: "D", themes: ["humor", "career"], colorVar: "--humor-color", answers: { q1: "That worrying about 'what other people think' is the biggest waste of energy. By 50, you realize most people aren't thinking about you nearly as much as you imagine.", q2: "\"Buy the good shoes. Your feet will thank you later.\"", q3: "Quitting my 'safe' job at 48 to consult independently. Terrifying at first, but it forced me to trust my own skills and build something truly mine." } },
+             { id: 5, name: "James Wilson", age: 58, initial: "J", themes: ["regrets"], colorVar: "--regrets-color", answers: { q1: "The corrosive power of unspoken resentments in a long marriage. It's not the big fights, but the small, silent withdrawals that do the most damage.", q2: "\"Forgive your parents. They were likely doing the best they could with what they knew.\"", q3: "Finally apologizing to my estranged brother after 15 years of silence. It didn't fix everything overnight, but it opened a door I thought was permanently closed." } },
+             { id: 6, name: "Sarah Johnson", age: 51, initial: "S", themes: ["health", "relationships"], colorVar: "--health-color", answers: { q1: "Menopause isn't just hot flashes; it's a fundamental rewiring of your brain and body. We need to talk more openly about the mental and emotional shifts.", q2: "\"Stop trying to 'fix' your friends' problems. Just listen.\"", q3: "Adopting a rescue dog. Sounds cliché, but that daily need for walks forced me out of a depressive slump and reconnected me to my neighborhood." } },
+             { id: 7, name: "Robert Chen", age: 57, initial: "R", themes: ["career", "regrets", "joy"], colorVar: "--career-color", answers: { q1: "How quickly your professional identity can evaporate after retirement or redundancy if you haven't cultivated other parts of yourself.", q2: "\"Invest in experiences, not just things. The memories compound interest.\"", q3: "Taking a sabbatical to travel through Southeast Asia. It cost a lot of savings, but it fundamentally changed my perspective on work, money, and what 'enough' means." } },
+             { id: 8, name: "Elena Rodriguez", age: 53, initial: "E", themes: ["relationships", "humor"], colorVar: "--relationships-color", answers: { q1: "Friendships require active maintenance, just like romantic relationships. You can't just expect them to coast on history.", q2: "\"Learn to laugh at yourself. It's incredibly liberating.\"", q3: "Joining an improv comedy class despite being terrified. It taught me to embrace imperfection and find joy in the unexpected." } },
+             { id: 9, name: "Thomas Wright", age: 59, initial: "T", themes: ["joy", "health"], colorVar: "--joy-color", answers: { q1: "The profound peace that comes from accepting you can't control everything, especially your adult children's choices.", q2: "\"Stretch every single day. Seriously.\"", q3: "Planting a small vegetable garden. The simple act of tending to something growing grounded me during a period of intense work stress." } },
+             { id: 10, name: "Naomi Parker", age: 56, initial: "N", themes: ["humor", "health"], colorVar: "--humor-color", answers: { q1: "Your 'weird' hobbies and interests are often the source of your greatest connections and joy. Don't hide them.", q2: "\"It's okay to outgrow people, even if you still love them.\"", q3: "Learning to swim properly as an adult. It conquered a lifelong fear and opened up a new form of exercise I genuinely enjoy." } },
+             { id: 11, name: "Kevin Foster", age: 54, initial: "K", themes: ["regrets", "career"], colorVar: "--regrets-color", answers: { q1: "The surprising weight of financial anxiety, even when you're outwardly 'successful'. It often stems from deeper insecurities than just money.", q2: "\"Don't wait for the 'perfect' time to make a change. It doesn't exist.\"", q3: "Hiring a financial advisor. It forced me to confront my money habits and create a real plan, reducing a huge source of background stress." } },
+             { id: 12, name: "Anisha Patel", age: 52, initial: "A", themes: ["relationships", "career"], colorVar: "--relationships-color", answers: { q1: "Navigating the 'sandwich generation'—caring for aging parents while still supporting children—is far more emotionally taxing than anyone prepares you for.", q2: "\"Define your own version of 'having it all'. It probably doesn't look like the magazine covers.\"", q3: "Setting a firm boundary with a demanding client, even though I feared losing the contract. It boosted my self-respect and, surprisingly, earned their respect too." } },
+            // Add data for the remaining contributors...
+        ];
+
+        // Sample data for featured quotes (link to contributor IDs)
+        const featuredQuotesData = [
+            // ... (Featured quotes data remains the same) ...
+             { id: 1, quote: "The body doesn't just age—it keeps score... forgiveness—of yourself and others—can be physically healing.", name: "Claire Michaels", age: 54, theme: "Health & Body", colorVar: "--health-color" },
+             { id: 2, quote: "That 'success' isn't a destination you arrive at, but the quality of your attention on the journey. I spent too long chasing the next promotion instead of savoring the craft.", name: "Marcus Thompson", age: 57, theme: "Career & Money", colorVar: "--career-color" },
+             { id: 3, quote: "How much unresolved grief we carry from our younger years. It doesn't vanish, it just changes shape and affects our current relationships until we consciously address it.", name: "Priya Kapoor", age: 52, theme: "Relationships & Parenting", colorVar: "--relationships-color" },
+             { id: 7, quote: "How quickly your professional identity can evaporate after retirement or redundancy if you haven't cultivated other parts of yourself.", name: "Robert Chen", age: 57, theme: "Career & Money", colorVar: "--career-color" },
+             { id: 8, quote: "Friendships require active maintenance, just like romantic relationships. You can't just expect them to coast on history.", name: "Elena Rodriguez", age: 53, theme: "Relationships & Parenting", colorVar: "--relationships-color" }
+        ];
+
+        // --- DOM Elements ---
+        const browseView = document.getElementById('browseView');
+        const profileView = document.getElementById('profileView');
+        const contributorsGrid = document.getElementById('contributorsGrid');
+        const contributorsList = document.getElementById('contributorsList');
+        const themeLegend = document.querySelector('.theme-legend');
+        const backButton = document.getElementById('backButton');
+        const viewOptionsContainer = document.querySelector('.view-options');
+        const alphabetFilterContainer = document.querySelector('.alphabet-filter');
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const featuredQuoteContainer = document.getElementById('featuredQuoteContainer');
+        const featuredIndicator = document.getElementById('featuredIndicator');
+
+        // Profile View Elements
+        const profileNameEl = document.getElementById('profileName');
+        const profileAgeEl = document.getElementById('profileAge');
+        const profileAnswer1El = document.getElementById('profileAnswer1');
+        const profileAnswer2El = document.getElementById('profileAnswer2');
+        const profileAnswer3El = document.getElementById('profileAnswer3');
+        const profileAnswersContainer = document.getElementById('profileAnswers');
+
+        // --- State Variables ---
+        let activeTheme = 'all';
+        let activeLetter = 'All';
+        let searchTerm = '';
+        let currentFeaturedIndex = 0;
+
+        // --- Functions ---
+
+        /**
+         * Finds contributor data by ID.
+         * @param {number | string} id - The ID of the contributor.
+         * @returns {object|null} The contributor object or null if not found.
+         */
+        function getContributorById(id) {
+            const numericId = parseInt(id, 10);
+            return contributorsData.find(c => c.id === numericId) || null;
+        }
+
+        /**
+         * Displays the profile view for a given contributor.
+         * @param {number | string} contributorId - The ID of the contributor to display.
+         */
+        function showProfile(contributorId) {
+            const contributor = getContributorById(contributorId);
+            if (!contributor) {
+                console.error("Contributor not found:", contributorId);
+                return;
+            }
+            profileNameEl.textContent = contributor.name;
+            profileAgeEl.textContent = `${contributor.age} years old`;
+            profileAnswer1El.textContent = contributor.answers.q1;
+            profileAnswer2El.textContent = contributor.answers.q2;
+            profileAnswer3El.textContent = contributor.answers.q3;
+            const themeColor = getComputedStyle(document.documentElement).getPropertyValue(contributor.colorVar || '--border-light').trim();
+             profileAnswersContainer.querySelectorAll('.answer-text').forEach(el => {
+                 el.style.borderLeft = `3px solid ${themeColor || 'var(--border-light)'}`;
+             });
+            browseView.classList.add('hidden');
+            profileView.classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        /**
+         * Hides the profile view and shows the browse view.
+         */
+        function showBrowseView() {
+            profileView.classList.add('hidden');
+            browseView.classList.remove('hidden');
+        }
+
+        /**
+         * Applies all active filters (theme, letter, search) to both grid and list views.
+         */
+        function applyFilters() {
+            const searchTermLower = searchTerm.toLowerCase();
+            const allContributorElements = document.querySelectorAll('.contributor-card-link, .contributor-list-item-link');
+
+            allContributorElements.forEach(element => {
+                const cardId = element.dataset.id;
+                const contributor = getContributorById(cardId);
+                let show = false; // Default to hidden
+
+                if (contributor) {
+                    // Check theme match
+                    const themeMatch = activeTheme === 'all' || contributor.themes.includes(activeTheme);
+                    // Check letter match
+                    const letterMatch = activeLetter === 'All' || contributor.name.toUpperCase().startsWith(activeLetter);
+
+                    // --- MODIFIED SEARCH LOGIC ---
+                    // Check search match within answers
+                    let searchMatch = false;
+                    if (searchTermLower === '') {
+                        searchMatch = true; // Show all if search is empty
+                    } else if (contributor.answers) { // Check if answers exist
+                        // Safely access answers and convert to lowercase
+                        const q1Lower = contributor.answers.q1?.toLowerCase() || '';
+                        const q2Lower = contributor.answers.q2?.toLowerCase() || '';
+                        const q3Lower = contributor.answers.q3?.toLowerCase() || '';
+                        // Check if search term is included in any answer
+                        searchMatch = q1Lower.includes(searchTermLower) ||
+                                      q2Lower.includes(searchTermLower) ||
+                                      q3Lower.includes(searchTermLower);
+                    }
+                    // --- END MODIFIED SEARCH LOGIC ---
+
+                    // Show only if all filters match
+                    show = themeMatch && letterMatch && searchMatch;
+                }
+                // Toggle hidden class based on whether the contributor passes all filters
+                element.classList.toggle('hidden', !show);
+            });
+        }
+
+
+        /**
+         * Updates the theme counts displayed in the legend.
+         */
+        function updateThemeCounts() {
+            const themeCounts = { all: contributorsData.length };
+            contributorsData.forEach(c => {
+                c.themes.forEach(theme => {
+                    themeCounts[theme] = (themeCounts[theme] || 0) + 1;
+                });
+            });
+
+            document.querySelectorAll('.theme-count').forEach(span => {
+                const theme = span.dataset.themeCount;
+                span.textContent = themeCounts[theme] || 0;
+            });
+        }
+
+         /**
+         * Updates the display of the featured quote carousel.
+         * @param {number} index - The index of the quote to display.
+         */
+        function showFeaturedQuote(index) {
+            const quoteItems = featuredQuoteContainer.querySelectorAll('.featured-quote-item');
+            const dots = featuredIndicator.querySelectorAll('.featured-dot');
+
+            if (quoteItems.length === 0) return; // Exit if no items
+
+            // Ensure index is within bounds
+            const validIndex = (index + quoteItems.length) % quoteItems.length; // Handles negative index and overflow
+
+            quoteItems.forEach((item, i) => {
+                item.classList.toggle('hidden', i !== validIndex);
+            });
+             // Only toggle dots if they exist (more than one quote)
+             if (dots.length > 0) {
+                 dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === validIndex);
+                });
+             }
+            currentFeaturedIndex = validIndex;
+        }
+
+        /**
+         * Initializes the featured quote section.
+         */
+        function initializeFeaturedQuotes() {
+            featuredQuoteContainer.innerHTML = ''; // Clear existing static content
+            featuredIndicator.innerHTML = ''; // Clear existing dots
+
+            if (!featuredQuotesData || featuredQuotesData.length === 0) return; // Exit if no data
+
+            featuredQuotesData.forEach((quoteData, index) => {
+                // Create quote item
+                const item = document.createElement('div');
+                item.classList.add('featured-quote-item');
+                if (index !== 0) {
+                    item.classList.add('hidden'); // Hide all but the first
+                }
+                item.dataset.index = index;
+
+                const quoteText = document.createElement('div');
+                quoteText.classList.add('featured-quote');
+                // Basic truncation for display - consider more robust solution if needed
+                const truncatedQuote = quoteData.quote.length > 150 ? quoteData.quote.substring(0, 150) + "..." : quoteData.quote;
+                quoteText.textContent = `"${truncatedQuote}"`; // Add quotes
+
+                const attribution = document.createElement('div');
+                attribution.classList.add('featured-attribution');
+
+                const nameAge = document.createElement('div');
+                nameAge.classList.add('featured-name');
+                nameAge.textContent = `— ${quoteData.name}, ${quoteData.age}`;
+
+                const themeInfo = document.createElement('div');
+                themeInfo.classList.add('featured-theme');
+                const colorBox = document.createElement('div');
+                colorBox.classList.add('color-box');
+                colorBox.style.backgroundColor = `var(${quoteData.colorVar})`;
+                themeInfo.appendChild(colorBox);
+                themeInfo.append(` ${quoteData.theme}`); // Add space before theme text
+
+                attribution.appendChild(nameAge);
+                attribution.appendChild(themeInfo);
+                item.appendChild(quoteText);
+                item.appendChild(attribution);
+                featuredQuoteContainer.appendChild(item);
+
+                // Create indicator dot only if more than one quote
+                if (featuredQuotesData.length > 1) {
+                    const dot = document.createElement('div');
+                    dot.classList.add('featured-dot');
+                    if (index === 0) {
+                        dot.classList.add('active');
+                    }
+                    dot.dataset.index = index;
+                    featuredIndicator.appendChild(dot);
+                }
+            });
+
+            // Add event listener to dots container only if more than one quote
+            if (featuredQuotesData.length > 1) {
+                featuredIndicator.addEventListener('click', (event) => {
+                    if (event.target.classList.contains('featured-dot') && event.target.dataset.index) {
+                        showFeaturedQuote(parseInt(event.target.dataset.index, 10));
+                    }
+                });
+            }
+        }
+
+        // --- Event Listeners ---
+
+        // Combined listener for contributor clicks (grid and list)
+        document.getElementById('mainContent').addEventListener('click', (event) => {
+            const cardLink = event.target.closest('.contributor-card-link, .contributor-list-item-link');
+            if (cardLink && cardLink.dataset.id) {
+                event.preventDefault();
+                const contributorId = cardLink.dataset.id;
+                showProfile(contributorId);
+            }
+        });
+
+        // Listener for theme filter clicks
+        themeLegend.addEventListener('click', (event) => {
+             const themeLink = event.target.closest('.theme-item-link');
+             if (themeLink && themeLink.dataset.theme) {
+                 event.preventDefault();
+                 activeTheme = themeLink.dataset.theme; // Update state
+
+                 // Update active class visual
+                 themeLegend.querySelectorAll('.theme-item-link').forEach(link => link.classList.remove('active'));
+                 themeLink.classList.add('active');
+
+                 applyFilters(); // Apply all filters
+             }
+        });
+
+        // Listener for View Toggle clicks
+        viewOptionsContainer.addEventListener('click', (event) => {
+            const viewButtonLink = event.target.closest('.view-option a'); // Target the link inside
+            if (viewButtonLink) {
+                 const viewButton = viewButtonLink.closest('.view-option');
+                 if (viewButton && viewButton.dataset.viewTarget) {
+                    event.preventDefault();
+                    const targetView = viewButton.dataset.viewTarget; // 'grid' or 'list'
+
+                    // Update active button visual
+                    viewOptionsContainer.querySelectorAll('.view-option').forEach(btn => btn.classList.remove('active'));
+                    viewButton.classList.add('active');
+
+                    // Toggle view visibility
+                    contributorsGrid.classList.toggle('hidden', targetView !== 'grid');
+                    contributorsList.classList.toggle('hidden', targetView !== 'list');
+                }
+            }
+        });
+
+
+        // Listener for Alphabet filter clicks
+        alphabetFilterContainer.addEventListener('click', (event) => {
+             const letterLink = event.target.closest('.letter a'); // Target the link inside
+             if(letterLink) {
+                const letterDiv = letterLink.closest('.letter');
+                 if (letterDiv && letterDiv.dataset.letter) {
+                     event.preventDefault();
+                     activeLetter = letterDiv.dataset.letter; // Update state
+
+                     // Update active class visual
+                     alphabetFilterContainer.querySelectorAll('.letter').forEach(l => l.classList.remove('active'));
+                     letterDiv.classList.add('active');
+
+                     applyFilters(); // Apply all filters
+                 }
+             }
+        });
+
+        // Listener for Search Button click
+        searchButton.addEventListener('click', () => {
+            searchTerm = searchInput.value.trim(); // Update state
+            applyFilters(); // Apply all filters
+        });
+
+        // Listener for Search Input Enter Key
+        searchInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent form submission if it were in a form
+                searchTerm = searchInput.value.trim(); // Update state
+                applyFilters(); // Apply all filters
+            }
+        });
+
+
+        // Listener for the back button in the profile view
+        backButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            showBrowseView();
+        });
+
+        // --- Initial Setup ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeFeaturedQuotes(); // Setup featured quotes carousel
+            updateThemeCounts(); // Calculate and display theme counts
+
+            // Ensure the correct view is visible initially based on active button
+            const initialView = viewOptionsContainer.querySelector('.view-option.active')?.dataset.viewTarget || 'grid';
+            contributorsGrid.classList.toggle('hidden', initialView !== 'grid');
+            contributorsList.classList.toggle('hidden', initialView !== 'list');
+
+            // Apply initial filters (show all) *after* setting initial view
+            applyFilters();
+
+            // Ensure profile view is hidden
+            profileView.classList.add('hidden');
+        });
+
+    </script>
+
+</body>
+</html>

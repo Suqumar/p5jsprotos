@@ -6,6 +6,13 @@ let radius = 300;
 let completedTrajectories = []; // Store completed legs for drawing
 let progress = 0; // Track progress within a leg
 let currentLeg = 0; // Track which leg is currently being drawn
+let legSequence = [
+  ["Leo", "Pisces"],
+  ["Pisces", "Libra"],
+  ["Libra", "Taurus"],
+  ["Taurus", "Sagittarius"],
+  ["Sagittarius", "Leo"]
+];
 
 function setup() {
   createCanvas(800, 800);
@@ -35,11 +42,9 @@ function drawCompletedTrajectories() {
   }
 }
 
-function drawFirstLeg() {
-  const start = "Leo";
-  const end = "Pisces";
-  let startPos = calculatePosition(start);
-  let endPos = calculatePosition(end);
+function drawLeg(startSign, endSign, isLastLeg) {
+  let startPos = calculatePosition(startSign);
+  let endPos = calculatePosition(endSign);
   let currentX = lerp(startPos.x, endPos.x, progress);
   let currentY = lerp(startPos.y, endPos.y, progress);
 
@@ -53,99 +58,9 @@ function drawFirstLeg() {
     completedTrajectories.push({ start: startPos, end: endPos });
     progress = 0;
     currentLeg++;
-  } else {
-    progress += 1 / cycleDays;
-  }
-}
-
-function drawSecondLeg() {
-  const start = "Pisces";
-  const end = "Libra";
-  let startPos = calculatePosition(start);
-  let endPos = calculatePosition(end);
-  let currentX = lerp(startPos.x, endPos.x, progress);
-  let currentY = lerp(startPos.y, endPos.y, progress);
-
-  stroke(255, 100, 100);
-  line(startPos.x, startPos.y, currentX, currentY);
-
-  fill(100, 255, 100);
-  ellipse(currentX, currentY, 10, 10);
-
-  if (progress >= 1) {
-    completedTrajectories.push({ start: startPos, end: endPos });
-    progress = 0;
-    currentLeg++;
-  } else {
-    progress += 1 / cycleDays;
-  }
-}
-
-
-function drawThirdLeg() {
-  const start = "Libra";
-  const end = "Taurus";
-  let startPos = calculatePosition(start);
-  let endPos = calculatePosition(end);
-  let currentX = lerp(startPos.x, endPos.x, progress);
-  let currentY = lerp(startPos.y, endPos.y, progress);
-
-  stroke(255, 100, 100);
-  line(startPos.x, startPos.y, currentX, currentY);
-
-  fill(100, 255, 100);
-  ellipse(currentX, currentY, 10, 10);
-
-  if (progress >= 1) {
-    completedTrajectories.push({ start: startPos, end: endPos });
-    progress = 0;
-    currentLeg++;
-  } else {
-    progress += 1 / cycleDays;
-  }
-}
-
-function drawFourthLeg() {
-  const start = "Taurus";
-  const end = "Sagittarius";
-  let startPos = calculatePosition(start);
-  let endPos = calculatePosition(end);
-  let currentX = lerp(startPos.x, endPos.x, progress);
-  let currentY = lerp(startPos.y, endPos.y, progress);
-
-  stroke(255, 100, 100);
-  line(startPos.x, startPos.y, currentX, currentY);
-
-  fill(100, 255, 100);
-  ellipse(currentX, currentY, 10, 10);
-
-  if (progress >= 1) {
-    completedTrajectories.push({ start: startPos, end: endPos });
-    progress = 0;
-    currentLeg++;
-  } else {
-    progress += 1 / cycleDays;
-  }
-}
-
-
-function drawFifthLeg() {
-  const start = "Sagittarius";
-  const end = "Leo";
-  let startPos = calculatePosition(start);
-  let endPos = calculatePosition(end);
-  let currentX = lerp(startPos.x, endPos.x, progress);
-  let currentY = lerp(startPos.y, endPos.y, progress);
-
-  stroke(255, 100, 100);
-  line(startPos.x, startPos.y, currentX, currentY);
-
-  fill(100, 255, 100);
-  ellipse(currentX, currentY, 10, 10);
-
-  if (progress >= 1) {
-    completedTrajectories.push({ start: startPos, end: endPos });
-    noLoop();
+    if (isLastLeg) {
+      noLoop();
+    }
   } else {
     progress += 1 / cycleDays;
   }
@@ -179,16 +94,10 @@ function draw() {
   drawCompletedTrajectories();
 
   // Draw current leg
-  if (currentLeg === 0) {
-    drawFirstLeg();
-  } else if (currentLeg === 1) {
-    drawSecondLeg();
-  } else if (currentLeg === 2) {
-    drawThirdLeg();
-  } else if (currentLeg === 3) {
-    drawFourthLeg();
-  } else if (currentLeg === 4) {
-    drawFifthLeg();
+  if (currentLeg < legSequence.length) {
+    let [startSign, endSign] = legSequence[currentLeg];
+    let isLastLeg = currentLeg === legSequence.length - 1;
+    drawLeg(startSign, endSign, isLastLeg);
   }
 }
 

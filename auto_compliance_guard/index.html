@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Auto-Compliance Guard – Vendor Payments</title>
+  <!-- Tailwind via CDN (optional for styling). App works offline without it. -->
+  <!-- Note: If completely offline, the UI still functions using the minimal inline CSS below. -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Minimal offline fallback styles (when CDN is unavailable). */
+    :root{--bg:#0b1220;--card:#0f172a;--muted:#1e293b;--text:#e2e8f0;--text-dim:#94a3b8;--accent:#22d3ee;--accent-2:#34d399;--warn:#fbbf24;--danger:#f87171;--ok:#10b981}
+    html,body{height:100%}
+    body{background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial}
+    .container{max-width:1200px;margin:0 auto;padding:1rem}
+    .btn{display:inline-flex;align-items:center;gap:.5rem;border:1px solid #334155;background:#0b1220;padding:.5rem .75rem;border-radius:.75rem;color:var(--text);cursor:pointer}
+    .btn:hover{border-color:#475569}
+    .btn-primary{background:linear-gradient(180deg,#0ea5e9, #0369a1);border-color:#0284c7}
+    .btn-primary:hover{filter:brightness(1.05)}
+    .btn-ghost{background:transparent;border-color:#334155}
+    .badge{display:inline-block;padding:.15rem .5rem;border-radius:9999px;font-size:.75rem}
+    .badge-warn{background:rgba(251,191,36,.15);color:#fbbf24}
+    .badge-ok{background:rgba(16,185,129,.15);color:#10b981}
+    .badge-flag{background:rgba(248,113,113,.15);color:#f87171}
+    table{width:100%;border-collapse:separate;border-spacing:0}
+    thead th{position:sticky;top:0;background:#0f172a;border-bottom:1px solid #1f2937;padding:.5rem .75rem;text-align:left;font-weight:600}
+    tbody td{padding:.5rem .75rem;border-bottom:1px solid #0f172a}
+    .row-invalid{background:rgba(248,113,113,.06)}
+    .cell-invalid{background:rgba(248,113,113,.12)}
+    .search{width:100%;background:#0b1220;border:1px solid #334155;border-radius:.75rem;padding:.5rem .75rem;color:var(--text)}
+    .drawer{position:fixed;right:0;top:0;bottom:0;width:420px;max-width:90vw;background:#0f172a;border-left:1px solid #1f2937;transform:translateX(100%);transition:transform .25s ease;overflow:auto}
+    .drawer.open{transform:translateX(0)}
+    .drawer-header{position:sticky;top:0;background:#0f172a;padding:1rem;border-bottom:1px solid #1f2937;display:flex;align-items:center;justify-content:space-between}
+    .kbd{border:1px solid #334155;padding:.1rem .4rem;border-radius:.375rem;font-size:.75rem;color:var(--text-dim)}
+    .pill{border:1px solid #334155;border-radius:999px;padding:.2rem .5rem;font-size:.75rem;color:var(--text-dim)}
+    .link{color:var(--accent)}
+  </style>
+  <!--
+  Embedded Prompt Logic Template (for future AI extension):
+  "Given payment proposal data and rule definitions in natural language,
+  interpret each rule into a condition, evaluate the dataset,
+  flag matching transactions, and generate clear rationales such as:
+  'Vendor ABC flagged – amount 1.2 M INR > threshold 500 K INR and vendor is new.'"
+  -->
+</head>
+<body class="min-h-screen">
+  <div class="container">
+    <!-- Top Bar -->
+    <div class="flex items-center justify-between gap-3 mb-4">
+      <div class="flex items-center gap-3">
+        <div class="text-2xl font-bold tracking-tight">Auto-Compliance Guard – Vendor Payments</div>
+        <span class="pill">Offline • Single File</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <input id="csvFile" type="file" accept=".csv" class="hidden" />
+        <button id="btnImport" class="btn">📥 Import CSV</button>
+        <button id="btnRules" class="btn">🧩 Define Rules</button>
+        <button id="btnScan" class="btn btn-primary">🔎 Run Scan</button>
+        <button id="btnDownload" class="btn">⬇️ Download Report CSV</button>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="mb-3 flex items-center gap-2">
+      <input id="searchInput" class="search" placeholder="Search payments (vendor, invoice, document, country, method, etc.)…" />
+    </div>
+
+    <!-- Table Container -->
+    <div class="rounded-2xl border border-slate-700 overflow-auto shadow" style="max-height:65vh">
+      <table id="paymentsTable" class="text-sm">
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+    <div class="mt-2 text-xs text-slate-400">Tip: Click a column header to sort. Shift+Click to multi-sort.</div>
+  </div>
+
+  <!-- Right Drawer -->
+  <aside id="drawer" class="drawer" aria-label="Right panel">
+    <div class="drawer-header">
+      <div class="font-semibold">Rules & Reviews</div>
+      <button id="btnCloseDrawer" class="btn btn-ghost">✖</button>
+    </div>
+
+    <div class="p-4 space-y-6">
+      <!-- Rule Editor -->
+      <section>
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="font-semibold">Define Rules (natural language)</h2>
+          <span class="text-xs text-slate-400">Saved automatically</span>
+        </div>
+        <textarea id="rulesText" class="w-full min-h-[160px] rounded-xl border border-slate-700 bg-slate-900 p-3" placeholder="Examples:\n- Flag any payment over 500000 INR.\n- Alert if vendor is new and amount > 100000.\n- Highlight duplicate vendor bank accounts in this run.\n- Flag if invoice older than 90 days.\n- Alert if vendor country is RU or IR.\n- Flag if discount not taken and amount > 200000."></textarea>
+        <div class="mt-2 flex items-center gap-2">
+          <button id="btnParseRules" class="btn">🧠 Interpret Rules</button>
+          <span class="text-xs text-slate-400">The app converts your text into executable conditions.</span>
+        </div>
+        <div id="rulesPreview" class="mt-3 text-sm space-y-2"></div>
+      </section>
+
+      <!-- Review Panel -->
+      <section>
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="font-semibold">Flag Review Queue</h2>
+          <span id="reviewCount" class="text-xs text-slate-400">0 items</span>
+        </div>
+        <div id="reviewList" class="space-y-3"></div>
+      </section>
+    </div>
+  </aside>
+
+  <script>
+    /**************************************
+     * Utilities & State
+     **************************************/
+    const REQUIRED_FIELDS = ["Vendor_ID","Payment_Amount","Currency","Payment_Date"];
+    const HEADERS = [
+      "Payment_Run_ID","Company_Code","Vendor_ID","Vendor_Name","Vendor_Country","Vendor_Bank_Account",
+      "Document_Number","Invoice_Number","Invoice_Date","Payment_Amount","Currency","Payment_Method",
+      "Payment_Term_Days","Discount_Taken","Due_Date","Payment_Date","Created_By","Created_On",
+      "First_Payment_Flag","Historical_Average_Amount","Historical_Payment_Count"
+    ];
+
+    let state = {
+      data: [],              // rows
+      flags: [],             // {rowIdx, ruleId, ruleLabel, rationale}
+      reviews: {},           // key = flagKey(rowIdx, ruleId) -> {decision, comment, ts}
+      sort: [],              // [{key, dir}]
+      rulesText: "",
+      rules: []              // [{id, label, predicate(row), type}]
+    };
+
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => Array.from(document.querySelectorAll(sel));
+    function saveLocal(){
+      const payload = {reviews: state.reviews, rulesText: state.rulesText};
+      localStorage.setItem("acg_state", JSON.stringify(payload));
+    }
+    function loadLocal(){
+      try{
+        const raw = localStorage.getItem("acg_state");
+        if(!raw) return;
+        const obj = JSON.parse(raw);
+        if(obj.reviews) state.reviews = obj.reviews;
+        if(obj.rulesText) { state.rulesText = obj.rulesText; $('#rulesText').value = state.rulesText; }
+      }catch(e){console.warn(e)}
+    }
+    function flagKey(rowIdx, ruleId){ return `${rowIdx}::${ruleId}`; }
+
+    function parseDate(s){ if(!s) return null; const d = new Date(s); return isNaN(d) ? null : d; }
+    function daysBetween(a,b){ const ms = Math.abs(a - b); return Math.floor(ms/(1000*60*60*24)); }
+    function toNumber(x){ if(typeof x === 'number') return x; if(x==null) return NaN; const n = Number(String(x).replace(/[,\s]/g,'')); return isNaN(n)?NaN:n; }
+
+    function nowISO(){
+      const d = new Date();
+      const pad=n=>String(n).padStart(2,'0');
+      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    }
+
+    /**************************************
+     * Synthetic Data
+     **************************************/
+    function randPick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+    function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+    function generateSynthetic(n=40){
+      const companies = ["1000","2000","3000"]; const users = ["F110BOT","AP_USER","JDOE","ANITA","RAHUL"]; const countries = ["IN","US","DE","SG","AE","GB","BR","CN"];
+      const methods = ["BANK_TRANSFER","CHECK","NEFT","RTGS","ACH"]; const names=["Acme Supplies","Zenith Traders","Nova Tech","BlueOcean LLC","Saraswati Exports","Koch & Co","Shivam Services","Ayana Imports","Silverline Pvt Ltd","GlobalEdge"];
+
+      const rows=[]; const runId="RUN"+randInt(1000,9999);
+      for(let i=0;i<n;i++){
+        const comp = randPick(companies);
+        const vendorId = String(100000 + i);
+        const vendorName = randPick(names);
+        const country = randPick(countries);
+        const bank = `XXXX-${randInt(1000,9999)}-${randInt(1000,9999)}`;
+        const doc = String(500000 + i);
+        const inv = `INV${randInt(10000,99999)}`;
+        const invDate = new Date(); invDate.setDate(invDate.getDate()-randInt(0,180));
+        const payAmt = randInt(5000, 1200000);
+        const currency = country === 'IN' ? 'INR' : randPick(['USD','EUR','INR']);
+        const method = randPick(methods);
+        const term = randPick([15,30,45,60,90]);
+        const disc = randPick(['Y','N']);
+        const due = new Date(invDate); due.setDate(due.getDate()+term);
+        const payDate = new Date(due); payDate.setDate(payDate.getDate()-randInt(-10,10));
+        const createdBy = randPick(users);
+        const createdOn = new Date(invDate); createdOn.setDate(createdOn.getDate()-randInt(0,5));
+        const firstFlag = randPick(['Y','N']);
+        const histAvg = randInt(10000, 300000);
+        const histCount = firstFlag==='Y'?0:randInt(1,30);
+
+        rows.push({
+          Payment_Run_ID: runId,
+          Company_Code: comp,
+          Vendor_ID: vendorId,
+          Vendor_Name: vendorName,
+          Vendor_Country: country,
+          Vendor_Bank_Account: bank,
+          Document_Number: doc,
+          Invoice_Number: inv,
+          Invoice_Date: invDate.toISOString().slice(0,10),
+          Payment_Amount: payAmt,
+          Currency: currency,
+          Payment_Method: method,
+          Payment_Term_Days: term,
+          Discount_Taken: disc,
+          Due_Date: due.toISOString().slice(0,10),
+          Payment_Date: payDate.toISOString().slice(0,10),
+          Created_By: createdBy,
+          Created_On: createdOn.toISOString().slice(0,10),
+          First_Payment_Flag: firstFlag,
+          Historical_Average_Amount: histAvg,
+          Historical_Payment_Count: histCount
+        });
+      }
+      return rows;
+    }
+
+    /**************************************
+     * CSV Parser (Local, small)
+     **************************************/
+    function parseCSV(text){
+      // Handles quotes, commas, newlines. Returns {headers, rows}
+      const rows=[]; let cur=[], cell=''; let inQ=false;
+      function pushCell(){ cur.push(cell); cell=''; }
+      function pushRow(){ rows.push(cur); cur=[]; }
+      for(let i=0;i<text.length;i++){
+        const ch=text[i]; const next=text[i+1];
+        if(inQ){
+          if(ch==='"' && next==='"'){ cell+='"'; i++; }
+          else if(ch==='"'){ inQ=false; }
+          else cell+=ch;
+        } else {
+          if(ch==='"'){ inQ=true; }
+          else if(ch===','){ pushCell(); }
+          else if(ch==='\n' || ch==='\r'){ if(cell!==''||cur.length){ pushCell(); pushRow(); } }
+          else cell+=ch;
+        }
+      }
+      if(cell!==''||cur.length){ pushCell(); pushRow(); }
+      // Remove possible empty trailing row
+      while(rows.length && rows[rows.length-1].every(x=>x==='' )) rows.pop();
+      const headers = rows.shift() || [];
+      const mapRows = rows.map(r=>{
+        const obj={}; headers.forEach((h,idx)=>{ obj[h.trim()] = (r[idx]||'').trim(); });
+        return obj;
+      });
+      return {headers, rows: mapRows};
+    }
+
+    function toCSVRow(arr){
+      return arr.map(v=>{
+        const s = v==null?'' : String(v);
+        return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+      }).join(',');
+    }
+
+    /**************************************
+     * Validation
+     **************************************/
+    function validateRow(row){
+      const errs={};
+      REQUIRED_FIELDS.forEach(f=>{
+        const v = row[f];
+        if(v==null || String(v).trim()==='') errs[f] = 'Missing';
+      });
+      // numeric
+      if(row.Payment_Amount!=null && isNaN(toNumber(row.Payment_Amount))) errs.Payment_Amount = 'Invalid number';
+      // dates
+      ["Invoice_Date","Due_Date","Payment_Date","Created_On"].forEach(f=>{ const d=parseDate(row[f]); if(row[f] && !d) errs[f]='Invalid date'; });
+      // enums
+      if(row.Discount_Taken && !['Y','N'].includes(String(row.Discount_Taken).toUpperCase())) errs.Discount_Taken='Use Y/N';
+      if(row.First_Payment_Flag && !['Y','N'].includes(String(row.First_Payment_Flag).toUpperCase())) errs.First_Payment_Flag='Use Y/N';
+      return errs; // {field: reason}
+    }
+
+    /**************************************
+     * Rendering: Table
+     **************************************/
+    function renderTable(){
+      const thead = $('#tableHead'); const tbody = $('#tableBody');
+      // Build header with sort indicators
+      thead.innerHTML = '<tr>' + HEADERS.map(h=>{
+        const sort = state.sort.find(s=>s.key===h);
+        const arrow = sort ? (sort.dir>0 ? '▲' : '▼') : '';
+        return `<th data-key="${h}" class="cursor-pointer select-none">${h} <span class="text-slate-500">${arrow}</span></th>`;
+      }).join('') + '</tr>';
+
+      thead.querySelectorAll('th').forEach(th=>{
+        th.addEventListener('click', (e)=>{
+          const key = th.dataset.key;
+          const multi = e.shiftKey; // allow multi-sort with Shift
+          const existing = state.sort.find(s=>s.key===key);
+          if(existing){ existing.dir = -existing.dir; }
+          else{
+            if(!multi) state.sort=[];
+            state.sort.push({key, dir: 1});
+          }
+          drawBody();
+        });
+      });
+
+      drawBody();
+
+      function drawBody(){
+        const q = $('#searchInput').value.toLowerCase().trim();
+        let rows = state.data.map((row, idx)=>({row, idx}));
+        // search
+        if(q){
+          rows = rows.filter(({row})=>{
+            return HEADERS.some(h=> String(row[h]??'').toLowerCase().includes(q));
+          });
+        }
+        // sort chain
+        if(state.sort.length){
+          rows.sort((a,b)=>{
+            for(const s of state.sort){
+              const va = a.row[s.key]; const vb = b.row[s.key];
+              const na = toNumber(va); const nb = toNumber(vb);
+              let cmp=0;
+              if(!isNaN(na) && !isNaN(nb)) cmp = na-nb;
+              else if(parseDate(va) && parseDate(vb)) cmp = parseDate(va)-parseDate(vb);
+              else cmp = String(va).localeCompare(String(vb));
+              if(cmp!==0) return s.dir>0?cmp:-cmp;
+            }
+            return 0;
+          });
+        }
+        // render rows
+        tbody.innerHTML = rows.map(({row, idx})=>{
+          const errs = validateRow(row); const hasErr = Object.keys(errs).length>0;
+          const flagged = state.flags.some(f=>f.rowIdx===idx);
+          const statusBadge = hasErr? `<span class="badge badge-flag">Invalid</span>` : flagged? `<span class="badge badge-warn">⚠️ Flagged</span>` : `<span class="badge badge-ok">✅ OK</span>`;
+          return `<tr class="${hasErr?'row-invalid':''}">` + HEADERS.map(h=>{
+            const v = row[h] ?? '';
+            const cellClass = errs[h]? 'cell-invalid' : '';
+            return `<td class="${cellClass}">${h==='Vendor_Name'? `${v} ${statusBadge}` : v}</td>`;
+          }).join('') + `</tr>`;
+        }).join('');
+      }
+    }
+
+    /**************************************
+     * Rule Parsing (Natural-ish)
+     **************************************/
+    function interpretRules(text){
+      // Split lines; create simple rules from patterns
+      const lines = text.split(/\n+/).map(s=>s.trim()).filter(Boolean);
+      const rules=[]; let counter=1;
+
+      // Helper creators
+      const mkRule=(label, predicate, type="generic")=>({ id: `R${counter++}`, label, predicate, type });
+
+      for(const line of lines){
+        const L=line.toLowerCase();
+        // 1) High amount: "over 500000 inr" or "> 500000" (optionally currency)
+        let m = L.match(/(over|greater than|>+)\s*([\d,\.]+)\s*(inr|usd|eur)?/);
+        if(m){
+          const amt = Number(m[2].replace(/[,]/g,''));
+          const cur = (m[3]||'').toUpperCase();
+          const label = cur ? `IF Payment_Amount > ${amt} AND Currency==${cur} → Flag: High Amount` : `IF Payment_Amount > ${amt} → Flag: High Amount`;
+          rules.push(mkRule(label, row=> toNumber(row.Payment_Amount)>amt && (!cur || String(row.Currency).toUpperCase()===cur) ));
+          continue;
+        }
+        // 2) New vendor and amount
+        m = L.match(/(vendor is new|new vendor).*(?:amount|payment).*?(?:>|greater than|over)\s*([\d,\.]+)/);
+        if(m){
+          const amt=Number(m[2].replace(/[,]/g,''));
+          const label=`IF First_Payment_Flag==Y AND Payment_Amount > ${amt} → Flag: High Value New Vendor`;
+          rules.push(mkRule(label, row=> String(row.First_Payment_Flag).toUpperCase()==='Y' && toNumber(row.Payment_Amount)>amt, "new_vendor_amount"));
+          continue;
+        }
+        // 3) Duplicate bank accounts in this run
+        if(/duplicate.*bank.*account/.test(L)){
+          rules.push(mkRule("IF Vendor_Bank_Account repeats → Flag: Duplicate Bank Account", (row, ctx)=>{
+            const acct = row.Vendor_Bank_Account;
+            return ctx.bankCounts[acct] > 1;
+          }, "dup_bank"));
+          continue;
+        }
+        // 4) Invoice older than N days
+        m = L.match(/invoice (?:older|age).*?(\d+)\s*days/);
+        if(m){
+          const n=Number(m[1]);
+          const label=`IF (Payment_Date - Invoice_Date) > ${n} days → Flag: Aged Invoice`;
+          rules.push(mkRule(label, row=>{
+            const pd=parseDate(row.Payment_Date); const id=parseDate(row.Invoice_Date);
+            if(!pd||!id) return false; return daysBetween(pd,id) > n;
+          }, "aged_invoice"));
+          continue;
+        }
+        // 5) Country list (e.g., RU or IR)
+        m = L.match(/vendor country is (.+)/);
+        if(m){
+          const list = m[1].toUpperCase().replace(/[^A-Z, ]/g,'').split(/[ ,]+/).filter(Boolean);
+          const label=`IF Vendor_Country in [${list.join(', ')}] → Flag: Country Watchlist`;
+          rules.push(mkRule(label, row=> list.includes(String(row.Vendor_Country).toUpperCase()), "country"));
+          continue;
+        }
+        // 6) Discount not taken and amount > N (FIX: Made "not" required)
+        m = L.match(/discount not taken.*(?:amount|payment).*?(?:>|over|greater than)\s*([\d,\.]+)/);
+        if(m){
+          const amt=Number(m[1].replace(/[,]/g,''));
+          const label=`IF Discount_Taken==N AND Payment_Amount > ${amt} → Flag: Discount Not Taken`;
+          rules.push(mkRule(label, row=> String(row.Discount_Taken).toUpperCase()==='N' && toNumber(row.Payment_Amount)>amt, "discount"));
+          continue;
+        }
+        // 7) Payment method specific
+        m = L.match(/payment method is ([a-z_]+)/);
+        if(m){
+          const method = m[1].toUpperCase();
+          const label=`IF Payment_Method==${method} → Flag: Method Specific`;
+          rules.push(mkRule(label, row=> String(row.Payment_Method).toUpperCase()===method, "method"));
+          continue;
+        }
+        // 8) Simple comparison on known fields (FIX: Proper field name mapping)
+        const simple = L.match(/(payment_amount|historical_average_amount|payment_term_days)\s*(>|<|>=|<=|==)\s*([\d,\.]+)/);
+        if(simple){
+          // Map lowercase_underscore to Capitalized_Underscore format
+          const fieldMap = {
+            'payment_amount': 'Payment_Amount',
+            'historical_average_amount': 'Historical_Average_Amount',
+            'payment_term_days': 'Payment_Term_Days'
+          };
+          const rawField = simple[1];
+          const actualField = fieldMap[rawField];
+          const op = simple[2];
+          const val = Number(simple[3].replace(/[,]/g,''));
+          const label=`IF ${actualField} ${op} ${val} → Flag`;
+          rules.push(mkRule(label, row=>{
+            const v = toNumber(row[actualField]);
+            switch(op){
+              case ">": return v>val;
+              case "<": return v<val;
+              case ">=": return v>=val;
+              case "<=": return v<=val;
+              case "==": return v===val;
+            }
+            return false;
+          }));
+          continue;
+        }
+        // Fallback: generic keyword creates an always-false placeholder
+        rules.push(mkRule(`(Unrecognized) ${line}`, ()=>false));
+      }
+      return rules;
+    }
+
+    function renderRulesPreview(){
+      const c = $('#rulesPreview');
+      if(!state.rules.length){ c.innerHTML = '<div class="text-slate-400">No rules yet. Add some above and click "Interpret Rules".</div>'; return; }
+      c.innerHTML = state.rules.map(r=>`<div class="border border-slate-700 rounded-xl p-2">${r.label}</div>`).join('');
+    }
+
+    /**************************************
+     * Scanning / Flagging
+     **************************************/
+    function buildContext(rows){
+      const bankCounts={}; rows.forEach(r=>{ const k=r.Vendor_Bank_Account; bankCounts[k]=(bankCounts[k]||0)+1; });
+      return { bankCounts };
+    }
+
+    function runScan(){
+      state.flags=[]; const ctx=buildContext(state.data);
+      state.data.forEach((row, idx)=>{
+        state.rules.forEach(rule=>{
+          try{
+            if(rule.predicate(row, ctx)){
+              const rationale = makeRationale(row, rule, ctx);
+              state.flags.push({rowIdx: idx, ruleId: rule.id, ruleLabel: rule.label, rationale});
+              // initialize review entry if absent
+              const k = flagKey(idx, rule.id);
+              if(!state.reviews[k]) state.reviews[k] = {decision: "", comment: "", ts: ""};
+            }
+          }catch(e){ console.warn('Rule error', rule, e); }
+        });
+      });
+      saveLocal();
+      renderTable();
+      renderReviewQueue();
+      openDrawer();
+    }
+
+    function makeRationale(row, rule, ctx){
+      // Some handcrafted rationales by rule type
+      const amt = toNumber(row.Payment_Amount);
+      const currency = row.Currency;
+      switch(rule.type){
+        case "new_vendor_amount":
+          return `${row.Vendor_Name} flagged – amount ${amt.toLocaleString()} ${currency} > threshold in rule and vendor is new.`;
+        case "dup_bank":
+          return `${row.Vendor_Name} flagged – bank account ${row.Vendor_Bank_Account} appears ${ctx.bankCounts[row.Vendor_Bank_Account]} times in this run.`;
+        case "aged_invoice":
+          const pd=parseDate(row.Payment_Date), id=parseDate(row.Invoice_Date);
+          return `${row.Vendor_Name} – invoice age ${daysBetween(pd,id)} days exceeds rule threshold.`;
+        case "country":
+          return `${row.Vendor_Name} – vendor country ${row.Vendor_Country} is on watchlist.`;
+        case "discount":
+          return `${row.Vendor_Name} – discount not taken and payment amount ${amt.toLocaleString()} ${currency} high.`;
+        default:
+          return `${row.Vendor_Name} matched rule: ${rule.label}`;
+      }
+    }
+
+    function renderReviewQueue(){
+      const list = $('#reviewList');
+      $('#reviewCount').textContent = `${state.flags.length} items`;
+      if(!state.flags.length){ list.innerHTML = '<div class="text-slate-400">No flags from the last scan.</div>'; return; }
+      list.innerHTML = state.flags.map((f,i)=>{
+        const row = state.data[f.rowIdx];
+        const key = flagKey(f.rowIdx, f.ruleId);
+        const rev = state.reviews[key] || {decision:"", comment:"", ts:""};
+        const status = rev.decision? (rev.decision==='Yes'? '<span class="badge badge-warn">Escalate</span>' : '<span class="badge badge-ok">Cleared</span>') : '<span class="badge">Pending</span>';
+        return `
+          <div class="border border-slate-700 rounded-2xl p-3">
+            <div class="flex items-center justify-between mb-1">
+              <div class="font-medium">${row.Vendor_Name} <span class="text-slate-400">(${row.Vendor_ID})</span></div>
+              <div>${status}</div>
+            </div>
+            <div class="text-sm">Amount: <span class="font-mono">${toNumber(row.Payment_Amount).toLocaleString()}</span> ${row.Currency} • Rule: <span class="text-slate-300">${f.ruleLabel}</span></div>
+            <div class="text-xs text-slate-400 mt-1">Reason: ${f.rationale}</div>
+            <div class="mt-2 flex items-center gap-2">
+              <button class="btn" data-action="decide" data-key="${key}" data-val="Yes">✅ Yes</button>
+              <button class="btn" data-action="decide" data-key="${key}" data-val="Skip">⏭️ Skip</button>
+              <button class="btn" data-action="comment" data-key="${key}">💬 Comment</button>
+              <span class="text-xs text-slate-500">${rev.ts?`@ ${rev.ts}`:''}</span>
+            </div>
+            ${rev.comment? `<div class="mt-2 text-xs border border-slate-700 rounded-xl p-2">Comment: ${rev.comment}</div>`: ''}
+          </div>`;
+      }).join('');
+
+      // Wire buttons
+      list.querySelectorAll('button').forEach(b=>{
+        const act=b.dataset.action; const key=b.dataset.key; const val=b.dataset.val;
+        b.addEventListener('click',()=>{
+          if(act==='decide'){
+            state.reviews[key] = { ...(state.reviews[key]||{}), decision: val, ts: nowISO() };
+            saveLocal(); renderReviewQueue();
+          } else if(act==='comment'){
+            const c = prompt('Enter comment for this item:');
+            if(c!=null){ state.reviews[key] = { ...(state.reviews[key]||{}), comment: c, ts: nowISO() }; saveLocal(); renderReviewQueue(); }
+          }
+        });
+      });
+    }
+
+    /**************************************
+     * Report Export
+     **************************************/
+    function downloadReport(){
+      const header = ["Vendor_ID","Vendor_Name","Payment_Amount","Currency","Rule_Triggered","Reviewer_Decision","Reviewer_Comment","Timestamp"];
+      const lines = [toCSVRow(header)];
+      state.flags.forEach(f=>{
+        const row = state.data[f.rowIdx];
+        const key = flagKey(f.rowIdx, f.ruleId);
+        const rev = state.reviews[key] || {decision:"", comment:"", ts:""};
+        lines.push(toCSVRow([
+          row.Vendor_ID,
+          row.Vendor_Name,
+          row.Payment_Amount,
+          row.Currency,
+          f.ruleLabel,
+          rev.decision||'',
+          rev.comment||'',
+          rev.ts||''
+        ]));
+      });
+      const blob = new Blob([lines.join('\n')], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download='auto_compliance_report.csv'; a.click(); URL.revokeObjectURL(url);
+    }
+
+    /**************************************
+     * Drawer Controls
+     **************************************/
+    function openDrawer(){ $('#drawer').classList.add('open'); }
+    function closeDrawer(){ $('#drawer').classList.remove('open'); }
+
+    /**************************************
+     * Data Loaders
+     **************************************/
+    function useData(rows){
+      // Normalize header presence and types
+      const normalized = rows.map(r=>{
+        const obj={}; HEADERS.forEach(h=> obj[h] = r[h] ?? '');
+        // Coerce numerics
+        obj.Payment_Amount = toNumber(obj.Payment_Amount);
+        obj.Payment_Term_Days = toNumber(obj.Payment_Term_Days);
+        obj.Historical_Average_Amount = toNumber(obj.Historical_Average_Amount);
+        obj.Historical_Payment_Count = toNumber(obj.Historical_Payment_Count);
+        return obj;
+      });
+      state.data = normalized;
+      renderTable();
+    }
+
+    async function importCSV(file){
+      const text = await file.text();
+      const {headers, rows} = parseCSV(text);
+      // Validate headers minimally
+      const missing = HEADERS.filter(h=>!headers.includes(h));
+      if(missing.length){
+        alert("CSV missing headers: \n"+missing.join(', '));
+      }
+      useData(rows);
+      // After import, re-run scan context if needed
+      state.flags=[]; renderReviewQueue();
+    }
+
+    /**************************************
+     * Wiring UI
+     **************************************/
+    function init(){
+      loadLocal();
+      // Initial synthetic data
+      useData(generateSynthetic(randInt(30,50)));
+
+      // Restore rules preview if any
+      state.rules = interpretRules(state.rulesText||'');
+      renderRulesPreview();
+
+      // Buttons
+      $('#btnImport').addEventListener('click', ()=> $('#csvFile').click());
+      $('#csvFile').addEventListener('change', (e)=>{ const f=e.target.files[0]; if(f) importCSV(f); e.target.value=''; });
+      $('#btnRules').addEventListener('click', openDrawer);
+      $('#btnCloseDrawer').addEventListener('click', closeDrawer);
+      $('#btnParseRules').addEventListener('click', ()=>{
+        state.rulesText = $('#rulesText').value.trim();
+        state.rules = interpretRules(state.rulesText);
+        saveLocal();
+        renderRulesPreview();
+      });
+      $('#btnScan').addEventListener('click', runScan);
+      $('#btnDownload').addEventListener('click', downloadReport);
+
+      $('#searchInput').addEventListener('input', renderTable);
+
+      // Keyboard: open drawer with Ctrl+/
+      document.addEventListener('keydown', (e)=>{
+        if((e.ctrlKey||e.metaKey) && e.key==='/'){ openDrawer(); }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

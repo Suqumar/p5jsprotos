@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Account Assigner</title>
+  <!-- Tailwind via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Minimal offline fallback styles (if Tailwind fails to load) */
+    html,body{margin:0;padding:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif;}
+    .tw-container{max-width:1200px;margin:0 auto;padding:1rem}
+    .tw-btn{padding:.5rem 1rem;border-radius:.5rem;border:1px solid #d1d5db;background:#111827;color:#fff;cursor:pointer}
+    .tw-btn-outline{background:#fff;color:#111827}
+    .tw-card{border:1px solid #e5e7eb;border-radius:.75rem;padding:1rem;background:#fff}
+    .tw-grid{display:grid;gap:1rem}
+    .tw-grid-2{grid-template-columns:1fr 1fr}
+    .tw-label{font-size:.8rem;color:#374151;margin-bottom:.25rem;display:block}
+    .tw-input, .tw-select, .tw-text{width:100%;padding:.5rem;border:1px solid #d1d5db;border-radius:.5rem}
+    .tw-muted{color:#6b7280}
+    .tw-title{font-size:1.25rem;font-weight:700}
+    .tw-subtitle{font-weight:600}
+    .tw-bar{display:flex;gap:.5rem;align-items:center;justify-content:space-between;padding:1rem;border-bottom:1px solid #e5e7eb;background:#f9fafb}
+    .tw-footer{display:flex;gap:.5rem;align-items:center;justify-content:space-between;padding:1rem;border-top:1px solid #e5e7eb;background:#f9fafb}
+    .tw-tag{display:inline-block;border:1px solid #d1d5db;border-radius:999px;padding:.125rem .5rem;font-size:.75rem}
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <!-- Top Bar -->
+  <header class="tw-bar">
+    <div class="flex items-center gap-3">
+      <span class="text-xl font-bold">Account Assigner</span>
+      <span class="tw-tag bg-white text-gray-700" title="Single-PO companion for quick account assignment review.">Single-PO Companion</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <button id="btnImportPO" class="tw-btn tw-btn-outline border-gray-300 text-gray-800 hover:bg-gray-100">Import PO CSV</button>
+      <button id="btnImportHistory" class="tw-btn tw-btn-outline border-gray-300 text-gray-800 hover:bg-gray-100">Import History CSV</button>
+      <button id="btnSuggest" class="tw-btn bg-indigo-600 hover:bg-indigo-700">Suggest Account Assignment</button>
+      <button id="btnDownloadTop" class="tw-btn tw-btn-outline border-gray-300 text-gray-800 hover:bg-gray-100">Download Review CSV</button>
+    </div>
+  </header>
+
+  <!-- Hidden file inputs -->
+  <input type="file" id="filePO" accept=".csv" class="hidden" />
+  <input type="file" id="fileHistory" accept=".csv" class="hidden" />
+
+  <!-- Main Layout -->
+  <main class="tw-container py-6">
+    <div class="tw-grid tw-grid-2 items-start">
+      <!-- Left: PO Details -->
+      <section class="tw-card shadow-sm">
+        <div class="mb-3">
+          <h2 class="tw-title">PO Details</h2>
+          <p class="text-sm text-gray-500">Editable fields. Hover for tips.</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Column 1 -->
+          <div>
+            <label class="tw-label" title="Unique identifier of the Purchase Order.">PO_Number</label>
+            <input id="PO_Number" class="tw-input" />
+          </div>
+          <div>
+            <label class="tw-label" title="Internal code for the material being ordered.">Material_Number</label>
+            <input id="Material_Number" class="tw-input" />
+          </div>
+          <div class="sm:col-span-2">
+            <label class="tw-label" title="Short text describing the material or service.">Material_Description</label>
+            <input id="Material_Description" class="tw-input" />
+          </div>
+          <div>
+            <label class="tw-label" title="Unique identifier of the vendor.">Vendor_ID</label>
+            <input id="Vendor_ID" class="tw-input" />
+          </div>
+          <div>
+            <label class="tw-label" title="Name of the vendor supplying the PO.">Vendor_Name</label>
+            <input id="Vendor_Name" class="tw-input" />
+          </div>
+          <div>
+            <label class="tw-label" title="Type of PO. Common: NB (standard), FO (framework), ZNB (custom).            ">PO_Type</label>
+            <select id="PO_Type" class="tw-select">
+              <option>NB</option>
+              <option>FO</option>
+              <option>ZNB</option>
+            </select>
+          </div>
+          <div>
+            <label class="tw-label" title="Plant or location receiving the goods/services.">Plant</label>
+            <input id="Plant" class="tw-input" />
+          </div>
+          <div>
+            <label class="tw-label" title="Ordered quantity in the given unit.">Quantity</label>
+            <input id="Quantity" type="number" step="0.01" class="tw-input" />
+          </div>
+          <div>
+            <label class="tw-label" title="Unit of measure, e.g., EA, KG, L.">Order_Unit</label>
+            <input id="Order_Unit" class="tw-input" />
+          </div>
+          <div>
+            <label class="tw-label" title="Calculated: Quantity × Price per unit.">Net_Value</label>
+            <input id="Net_Value" type="number" step="0.01" class="tw-input" />
+          </div>
+          <div>
+            <label class="tw-label" title="Transaction currency.">Currency</label>
+            <input id="Currency" class="tw-input" value="USD" />
+          </div>
+          <div>
+            <label class="tw-label" title="Cost object where expense is booked.">Cost_Center</label>
+            <input id="Cost_Center" class="tw-input" />
+          </div>
+          <div>
+            <label class="tw-label" title="General Ledger account impacted by the PO.">GL_Account</label>
+            <input id="GL_Account" class="tw-input" />
+          </div>
+          <div>
+            <label class="tw-label" title="How the cost is charged: K (Cost Center), P (Project), A (Asset), F (Order).            ">Account_Assignment_Category</label>
+            <select id="Account_Assignment_Category" class="tw-select">
+              <option>K</option>
+              <option>P</option>
+              <option>A</option>
+              <option>F</option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-4 text-xs text-gray-500">
+          <p><strong>Tip:</strong> <em>Account Assignment Category</em> = how costs are charged (e.g., <span class="font-mono">K</span> to a Cost Center).</p>
+        </div>
+      </section>
+
+      <!-- Right: Suggestions -->
+      <section class="tw-card shadow-sm">
+        <div class="mb-3 flex items-center justify-between">
+          <h2 class="tw-title">Suggestions & Rationale</h2>
+          <div class="text-sm text-gray-500" id="historyStatus">History: <span class="font-medium">Synthetic</span></div>
+        </div>
+
+        <div id="suggestionsBox" class="space-y-3">
+          <div class="text-sm text-gray-500">Click <span class="font-semibold">Suggest Account Assignment</span> to analyze history and rank likely choices.</div>
+        </div>
+
+        <div class="mt-4">
+          <label class="tw-label">Reviewer Name</label>
+          <input id="Reviewer_Name" class="tw-input" placeholder="Your name" />
+        </div>
+
+        <div class="mt-4 text-xs text-gray-500" id="rationaleNote"></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="tw-footer">
+    <div class="text-sm text-gray-600">
+      <span class="tw-tag" title="Intent → Insight → Decision">vibe-coded</span>
+      <span class="ml-2">All data stays in your browser. No network calls.</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <button id="btnApprove" class="tw-btn bg-emerald-600 hover:bg-emerald-700">Approve Suggestion</button>
+      <button id="btnDownloadBottom" class="tw-btn tw-btn-outline border-gray-300 text-gray-800 hover:bg-gray-100">Download Review CSV</button>
+    </div>
+  </footer>
+
+  <!-- Global Message Toast -->
+  <div id="messageToast" class="hidden fixed top-5 right-5 z-50 p-4 rounded-lg shadow-lg text-white transition-all duration-300">
+    Message goes here
+  </div>
+
+  <script>
+    /* ---------------------------------------------
+     * Embedded Prompt Logic (AI placeholder)
+     * ---------------------------------------------
+     * "Given a new PO with fields <JSON>, analyze similar records from history.csv.
+     * Return the top 3 most likely account assignment categories and cost centers,
+     * with confidence percentages and short rationale for each."
+     */
+
+    // ===== Utilities =====
+    const $ = (id) => document.getElementById(id);
+
+    function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function randomChoice(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+    // FIX: Preprocess CSV to remove row-level quotes
+    function preprocessCSV(text) {
+      // Split into lines
+      const lines = text.split(/\r?\n/);
+      // Remove leading/trailing quotes from each line
+      return lines.map(line => {
+        line = line.trim();
+        // If entire line is wrapped in quotes, remove them
+        if (line.startsWith('"') && line.endsWith('"')) {
+          return line.slice(1, -1);
+        }
+        return line;
+      }).join('\n');
+    }
+
+    // Tiny CSV parser (supports commas inside quotes, double-quote escaping)
+    function parseCSV(text) {
+      // FIX: Preprocess to remove row-level quotes
+      text = preprocessCSV(text);
+
+      const rows = [];
+      let i = 0, field = '', row = [], inQuotes = false;
+      // Handle \r\n and \n line endings
+      text = text.replace(/\r\n/g, '\n');
+      while (i < text.length) {
+        const char = text[i];
+        if (char === '"') {
+          if (inQuotes && text[i+1] === '"') { field += '"'; i++; } // Escaped quote
+          else { inQuotes = !inQuotes; }
+        } else if (char === ',' && !inQuotes) {
+          row.push(field); field = '';
+        } else if (char === '\n' && !inQuotes) {
+          // Only push if row has content
+          if (field !== '' || row.length > 0) {
+              row.push(field);
+              rows.push(row);
+          }
+          row = []; field = '';
+        } else {
+          field += char;
+        }
+        i++;
+      }
+      // Push last row if it has content
+      if (field !== '' || row.length > 0) { row.push(field); rows.push(row); }
+
+      // map to objects by headers
+      if (rows.length === 0) return []; // Handle empty file
+      const headers = rows.shift().map(h => h.trim());
+
+      console.log('CSV Headers found:', headers); // DEBUG
+
+      return rows.filter(r => r.length === headers.length && r.some(c => c && c.trim() !== '')) // Ensure row has same length as headers and is not empty
+        .map(r => Object.fromEntries(headers.map((h, idx) => [h, (r[idx] || '').trim()])));
+    }
+
+    function toCSVRow(values) {
+      return values.map(v => {
+        const nonNullV = (v === null || v === undefined) ? '' : v;
+        const s = String(nonNullV);
+
+        if (/[",\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+        return s;
+      }).join(',');
+    }
+
+    function download(filename, content) {
+      const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 500);
+    }
+
+    // ===== Global Message Toast =====
+    const toast = $('messageToast');
+    let toastTimer;
+
+    /**
+     * Shows a non-blocking toast message.
+     * @param {string} message - The message to display.
+     * @param {boolean} [isError=false] - True for red, false for green.
+     */
+    function showMessage(message, isError = false) {
+      if (isError) {
+        console.error(message); // Log errors for debugging
+        toast.classList.remove('bg-green-600');
+        toast.classList.add('bg-red-600');
+      } else {
+        console.log(message); // Log success/info
+        toast.classList.remove('bg-red-600');
+        toast.classList.add('bg-green-600');
+      }
+      toast.textContent = message;
+      toast.classList.remove('hidden');
+
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3500); // Hide after 3.5 seconds
+    }
+
+
+    // ===== Synthetic Data =====
+    const MATERIAL_RANGE = [100001, 100050];
+    const VENDOR_RANGE = [200001, 200010];
+    const COST_CENTER_RANGE = [100100, 100500];
+    const GL_RANGE = [400000, 410000];
+    const PO_TYPES = ['NB','FO','ZNB'];
+    const AAC = ['K','P','A','F'];
+
+    function currentFiscalYearDates() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const fyStart = new Date(y, 3, 1); // Apr 1
+      const fyEnd = new Date(y+1, 2, 31); // Mar 31 next year
+      if (now < fyStart) { // we're in Jan–Mar, belong to previous FY
+        return { start: new Date(y-1, 3, 1), end: new Date(y, 2, 31) };
+      }
+      return { start: fyStart, end: fyEnd };
+    }
+
+    function randomDateInFY() {
+      const { start, end } = currentFiscalYearDates();
+      const t = randomInt(start.getTime(), end.getTime());
+      return new Date(t);
+    }
+
+    function generateSyntheticPO() {
+      const poNum = 'PO' + randomInt(100000, 999999);
+      const mat = randomInt(...MATERIAL_RANGE);
+      const ven = randomInt(...VENDOR_RANGE);
+      const q = randomInt(1, 200);
+      const unit = randomChoice(['EA','KG','L','BOX']);
+      const price = (Math.random() * 500 + 5);
+      const net = (q * price);
+      const plant = 'PL' + randomInt(100, 199);
+      const gl = randomInt(...GL_RANGE);
+      const cc = randomInt(...COST_CENTER_RANGE);
+      const type = randomChoice(PO_TYPES);
+      const aac = randomChoice(AAC);
+      const date = randomDateInFY();
+      return {
+        PO_Number: poNum,
+        Material_Number: String(mat),
+        Material_Description: `Material ${mat} Description` ,
+        Vendor_ID: String(ven),
+        Vendor_Name: `Vendor ${ven}`,
+        PO_Type: type,
+        Plant: plant,
+        Quantity: q,
+        Order_Unit: unit,
+        Net_Value: net.toFixed(2),
+        Currency: 'USD',
+        Cost_Center: String(cc),
+        GL_Account: String(gl),
+        Account_Assignment_Category: aac,
+        PO_Date: date.toISOString().substring(0,10)
+      };
+    }
+
+    function populatePOForm(po) {
+      console.log('populatePOForm called with:', po); // DEBUG
+      const fields = [
+        'PO_Number','Material_Number','Material_Description','Vendor_ID','Vendor_Name','PO_Type','Plant','Quantity','Order_Unit','Net_Value','Currency','Cost_Center','GL_Account','Account_Assignment_Category'
+      ];
+      fields.forEach(f => {
+          if ($(f)) { // Check if element exists
+             const value = po[f] || ''; // FIX: Changed ?? to ||
+             console.log(`Setting ${f} = "${value}"`); // DEBUG
+             $(f).value = value;
+          }
+      });
+    }
+
+    function readPOForm() {
+      const o = {};
+      ['PO_Number','Material_Number','Material_Description','Vendor_ID','Vendor_Name','PO_Type','Plant','Quantity','Order_Unit','Net_Value','Currency','Cost_Center','GL_Account','Account_Assignment_Category']
+        .forEach(id => o[id] = $(id).value);
+      return o;
+    }
+
+    // ===== History & Suggestion Logic =====
+    let historyData = [];
+
+    function loadSyntheticHistory(seedPO = null) {
+      // Create a small synthetic history consistent with the current PO ranges
+      const rows = [];
+      const n = 300;
+
+      // If a seedPO is provided, add 5-10 records based on it
+      // to guarantee the fallback logic finds matches.
+      if (seedPO && seedPO.PO_Number) { // Ensure seedPO is valid
+          for (let i = 0; i < 10; i++) {
+              const base = { ...seedPO }; // Clone the seed
+              // Make minor variations
+              base.PO_Number = 'PO' + randomInt(100000, 999999);
+              base.Quantity = randomInt(1, 200);
+              base.Net_Value = (base.Quantity * (Math.random() * 50 + 5)).toFixed(2);
+              // Keep the important fields: Material_Number, Vendor_ID, PO_Type
+              // And the target fields: Account_Assignment_Category, Cost_Center
+              rows.push(base);
+          }
+      }
+
+      for (let i=rows.length; i<n; i++) {
+        const base = generateSyntheticPO();
+        // Strengthen patterns by biasing AAC + CC based on (mat, vendor, type)
+        const biasSeed = (parseInt(base.Material_Number) % 4);
+        const aacPref = AAC[biasSeed];
+        const ccPref = String(parseInt(base.Cost_Center) - (parseInt(base.Cost_Center)%10) + biasSeed);
+        base.Account_Assignment_Category = Math.random() < 0.7 ? aacPref : randomChoice(AAC);
+        base.Cost_Center = Math.random() < 0.7 ? ccPref : String(randomInt(...COST_CENTER_RANGE));
+        rows.push(base);
+      }
+      return rows;
+    }
+
+    function keyMatch(rec, po) {
+      return (
+        String(rec.Material_Number) === String(po.Material_Number) &&
+        String(rec.Vendor_ID) === String(po.Vendor_ID) &&
+        String(rec.PO_Type) === String(po.PO_Type)
+      );
+    }
+
+    function suggestForPO(po, history) {
+      // Filter matching records by (Material_Number, Vendor_ID, PO_Type)
+      const matches = history.filter(r => keyMatch(r, po));
+      const total = matches.length;
+      const rationale = { total, detail: '' };
+      const result = { suggestions: [], rationale };
+
+      if (total === 0) {
+        rationale.detail = 'No exact history matches on (Material, Vendor, PO Type). Falling back to loose frequency by Vendor.';
+        // Fallback: vendor-level frequency
+        const vendorMatches = history.filter(r => String(r.Vendor_ID) === String(po.Vendor_ID));
+        return rankByAacCc(vendorMatches, 'Based on vendor-level history');
+      }
+
+      return rankByAacCc(matches, `Based on ${total} historical records for this material-vendor-type.`);
+    }
+
+    function rankByAacCc(records, rationaleText) {
+      const freq = new Map(); // key: AAC|CC -> count
+      for (const r of records) {
+        const key = `${r.Account_Assignment_Category}|${r.Cost_Center}`;
+        freq.set(key, (freq.get(key) || 0) + 1);
+      }
+
+      const total = records.length || 1;
+      const ranked = Array.from(freq.entries())
+        .map(([k, c]) => {
+          const [cat, cc] = k.split('|');
+          return { cat, cc, count: c, pct: Math.round((c/total)*100) };
+        })
+        .sort((a,b) => b.count - a.count)
+        .slice(0, 3);
+
+      return {
+        suggestions: ranked,
+        rationale: { total: records.length, detail: rationaleText }
+      };
+    }
+
+    function renderSuggestions(sugg) {
+      const box = $('suggestionsBox');
+      box.innerHTML = '';
+
+      if (!sugg || !sugg.suggestions || sugg.suggestions.length === 0) {
+        box.innerHTML = '<div class="text-sm text-gray-500">No suggestions yet. Import history or use synthetic data, then click Suggest.</div>';
+        return;
+      }
+
+      sugg.suggestions.forEach((s, idx) => {
+        const id = `choice_${idx}`;
+        const row = document.createElement('div');
+        row.className = 'border border-gray-200 rounded-xl p-3 bg-white flex items-start gap-3';
+        row.innerHTML = `
+          <input type="radio" name="choice" id="${id}" class="mt-1" ${idx===0?'checked':''}>
+          <label for="${id}" class="flex-1">
+            <div class="font-semibold">${idx===0? 'Suggested' : 'Alternative'}: Category <span class="font-mono">${s.cat}</span> – Cost Center <span class="font-mono">${s.cc}</span> (<span title="Confidence out of matched records">${s.pct}%</span>)</div>
+            <div class="text-sm text-gray-600">Rank #${idx+1}</div>
+          </label>
+        `;
+        box.appendChild(row);
+      });
+      $('rationaleNote').textContent = sugg.rationale.detail;
+    }
+
+    // ===== Review & Export =====
+    const REVIEW_LS_KEY = 'account_assigner_last_review_v1';
+
+    function approveSelection() {
+      const po = readPOForm();
+      const reviewer = $('Reviewer_Name').value || '';
+      const radios = Array.from(document.querySelectorAll('input[name="choice"]'));
+      const idx = radios.findIndex(r => r.checked);
+      const selected = currentSuggestions && currentSuggestions.suggestions && currentSuggestions.suggestions[idx >= 0 ? idx : 0];
+
+      if (!selected) {
+        showMessage('No suggestion selected. Please run Suggest first.', true);
+        return;
+      }
+
+      const timestamp = new Date().toISOString();
+      const rationale = $('rationaleNote').textContent || '—';
+
+      const rec = {
+        PO_Number: po.PO_Number,
+        Suggested_Category: selected.cat,
+        Suggested_Cost_Center: selected.cc,
+        Confidence: `${selected.pct}%`,
+        Rationale: rationale,
+        Reviewer_Name: reviewer,
+        Timestamp: timestamp
+      };
+
+      // Persist
+      localStorage.setItem(REVIEW_LS_KEY, JSON.stringify({ rec, po }));
+      showMessage('Suggestion approved and saved locally. You can download the Review CSV now.');
+    }
+
+    function downloadReview() {
+      const saved = localStorage.getItem(REVIEW_LS_KEY);
+      if (!saved) {
+        showMessage('No approved review found. Click Approve Suggestion first.', true);
+        return;
+      }
+      const { rec } = JSON.parse(saved);
+      const headers = ['PO_Number','Suggested_Category','Suggested_Cost_Center','Confidence','Rationale','Reviewer_Name','Timestamp'];
+      const csv = [ toCSVRow(headers), toCSVRow(headers.map(h => rec[h])) ].join('\n');
+      download('account_assignment_review.csv', csv);
+    }
+
+    function restoreFromLocal() {
+      const saved = localStorage.getItem(REVIEW_LS_KEY);
+      if (!saved) return;
+      try {
+        const { rec, po } = JSON.parse(saved);
+        if (po) populatePOForm(po);
+        if (rec && rec.Reviewer_Name) $('Reviewer_Name').value = rec.Reviewer_Name;
+      } catch(e) {
+          console.error("Failed to restore from local storage", e);
+          localStorage.removeItem(REVIEW_LS_KEY); // Clear corrupted data
+      }
+    }
+
+    // ===== Imports =====
+    function handleImportPO(file) {
+      if (!file) return;
+      file.text().then(txt => {
+        console.log('PO CSV raw text:', txt.substring(0, 200)); // DEBUG: Show first 200 chars
+        const rows = parseCSV(txt);
+        console.log('Parsed rows:', rows); // DEBUG
+
+        if (!rows.length) {
+          showMessage('No data rows found in PO CSV.', true);
+          return;
+        }
+
+        const po = rows[0];
+        console.log('First PO record:', po); // DEBUG
+
+        // Validate that we have the expected fields
+        const requiredFields = ['PO_Number', 'Material_Number', 'Vendor_ID'];
+        const missingFields = requiredFields.filter(f => !po.hasOwnProperty(f));
+
+        if (missingFields.length > 0) {
+          showMessage(`CSV headers don't match! Missing fields: ${missingFields.join(', ')}. Expected headers with underscores like "PO_Number", not "PO Number"`, true);
+          console.error('Available fields in CSV:', Object.keys(po));
+          console.error('Expected one of these required fields:', requiredFields);
+          return;
+        }
+
+        populatePOForm(po);
+        showMessage('PO imported successfully.');
+      }).catch((err) => {
+        console.error("Error reading PO CSV:", err);
+        showMessage('Failed to read PO CSV: ' + err.message, true);
+      });
+    }
+
+    function handleImportHistory(file) {
+      if (!file) return;
+      $('historyStatus').innerHTML = 'History: <span class="font-medium">Loading…</span>';
+      file.text().then(txt => {
+        console.log('History CSV raw text:', txt.substring(0, 200)); // DEBUG
+        const rows = parseCSV(txt);
+        console.log('Parsed history rows count:', rows.length); // DEBUG
+
+        if (!rows.length) {
+          showMessage('No data rows found in History CSV.', true);
+          $('historyStatus').innerHTML = 'History: <span class="font-medium">Empty</span>';
+          return;
+        }
+
+        // Validate headers
+        const requiredFields = ['Material_Number', 'Vendor_ID', 'Account_Assignment_Category'];
+        const sampleRow = rows[0];
+        const missingFields = requiredFields.filter(f => !sampleRow.hasOwnProperty(f));
+
+        if (missingFields.length > 0) {
+          showMessage(`History CSV headers don't match! Missing: ${missingFields.join(', ')}`, true);
+          console.error('Available fields in History CSV:', Object.keys(sampleRow));
+          $('historyStatus').innerHTML = 'History: <span class="font-medium">Invalid Headers</span>';
+          return;
+        }
+
+        historyData = rows;
+        $('historyStatus').innerHTML = `History: <span class="font-medium">${rows.length.toLocaleString()} rows</span>`;
+        showMessage(`History imported: ${rows.length} records.`);
+      }).catch((err) => {
+        console.error("Error reading History CSV:", err);
+        $('historyStatus').innerHTML = 'History: <span class="font-medium">Error</span>';
+        showMessage('Failed to read History CSV: ' + err.message, true);
+      });
+    }
+
+    // ===== Events =====
+    let currentSuggestions = null;
+
+    $('btnImportPO').addEventListener('click', () => $('filePO').click());
+    $('btnImportHistory').addEventListener('click', () => $('fileHistory').click());
+
+    $('filePO').addEventListener('change', (e) => {
+      const f = e.target.files[0];
+      if (f) handleImportPO(f);
+      e.target.value = ''; // Reset for re-upload
+    });
+    $('fileHistory').addEventListener('change', (e) => {
+      const f = e.target.files[0];
+      if (f) handleImportHistory(f);
+      e.target.value = ''; // Reset for re-upload
+    });
+
+    $('btnSuggest').addEventListener('click', () => {
+      const po = readPOForm();
+      const base = historyData.length ? historyData : syntheticHistory;
+      currentSuggestions = suggestForPO(po, base);
+      renderSuggestions(currentSuggestions);
+      if (currentSuggestions.suggestions.length > 0) {
+          showMessage("Suggestions generated.");
+      } else {
+          showMessage("Could not find relevant suggestions.", true);
+      }
+    });
+
+    $('btnApprove').addEventListener('click', approveSelection);
+    $('btnDownloadTop').addEventListener('click', downloadReview);
+    $('btnDownloadBottom').addEventListener('click', downloadReview);
+
+    // ===== Init =====
+
+    // 1. Try to restore from local storage FIRST
+    let currentPO = null;
+    try {
+        const saved = localStorage.getItem(REVIEW_LS_KEY);
+        if (saved) {
+            const { rec, po } = JSON.parse(saved);
+            if (po && po.PO_Number) { // Check for a valid PO object
+                currentPO = po;
+                if (rec && rec.Reviewer_Name) $('Reviewer_Name').value = rec.Reviewer_Name;
+                setTimeout(() => showMessage("Restored last PO from local storage."), 500);
+            }
+        }
+    } catch(e) {
+        console.error("Failed to restore from local storage", e);
+        localStorage.removeItem(REVIEW_LS_KEY); // Clear corrupted data
+    }
+
+    // 2. If no PO was restored, generate a new synthetic one
+    if (!currentPO) {
+        currentPO = generateSyntheticPO();
+    }
+
+    // 3. Populate the form with the determined PO
+    populatePOForm(currentPO);
+
+    // 4. Load synthetic history, *seeding it with the current PO*
+    // This ensures that even if a PO is restored, the synthetic history
+    // will contain relevant matches for it.
+    const syntheticHistory = loadSyntheticHistory(currentPO);
+    historyData = syntheticHistory.slice(); // Use synthetic by default
+    $('historyStatus').innerHTML = `History: <span class="font-medium">Synthetic (${historyData.length})</span>`;
+
+    console.log("Account Assigner App Initialized.");
+
+  </script>
+</body>
+</html>

@@ -120,6 +120,13 @@
       "First_Payment_Flag","Historical_Average_Amount","Historical_Payment_Count"
     ];
 
+    const DEFAULT_RULES = `Flag any payment over 500000 INR.
+Alert if vendor is new and amount > 100000.
+Highlight duplicate vendor bank accounts in this run.
+Flag if invoice older than 90 days.
+Alert if vendor country is RU or IR.
+Flag if discount not taken and amount > 200000.`;
+
     let state = {
       data: [],              // rows
       flags: [],             // {rowIdx, ruleId, ruleLabel, rationale}
@@ -611,11 +618,18 @@
      **************************************/
     function init(){
       loadLocal();
+
+      // If no rules saved, use defaults
+      if(!state.rulesText || state.rulesText.trim()===''){
+        state.rulesText = DEFAULT_RULES;
+        $('#rulesText').value = DEFAULT_RULES;
+      }
+
       // Initial synthetic data
       useData(generateSynthetic(randInt(30,50)));
 
-      // Restore rules preview if any
-      state.rules = interpretRules(state.rulesText||'');
+      // Restore rules preview and interpret them
+      state.rules = interpretRules(state.rulesText);
       renderRulesPreview();
 
       // Buttons

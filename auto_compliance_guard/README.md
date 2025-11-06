@@ -122,11 +122,24 @@ The system now correctly supports:
 
 1. Open `index.html` in any modern web browser
 2. The app generates synthetic payment data on load
-3. Import your own CSV (optional) with the "📥 Import CSV" button
-4. Define rules using natural language
-5. Click "🔎 Run Scan" to execute all rules
-6. Review flagged items in the right drawer
-7. Export results with "⬇️ Download Report CSV"
+3. **Default rules are pre-loaded** - you can click "🔎 Run Scan" immediately!
+4. Import your own CSV (optional) with the "📥 Import CSV" button
+5. Modify rules (optional) by clicking "🧩 Define Rules"
+6. Click "🔎 Run Scan" to execute all rules
+7. Review flagged items in the right drawer
+8. Export results with "⬇️ Download Report CSV"
+
+### Default Rules Included
+
+The app comes pre-configured with these compliance rules:
+- Flag any payment over 500000 INR
+- Alert if vendor is new and amount > 100000
+- Highlight duplicate vendor bank accounts in this run
+- Flag if invoice older than 90 days
+- Alert if vendor country is RU or IR
+- Flag if discount not taken and amount > 200000
+
+You can customize these rules at any time using the "🧩 Define Rules" button.
 
 ## Features
 

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Login App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">LinkedIn Login Demo</h1>
+            <p class="text-gray-600">Connect with your LinkedIn account</p>
+        </div>
+
+        <!-- Configuration Panel -->
+        <div id="configPanel" class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Configure LinkedIn App</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Client ID</label>
+                    <input type="text" id="clientId"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           placeholder="Enter your LinkedIn Client ID">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Redirect URI</label>
+                    <input type="text" id="redirectUri"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           value="http://localhost:8000">
+                    <p class="text-xs text-gray-500 mt-1">Make sure this matches your LinkedIn app settings</p>
+                </div>
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h3 class="font-semibold text-blue-900 mb-2">Setup Instructions:</h3>
+                    <ol class="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+                        <li>Create a LinkedIn app at <a href="https://www.linkedin.com/developers/apps" target="_blank" class="underline">LinkedIn Developers</a></li>
+                        <li>Add your redirect URI in the app settings</li>
+                        <li>Copy your Client ID and paste it above</li>
+                        <li>For production, you'll need a backend to handle the token exchange</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Section -->
+        <div id="loginSection" class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8 text-center">
+            <div class="mb-6">
+                <svg class="w-24 h-24 mx-auto text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Sign in with LinkedIn</h2>
+            <p class="text-gray-600 mb-6">Access your LinkedIn profile information</p>
+            <button id="loginBtn"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg transition duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+                Connect with LinkedIn
+            </button>
+        </div>
+
+        <!-- User Profile Section (Hidden by default) -->
+        <div id="profileSection" class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8 hidden">
+            <div class="text-center mb-6">
+                <img id="profilePicture" src="" alt="Profile" class="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-blue-500">
+                <h2 id="profileName" class="text-3xl font-bold text-gray-800 mb-2"></h2>
+                <p id="profileHeadline" class="text-gray-600 mb-4"></p>
+            </div>
+
+            <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Profile Details</h3>
+                <div id="profileDetails" class="space-y-3">
+                    <!-- Profile details will be inserted here -->
+                </div>
+            </div>
+
+            <div class="mt-6 text-center">
+                <button id="logoutBtn"
+                        class="bg-red-500 hover:bg-red-600 text-white font-semibold px-6 py-2 rounded-lg transition duration-200">
+                    Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="max-w-2xl mx-auto text-center hidden">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <p class="text-gray-600 mt-4">Loading your profile...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="max-w-2xl mx-auto bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg hidden">
+            <p class="font-semibold">Error</p>
+            <p id="errorText"></p>
+        </div>
+
+        <!-- Raw Data Section (for debugging) -->
+        <div id="rawDataSection" class="max-w-2xl mx-auto bg-gray-50 rounded-lg shadow p-6 mt-6 hidden">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">Raw API Response</h3>
+            <pre id="rawData" class="bg-gray-800 text-green-400 p-4 rounded overflow-x-auto text-sm"></pre>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

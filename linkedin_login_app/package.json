@@ -1,0 +1,23 @@
+{
+  "name": "linkedin-login-app",
+  "version": "1.0.0",
+  "description": "Simple LinkedIn OAuth login demo app",
+  "main": "proxy.js",
+  "scripts": {
+    "start": "node proxy.js",
+    "dev": "node proxy.js"
+  },
+  "keywords": [
+    "linkedin",
+    "oauth",
+    "authentication",
+    "login"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1"
+  }
+}

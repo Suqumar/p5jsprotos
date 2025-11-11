@@ -1,19 +1,30 @@
 # LinkedIn Login App
 
-A simple, clean implementation of LinkedIn OAuth authentication using HTML, JavaScript, and Tailwind CSS.
+A simple, clean implementation of LinkedIn OAuth authentication using HTML, JavaScript, Tailwind CSS, and FastAPI backend.
 
 ## Features
 
 - LinkedIn OAuth 2.0 authentication flow
 - Display user profile information (name, email, photo, etc.)
 - Beautiful UI with Tailwind CSS
-- Secure token exchange via backend proxy
+- Secure token exchange via FastAPI backend
 - Client-side state management
 - CSRF protection with state parameter
 
+## Architecture
+
+```
+┌─────────────┐         ┌─────────────┐         ┌─────────────┐
+│   Browser   │────────▶│   FastAPI   │────────▶│  LinkedIn   │
+│  (Frontend) │         │  (Backend)  │         │     API     │
+└─────────────┘         └─────────────┘         └─────────────┘
+```
+
+The frontend handles the OAuth flow and UI, while the FastAPI backend securely manages token exchange and API requests to LinkedIn.
+
 ## Prerequisites
 
-- Node.js (v14 or higher)
+- Python 3.8+ (for FastAPI backend)
 - A LinkedIn Developer App
 
 ## Setup Instructions
@@ -32,7 +43,7 @@ A simple, clean implementation of LinkedIn OAuth authentication using HTML, Java
 
 1. In your LinkedIn app dashboard, go to the "Auth" tab
 2. Under "OAuth 2.0 settings", add your redirect URLs:
-   - For local development: `http://localhost:3000`
+   - For local development: `http://localhost:8000`
    - For production: Your production URL
 3. Under "OAuth 2.0 scopes", request these permissions:
    - `openid`
@@ -40,45 +51,39 @@ A simple, clean implementation of LinkedIn OAuth authentication using HTML, Java
    - `email`
 4. Copy your **Client ID** and **Client Secret**
 
-### 3. Install Dependencies
+### 3. Set Up FastAPI Backend
 
+The FastAPI backend will be generated separately. It will handle:
+- Token exchange with LinkedIn (keeping client_secret secure)
+- Fetching user profile data from LinkedIn API
+- CORS configuration for frontend access
+
+**Backend Endpoints:**
+- `POST /api/linkedin/token` - Exchange authorization code for access token
+- `GET /api/linkedin/profile` - Fetch user profile from LinkedIn
+
+See `FASTAPI_BACKEND.md` for implementation details (to be generated).
+
+### 4. Running the App
+
+**Step 1: Start the FastAPI Backend**
 ```bash
-cd linkedin_login_app
-npm install
+# Instructions will be provided when FastAPI code is generated
+# Default: uvicorn main:app --reload --port 8000
 ```
 
-### 4. Configure Environment Variables
-
-1. Copy the example environment file:
+**Step 2: Access the Frontend**
 ```bash
-cp .env.example .env
+# Open in browser:
+http://localhost:8000
 ```
 
-2. Edit `.env` and add your LinkedIn credentials:
-```env
-LINKEDIN_CLIENT_ID=your_client_id_here
-LINKEDIN_CLIENT_SECRET=your_client_secret_here
-PORT=3000
-```
-
-## Running the App
-
-### Start the Backend Proxy Server
-
-```bash
-npm start
-```
-
-The server will start on `http://localhost:3000`
-
-### Access the App
-
-1. Open your browser and go to: `http://localhost:3000`
-2. Enter your LinkedIn Client ID in the configuration panel
-3. Make sure the Redirect URI matches what you configured in LinkedIn (default: `http://localhost:3000`)
-4. Click "Connect with LinkedIn"
-5. Authorize the app on LinkedIn
-6. You'll be redirected back with your profile information displayed
+**Step 3: Configure and Login**
+1. Enter your LinkedIn Client ID in the configuration panel
+2. Make sure the Redirect URI matches (default: `http://localhost:8000`)
+3. Click "Connect with LinkedIn"
+4. Authorize the app on LinkedIn
+5. You'll be redirected back with your profile information displayed
 
 ## Project Structure
 
@@ -86,27 +91,31 @@ The server will start on `http://localhost:3000`
 linkedin_login_app/
 ├── index.html          # Main HTML file with Tailwind CSS
 ├── app.js             # Client-side JavaScript (OAuth flow & UI)
-├── proxy.js           # Backend proxy server (secure token exchange)
-├── package.json       # Node.js dependencies
+├── backend/           # FastAPI backend (to be generated)
+│   ├── main.py        # FastAPI application
+│   ├── config.py      # Configuration management
+│   └── requirements.txt
 ├── .env.example       # Environment variables template
 ├── .gitignore        # Git ignore rules
-└── README.md         # This file
+├── README.md         # This file
+└── FASTAPI_BACKEND.md # FastAPI backend documentation
 ```
 
 ## How It Works
 
 ### OAuth Flow
 
-1. **Authorization Request**: User clicks login, app redirects to LinkedIn authorization page
+1. **Authorization Request**: User clicks login, frontend redirects to LinkedIn authorization page
 2. **Authorization Grant**: User approves, LinkedIn redirects back with authorization code
-3. **Token Exchange**: Backend proxy exchanges code for access token (keeps client_secret secure)
-4. **API Request**: App uses access token to fetch user profile from LinkedIn API
-5. **Display Data**: User profile information is displayed
+3. **Token Exchange**: Frontend sends code to FastAPI backend, which exchanges it for access token
+4. **Profile Fetch**: Frontend requests profile data, FastAPI backend fetches from LinkedIn API
+5. **Display Data**: User profile information is displayed in the frontend
 
 ### Security Features
 
 - **CSRF Protection**: State parameter validation
 - **Secure Secrets**: Client secret kept on backend, never exposed to browser
+- **Backend Proxy**: All LinkedIn API calls go through FastAPI backend
 - **HTTPS Ready**: Works with SSL/TLS in production
 - **Scope Limitation**: Only requests necessary permissions
 
@@ -122,6 +131,63 @@ The app displays the following user information from LinkedIn's OpenID Connect e
 - **Locale** (language preference)
 - **Sub** (LinkedIn user ID)
 
+## API Endpoints (FastAPI Backend)
+
+### POST /api/linkedin/token
+
+Exchange authorization code for access token.
+
+**Request:**
+```json
+{
+  "code": "AQT...",
+  "redirect_uri": "http://localhost:8000"
+}
+```
+
+**Response:**
+```json
+{
+  "access_token": "eyJ...",
+  "expires_in": 5184000,
+  "scope": "openid profile email"
+}
+```
+
+### GET /api/linkedin/profile
+
+Fetch user profile from LinkedIn API.
+
+**Headers:**
+```
+Authorization: Bearer <access_token>
+```
+
+**Response:**
+```json
+{
+  "sub": "abc123",
+  "name": "John Doe",
+  "given_name": "John",
+  "family_name": "Doe",
+  "picture": "https://...",
+  "email": "john@example.com",
+  "email_verified": true,
+  "locale": "en-US"
+}
+```
+
+## Environment Variables
+
+The FastAPI backend will use these environment variables:
+
+```env
+LINKEDIN_CLIENT_ID=your_client_id_here
+LINKEDIN_CLIENT_SECRET=your_client_secret_here
+BACKEND_PORT=8000
+CORS_ORIGINS=http://localhost:8000
+```
+
 ## Customization
 
 ### Styling
@@ -135,28 +201,28 @@ The app uses Tailwind CSS via CDN. To customize:
 To fetch more LinkedIn profile data:
 1. Update the OAuth scopes in the LinkedIn app settings
 2. Modify the `scope` parameter in `app.js`
-3. Call additional LinkedIn API endpoints in the `fetchUserProfile` function
+3. Add additional API endpoints in the FastAPI backend
 
 ## Deployment
 
-### Backend Deployment (Heroku, Railway, etc.)
+### Backend Deployment (Heroku, Railway, Render, etc.)
 
 1. Set environment variables in your hosting platform
-2. Deploy the `proxy.js` server
-3. Update the redirect URI in LinkedIn app settings
-4. Update the redirect URI in the frontend configuration
+2. Deploy the FastAPI application
+3. Update `API_BASE_URL` in `app.js` to point to your backend URL
+4. Update the redirect URI in LinkedIn app settings
 
 ### Frontend Deployment
 
-1. Update the backend URL in `app.js` (line with `fetch('http://localhost:3000/...`)
-2. Deploy to any static hosting (Netlify, Vercel, GitHub Pages, etc.)
+1. Update `API_BASE_URL` in `app.js` to point to your production backend
+2. Deploy to any static hosting (Netlify, Vercel, GitHub Pages, etc.) or serve via FastAPI
 
 ## Troubleshooting
 
 ### "Failed to exchange code for token"
 
-- Make sure the proxy server is running (`npm start`)
-- Verify your `.env` file has correct credentials
+- Make sure the FastAPI server is running on port 8000
+- Verify your environment variables have correct LinkedIn credentials
 - Check that redirect URI matches exactly in LinkedIn app settings
 
 ### "Invalid redirect_uri"
@@ -172,13 +238,20 @@ To fetch more LinkedIn profile data:
 
 ### CORS Errors
 
-- The proxy server includes CORS headers
-- Make sure you're accessing via `localhost:3000`, not opening the HTML file directly
+- The FastAPI backend must include proper CORS configuration
+- Make sure you're accessing via the configured origin
+
+### Connection Refused / Cannot Connect to Backend
+
+- Verify FastAPI is running: `http://localhost:8000/docs`
+- Check firewall settings
+- Ensure port 8000 is not being used by another application
 
 ## Resources
 
 - [LinkedIn OAuth Documentation](https://learn.microsoft.com/en-us/linkedin/shared/authentication/authentication)
 - [LinkedIn API Reference](https://learn.microsoft.com/en-us/linkedin/shared/references/v2/)
+- [FastAPI Documentation](https://fastapi.tiangolo.com/)
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 
 ## License
@@ -188,7 +261,11 @@ MIT
 ## Notes
 
 - This is a demo application for learning purposes
-- For production use, implement additional security measures
+- For production use, implement additional security measures:
+  - Rate limiting
+  - Request validation
+  - Proper error handling
+  - Logging and monitoring
 - Always use HTTPS in production
 - Consider implementing token refresh logic for long-lived sessions
-- Add proper error handling and logging
+- Store tokens securely (consider Redis or database for production)

@@ -3,6 +3,9 @@ const LINKEDIN_AUTH_URL = 'https://www.linkedin.com/oauth/v2/authorization';
 const LINKEDIN_TOKEN_URL = 'https://www.linkedin.com/oauth/v2/accessToken';
 const LINKEDIN_PROFILE_URL = 'https://api.linkedin.com/v2/userinfo';
 
+// FastAPI Backend URL
+const API_BASE_URL = 'http://localhost:8000';
+
 // State management
 let accessToken = null;
 
@@ -137,16 +140,11 @@ async function exchangeCodeForToken(code) {
     const clientId = elements.clientId.value.trim();
     const redirectUri = elements.redirectUri.value.trim();
 
-    // Note: This is a client-side implementation for demonstration
-    // In production, this MUST be done server-side to keep client_secret secure
-
-    showError('Note: Token exchange requires a backend server. See proxy.js for implementation.');
-
-    // For demo purposes, we'll show how to call a backend endpoint
-    // You need to implement the backend proxy server (see proxy.js)
+    // Note: Token exchange must be done server-side to keep client_secret secure
+    // This calls the FastAPI backend which handles the secure token exchange
 
     try {
-        const response = await fetch('http://localhost:3000/auth/linkedin/token', {
+        const response = await fetch(`${API_BASE_URL}/api/linkedin/token`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -158,28 +156,32 @@ async function exchangeCodeForToken(code) {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to exchange code for token. Make sure the proxy server is running.');
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.detail || 'Failed to exchange code for token. Make sure the FastAPI server is running.');
         }
 
         const data = await response.json();
         return data.access_token;
 
     } catch (error) {
-        throw new Error(`Token exchange failed: ${error.message}. Please run the proxy server (node proxy.js)`);
+        throw new Error(`Token exchange failed: ${error.message}. Please ensure the FastAPI backend is running on port 8000.`);
     }
 }
 
-// Fetch user profile from LinkedIn
+// Fetch user profile from LinkedIn via FastAPI backend
 async function fetchUserProfile(token) {
     try {
-        const response = await fetch(LINKEDIN_PROFILE_URL, {
+        // Call FastAPI backend to fetch profile
+        const response = await fetch(`${API_BASE_URL}/api/linkedin/profile`, {
+            method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch profile');
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.detail || 'Failed to fetch profile');
         }
 
         const profile = await response.json();

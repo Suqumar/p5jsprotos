@@ -1,0 +1,2105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Learning App</title>
+    <style>
+        /* CSS Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-cream: #F7F9FC;
+            --primary-teal: #4ECDC4;
+            --secondary-coral: #FF6B6B;
+            --text-dark: #2C3E50;
+            --text-medium: #7F8C8D;
+            --card-bg: #FFFFFF;
+            --input-bg: #F0F2F5;
+            --success-green: #51CF66;
+            --warning-yellow: #FFD43B;
+            --border-light: #E0E0E0;
+            --shadow-soft: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-lifted: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, Helvetica, sans-serif;
+            background: var(--bg-cream);
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        p {
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        small {
+            font-size: 14px;
+            color: var(--text-medium);
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            box-shadow: var(--shadow-soft);
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-teal);
+        }
+
+        .header-progress {
+            font-size: 14px;
+            color: var(--text-medium);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lifted);
+            transform: translateY(-2px);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-primary {
+            background: var(--primary-teal);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #45b8b0;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary-teal);
+            border: 2px solid var(--primary-teal);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-cream);
+        }
+
+        .btn-danger {
+            background: var(--secondary-coral);
+            color: white;
+        }
+
+        .btn-large {
+            font-size: 18px;
+            padding: 16px 32px;
+            min-height: 52px;
+        }
+
+        .btn-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            padding: 0;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Input Fields */
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 18px;
+            background: var(--input-bg);
+            border: 1px solid transparent;
+            border-radius: 8px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-teal);
+            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: var(--border-light);
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-teal), #45b8b0);
+            transition: width 0.5s ease;
+            border-radius: 6px;
+        }
+
+        /* Dashboard */
+        .welcome-banner {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .welcome-banner h1 {
+            color: var(--primary-teal);
+            margin-bottom: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary-teal);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-medium);
+            margin-top: 4px;
+        }
+
+        /* Lesson List */
+        .lesson-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .lesson-item {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .lesson-item:hover {
+            box-shadow: var(--shadow-lifted);
+            transform: translateX(4px);
+        }
+
+        .lesson-item.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .lesson-info {
+            flex: 1;
+        }
+
+        .lesson-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .lesson-progress-text {
+            font-size: 14px;
+            color: var(--text-medium);
+        }
+
+        .lesson-status {
+            font-size: 24px;
+        }
+
+        /* Practice View */
+        .practice-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .sentence-display {
+            background: linear-gradient(135deg, var(--primary-teal), #45b8b0);
+            color: white;
+            padding: 40px 30px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .sentence-text {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .practice-controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .input-mode-toggle {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .practice-input-area {
+            margin-bottom: 20px;
+        }
+
+        .mic-button {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            font-size: 32px;
+            background: var(--primary-teal);
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .mic-button:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-lifted);
+        }
+
+        .mic-button.recording {
+            animation: pulse 1.5s infinite;
+            background: var(--secondary-coral);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .mic-status {
+            margin-top: 12px;
+            font-size: 14px;
+            color: var(--text-medium);
+            min-height: 20px;
+        }
+
+        .hint-box {
+            background: #FFF9DB;
+            border-left: 4px solid var(--warning-yellow);
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .hint-box h4 {
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        /* Feedback */
+        .feedback {
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            animation: bounceIn 0.5s ease;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .feedback.success {
+            background: #D3F9D8;
+            color: #2B8A3E;
+        }
+
+        .feedback.partial {
+            background: #FFF3BF;
+            color: #C68304;
+        }
+
+        .feedback.error {
+            background: #FFE3E3;
+            color: #C92A2A;
+        }
+
+        /* Settings */
+        .settings-group {
+            margin-bottom: 24px;
+        }
+
+        .settings-group h3 {
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            font-size: 16px;
+            color: var(--text-dark);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-light);
+            transition: 0.3s;
+            border-radius: 26px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-teal);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        select,
+        input[type="range"] {
+            padding: 8px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+            background: var(--input-bg);
+        }
+
+        input[type="range"] {
+            width: 150px;
+        }
+
+        /* Statistics */
+        .chart-container {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 200px;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: var(--primary-teal);
+            border-radius: 4px 4px 0 0;
+            min-height: 10px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .chart-bar:hover {
+            background: #45b8b0;
+            transform: translateY(-4px);
+        }
+
+        .chart-label {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--text-medium);
+        }
+
+        /* Lesson Manager */
+        .import-export-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lifted);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-medium);
+        }
+
+        /* Celebration */
+        .celebration {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .celebration-icon {
+            font-size: 80px;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Navigation */
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 12px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            .sentence-text {
+                font-size: 22px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .btn {
+                min-height: 48px;
+            }
+
+            .import-export-buttons {
+                flex-direction: column;
+            }
+
+            .import-export-buttons .btn {
+                width: 100%;
+            }
+        }
+
+        /* Utilities */
+        .text-center {
+            text-align: center;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid var(--border-light);
+            border-top: 3px solid var(--primary-teal);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Welcome/Onboarding View -->
+    <div id="welcomeView" class="view active">
+        <div class="container">
+            <div class="welcome-banner">
+                <h1>Welcome to English Learning! 👋</h1>
+                <p>Your friendly companion for learning spoken English</p>
+            </div>
+
+            <div class="card">
+                <h2>How it works:</h2>
+                <p style="font-size: 16px; line-height: 1.8;">
+                    1. <strong>Listen</strong> to sentences spoken clearly<br>
+                    2. <strong>Practice</strong> by typing or speaking<br>
+                    3. <strong>Get feedback</strong> instantly<br>
+                    4. <strong>Track progress</strong> as you learn<br>
+                </p>
+            </div>
+
+            <div class="card">
+                <h2>Features:</h2>
+                <p style="font-size: 16px; line-height: 1.8;">
+                    ✅ Built-in lessons covering essential topics<br>
+                    ✅ Voice recognition for pronunciation practice<br>
+                    ✅ Progress tracking and statistics<br>
+                    ✅ Import custom lesson packs<br>
+                    ✅ Works completely offline<br>
+                </p>
+            </div>
+
+            <div class="text-center mt-20">
+                <button class="btn btn-primary btn-large" onclick="app.startApp()">
+                    Let's Get Started! 🚀
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard View -->
+    <div id="dashboardView" class="view">
+        <div class="header">
+            <div class="header-title">🌟 English Learning</div>
+            <div class="header-progress" id="headerProgress">Loading...</div>
+        </div>
+
+        <div class="container">
+            <div class="card">
+                <h1>Welcome back! 👋</h1>
+                <p id="dashboardWelcome">You've mastered 0 sentences</p>
+
+                <button class="btn btn-primary btn-large mb-20" onclick="app.continueLearning()">
+                    Continue Learning →
+                </button>
+
+                <div>
+                    <strong>Your Progress:</strong>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="overallProgress" style="width: 0%"></div>
+                    </div>
+                    <small id="progressText">0% complete</small>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="statSentences">0</div>
+                    <div class="stat-label">Sentences Mastered</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statLessons">0</div>
+                    <div class="stat-label">Lessons Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statSuccessRate">0%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statStreak">0</div>
+                    <div class="stat-label">Day Streak</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Lessons</h2>
+                <div class="lesson-list" id="lessonList">
+                    <!-- Lessons will be populated here -->
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="app.showView('statisticsView')">
+                    📊 Statistics
+                </button>
+                <button class="btn btn-secondary" onclick="app.showView('lessonManagerView')">
+                    📚 Lesson Manager
+                </button>
+                <button class="btn btn-secondary" onclick="app.showView('settingsView')">
+                    ⚙️ Settings
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Practice View -->
+    <div id="practiceView" class="view">
+        <div class="header">
+            <button class="btn btn-secondary" onclick="app.exitPractice()">← Back</button>
+            <div class="header-progress" id="practiceProgress">Progress</div>
+        </div>
+
+        <div class="container">
+            <div class="practice-header">
+                <h2 id="lessonTitle">Lesson Title</h2>
+                <p id="sentenceCounter">Sentence 1 of 8</p>
+            </div>
+
+            <div class="sentence-display">
+                <div class="sentence-text" id="currentSentence">Hello</div>
+                <button class="btn btn-primary" onclick="app.speakSentence()">
+                    🔊 Listen
+                </button>
+            </div>
+
+            <div class="card">
+                <h3>Try it yourself:</h3>
+
+                <div class="input-mode-toggle">
+                    <button class="btn btn-primary" id="textModeBtn" onclick="app.setInputMode('text')">
+                        ⌨️ Type
+                    </button>
+                    <button class="btn btn-secondary" id="voiceModeBtn" onclick="app.setInputMode('voice')">
+                        🎤 Speak
+                    </button>
+                </div>
+
+                <!-- Text Input Mode -->
+                <div id="textInputArea" class="practice-input-area">
+                    <input type="text" id="textInput" placeholder="Type the sentence here..."
+                           onkeypress="if(event.key==='Enter') app.checkTextInput()">
+                    <div class="nav-buttons mt-20">
+                        <button class="btn btn-primary" onclick="app.checkTextInput()">
+                            ✓ Submit
+                        </button>
+                        <button class="btn btn-secondary" onclick="document.getElementById('textInput').value=''">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Voice Input Mode -->
+                <div id="voiceInputArea" class="practice-input-area hidden">
+                    <div class="text-center">
+                        <button class="mic-button" id="micButton" onclick="app.toggleRecording()">
+                            🎤
+                        </button>
+                        <div class="mic-status" id="micStatus">Click to record</div>
+                    </div>
+                </div>
+
+                <div id="feedbackArea"></div>
+
+                <div id="hintArea" class="hidden">
+                    <div class="hint-box">
+                        <h4>💡 Hint</h4>
+                        <p id="hintText"></p>
+                    </div>
+                </div>
+
+                <div class="nav-buttons mt-20">
+                    <button class="btn btn-secondary" onclick="app.toggleHint()">
+                        💡 Show Hint
+                    </button>
+                    <button class="btn btn-secondary" onclick="app.skipSentence()">
+                        Skip →
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics View -->
+    <div id="statisticsView" class="view">
+        <div class="header">
+            <button class="btn btn-secondary" onclick="app.showView('dashboardView')">← Back</button>
+            <div class="header-title">Statistics</div>
+        </div>
+
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalAttempts">0</div>
+                    <div class="stat-label">Total Attempts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalSuccess">0</div>
+                    <div class="stat-label">Successful Attempts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="averageAccuracy">0%</div>
+                    <div class="stat-label">Average Accuracy</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="practiceTime">0</div>
+                    <div class="stat-label">Minutes Practiced</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Progress Over Time</h3>
+                <div class="chart-bars" id="progressChart">
+                    <!-- Chart will be populated here -->
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Milestones</h3>
+                <div id="milestones">
+                    <p>🎯 Complete your first sentence to unlock milestones!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings View -->
+    <div id="settingsView" class="view">
+        <div class="header">
+            <button class="btn btn-secondary" onclick="app.showView('dashboardView')">← Back</button>
+            <div class="header-title">Settings</div>
+        </div>
+
+        <div class="container">
+            <div class="card">
+                <div class="settings-group">
+                    <h3>Speech Settings</h3>
+
+                    <div class="setting-item">
+                        <div class="setting-label">Voice Speed</div>
+                        <div>
+                            <input type="range" id="voiceSpeed" min="0.7" max="1.2" step="0.1" value="0.9"
+                                   onchange="app.updateSetting('voiceSpeed', this.value)">
+                            <span id="voiceSpeedValue">0.9x</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">Language Variant</div>
+                        <select id="languageVariant" onchange="app.updateSetting('languageVariant', this.value)">
+                            <option value="en-US">US English</option>
+                            <option value="en-GB">UK English</option>
+                            <option value="en-AU">Australian English</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Learning Settings</h3>
+
+                    <div class="setting-item">
+                        <div class="setting-label">Auto-advance to next sentence</div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="autoAdvance" onchange="app.updateSetting('autoAdvance', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">Show hints automatically</div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="autoHints" onchange="app.updateSetting('autoHints', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">Practice mode</div>
+                        <select id="practiceMode" onchange="app.updateSetting('practiceMode', this.value)">
+                            <option value="sequential">Sequential</option>
+                            <option value="random">Random</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">Sound effects</div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="soundEffects" checked onchange="app.updateSetting('soundEffects', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Browser Support</h3>
+                    <div id="browserSupport">
+                        <!-- Will be populated with feature detection -->
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Data Management</h3>
+                    <div class="nav-buttons">
+                        <button class="btn btn-secondary" onclick="app.exportProgress()">
+                            📤 Export Progress
+                        </button>
+                        <button class="btn btn-danger" onclick="app.confirmResetProgress()">
+                            🔄 Reset All Progress
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson Manager View -->
+    <div id="lessonManagerView" class="view">
+        <div class="header">
+            <button class="btn btn-secondary" onclick="app.showView('dashboardView')">← Back</button>
+            <div class="header-title">Lesson Manager</div>
+        </div>
+
+        <div class="container">
+            <div class="card">
+                <h2>Lesson Library</h2>
+                <p>Built-in Lessons: <strong id="builtInCount">6</strong></p>
+                <p>Custom Lessons: <strong id="customCount">0</strong></p>
+
+                <div class="import-export-buttons mt-20">
+                    <div class="file-input-wrapper">
+                        <button class="btn btn-primary">📥 Import Lessons</button>
+                        <input type="file" id="importFile" accept=".json" onchange="app.importLessons(event)">
+                    </div>
+                    <button class="btn btn-secondary" onclick="app.exportTemplate()">
+                        📤 Download Template
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Available Lessons</h3>
+                <div id="managerLessonList" class="lesson-list">
+                    <!-- Lessons will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Celebration Modal -->
+    <div id="celebrationModal" class="modal">
+        <div class="modal-content">
+            <div class="celebration">
+                <div class="celebration-icon">🎉</div>
+                <h2 id="celebrationTitle">Lesson Complete!</h2>
+                <p id="celebrationMessage">Amazing work! You've mastered this lesson!</p>
+                <div class="nav-buttons mt-20">
+                    <button class="btn btn-primary" onclick="app.closeCelebration()">
+                        Continue Learning
+                    </button>
+                    <button class="btn btn-secondary" onclick="app.backToDashboard()">
+                        Back to Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="confirmTitle">Confirm Action</h2>
+                <button class="modal-close" onclick="app.closeConfirmModal()">×</button>
+            </div>
+            <p id="confirmMessage">Are you sure?</p>
+            <div class="nav-buttons mt-20">
+                <button class="btn btn-danger" id="confirmBtn" onclick="app.confirmAction()">
+                    Confirm
+                </button>
+                <button class="btn btn-secondary" onclick="app.closeConfirmModal()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application State and Logic
+        const app = {
+            db: null,
+            currentView: 'welcomeView',
+            currentLesson: null,
+            currentSentenceIndex: 0,
+            inputMode: 'text',
+            recognition: null,
+            isRecording: false,
+            settings: {
+                voiceSpeed: 0.9,
+                languageVariant: 'en-US',
+                autoAdvance: true,
+                autoHints: false,
+                practiceMode: 'sequential',
+                soundEffects: true
+            },
+            builtInLessons: [
+                {
+                    id: 'lesson_001',
+                    category: 'Greetings',
+                    title: 'Basic Greetings',
+                    level: 1,
+                    sentences: [
+                        { text: 'Hello', hint: 'Say it clearly with a smile' },
+                        { text: 'Good morning', hint: 'Emphasize "good"' },
+                        { text: 'Good afternoon', hint: 'Speak clearly and warmly' },
+                        { text: 'Good evening', hint: 'Soft and welcoming tone' },
+                        { text: 'How are you?', hint: 'Rising intonation at the end' },
+                        { text: 'I am fine', hint: 'Stress on "fine"' },
+                        { text: 'Nice to meet you', hint: 'Friendly and clear' },
+                        { text: 'Have a good day', hint: 'Warm and encouraging' }
+                    ],
+                    isActive: true,
+                    isCustom: false
+                },
+                {
+                    id: 'lesson_002',
+                    category: 'Introductions',
+                    title: 'Introducing Yourself',
+                    level: 1,
+                    sentences: [
+                        { text: 'My name is John', hint: 'Emphasize your name' },
+                        { text: 'I am from America', hint: 'Clear pronunciation of country' },
+                        { text: 'I live in New York', hint: 'Stress on city name' },
+                        { text: 'I am a student', hint: 'Clear "student"' },
+                        { text: 'I am a teacher', hint: 'Emphasize "teacher"' },
+                        { text: 'Nice to meet you', hint: 'Friendly tone' },
+                        { text: 'What is your name?', hint: 'Rising intonation' }
+                    ],
+                    isActive: true,
+                    isCustom: false
+                },
+                {
+                    id: 'lesson_003',
+                    category: 'Basic Questions',
+                    title: 'Asking Questions',
+                    level: 2,
+                    sentences: [
+                        { text: 'What is your name?', hint: 'Rising tone at end' },
+                        { text: 'Where are you from?', hint: 'Emphasize "where"' },
+                        { text: 'How old are you?', hint: 'Polite and clear' },
+                        { text: 'What do you do?', hint: 'Asking about occupation' },
+                        { text: 'Do you speak English?', hint: 'Clear "English"' },
+                        { text: 'Can you help me?', hint: 'Polite request' },
+                        { text: 'Where is the bathroom?', hint: 'Clear and direct' }
+                    ],
+                    isActive: true,
+                    isCustom: false
+                },
+                {
+                    id: 'lesson_004',
+                    category: 'Daily Activities',
+                    title: 'Daily Routine',
+                    level: 2,
+                    sentences: [
+                        { text: 'I wake up early', hint: 'Stress on "wake up"' },
+                        { text: 'I eat breakfast', hint: 'Clear "breakfast"' },
+                        { text: 'I go to work', hint: 'Simple and clear' },
+                        { text: 'I study English', hint: 'Emphasize "study"' },
+                        { text: 'I have lunch', hint: 'Casual tone' },
+                        { text: 'I go home', hint: 'Relaxed pronunciation' },
+                        { text: 'I watch TV', hint: 'Clear "TV"' },
+                        { text: 'I go to sleep', hint: 'Soft tone' }
+                    ],
+                    isActive: true,
+                    isCustom: false
+                },
+                {
+                    id: 'lesson_005',
+                    category: 'Common Phrases',
+                    title: 'Essential Phrases',
+                    level: 1,
+                    sentences: [
+                        { text: 'Thank you', hint: 'Sincere and clear' },
+                        { text: 'You are welcome', hint: 'Friendly response' },
+                        { text: 'Excuse me', hint: 'Polite and clear' },
+                        { text: 'I am sorry', hint: 'Apologetic tone' },
+                        { text: 'I do not understand', hint: 'Clearly state confusion' },
+                        { text: 'Please help me', hint: 'Polite request' }
+                    ],
+                    isActive: true,
+                    isCustom: false
+                },
+                {
+                    id: 'lesson_006',
+                    category: 'Numbers & Time',
+                    title: 'Numbers and Time',
+                    level: 1,
+                    sentences: [
+                        { text: 'One, two, three', hint: 'Count clearly' },
+                        { text: 'What time is it?', hint: 'Rising intonation' },
+                        { text: 'Today is Monday', hint: 'Clear day name' },
+                        { text: 'It is morning', hint: 'Simple statement' }
+                    ],
+                    isActive: true,
+                    isCustom: false
+                }
+            ],
+            customLessons: [],
+            progress: {},
+            stats: {
+                totalAttempts: 0,
+                totalSuccess: 0,
+                practiceTime: 0,
+                streak: 0,
+                lastPracticeDate: null,
+                milestones: []
+            },
+
+            // Initialize the application
+            async init() {
+                await this.initDB();
+                await this.loadSettings();
+                await this.loadCustomLessons();
+                await this.loadProgress();
+                await this.loadStats();
+                this.initSpeechRecognition();
+                this.checkBrowserSupport();
+                this.loadSettingsUI();
+            },
+
+            // IndexedDB Initialization
+            async initDB() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open('EnglishLearningDB', 1);
+
+                    request.onerror = () => reject(request.error);
+                    request.onsuccess = () => {
+                        this.db = request.result;
+                        resolve();
+                    };
+
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+
+                        if (!db.objectStoreNames.contains('lessons')) {
+                            db.createObjectStore('lessons', { keyPath: 'id' });
+                        }
+                        if (!db.objectStoreNames.contains('progress')) {
+                            db.createObjectStore('progress', { keyPath: 'lessonId' });
+                        }
+                        if (!db.objectStoreNames.contains('settings')) {
+                            db.createObjectStore('settings', { keyPath: 'key' });
+                        }
+                        if (!db.objectStoreNames.contains('stats')) {
+                            db.createObjectStore('stats', { keyPath: 'key' });
+                        }
+                    };
+                });
+            },
+
+            // Database Operations
+            async saveToStore(storeName, data) {
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction([storeName], 'readwrite');
+                    const store = transaction.objectStore(storeName);
+                    const request = store.put(data);
+
+                    request.onsuccess = () => resolve();
+                    request.onerror = () => reject(request.error);
+                });
+            },
+
+            async getFromStore(storeName, key) {
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction([storeName], 'readonly');
+                    const store = transaction.objectStore(storeName);
+                    const request = store.get(key);
+
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            },
+
+            async getAllFromStore(storeName) {
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction([storeName], 'readonly');
+                    const store = transaction.objectStore(storeName);
+                    const request = store.getAll();
+
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            },
+
+            async deleteFromStore(storeName, key) {
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction([storeName], 'readwrite');
+                    const store = transaction.objectStore(storeName);
+                    const request = store.delete(key);
+
+                    request.onsuccess = () => resolve();
+                    request.onerror = () => reject(request.error);
+                });
+            },
+
+            // Settings Management
+            async loadSettings() {
+                const savedSettings = await this.getFromStore('settings', 'userSettings');
+                if (savedSettings) {
+                    this.settings = { ...this.settings, ...savedSettings.value };
+                }
+            },
+
+            async updateSetting(key, value) {
+                this.settings[key] = value;
+                await this.saveToStore('settings', { key: 'userSettings', value: this.settings });
+
+                // Update UI
+                if (key === 'voiceSpeed') {
+                    document.getElementById('voiceSpeedValue').textContent = value + 'x';
+                }
+            },
+
+            loadSettingsUI() {
+                document.getElementById('voiceSpeed').value = this.settings.voiceSpeed;
+                document.getElementById('voiceSpeedValue').textContent = this.settings.voiceSpeed + 'x';
+                document.getElementById('languageVariant').value = this.settings.languageVariant;
+                document.getElementById('autoAdvance').checked = this.settings.autoAdvance;
+                document.getElementById('autoHints').checked = this.settings.autoHints;
+                document.getElementById('practiceMode').value = this.settings.practiceMode;
+                document.getElementById('soundEffects').checked = this.settings.soundEffects;
+            },
+
+            // Custom Lessons Management
+            async loadCustomLessons() {
+                const lessons = await this.getAllFromStore('lessons');
+                this.customLessons = lessons;
+            },
+
+            async saveCustomLesson(lesson) {
+                await this.saveToStore('lessons', lesson);
+                await this.loadCustomLessons();
+            },
+
+            getAllLessons() {
+                return [...this.builtInLessons, ...this.customLessons];
+            },
+
+            // Progress Management
+            async loadProgress() {
+                const allProgress = await this.getAllFromStore('progress');
+                this.progress = {};
+                allProgress.forEach(p => {
+                    this.progress[p.lessonId] = p;
+                });
+            },
+
+            async updateProgress(lessonId, sentenceIndex, success) {
+                if (!this.progress[lessonId]) {
+                    this.progress[lessonId] = {
+                        lessonId: lessonId,
+                        completedSentences: [],
+                        attempts: 0,
+                        successCount: 0,
+                        lastAttemptDate: new Date().toISOString(),
+                        masteryLevel: 0
+                    };
+                }
+
+                const progress = this.progress[lessonId];
+                progress.attempts++;
+                if (success) {
+                    progress.successCount++;
+                    if (!progress.completedSentences.includes(sentenceIndex)) {
+                        progress.completedSentences.push(sentenceIndex);
+                    }
+                }
+                progress.lastAttemptDate = new Date().toISOString();
+                progress.masteryLevel = progress.successCount / progress.attempts;
+
+                await this.saveToStore('progress', progress);
+                await this.updateStats(success);
+            },
+
+            // Statistics Management
+            async loadStats() {
+                const savedStats = await this.getFromStore('stats', 'userStats');
+                if (savedStats) {
+                    this.stats = { ...this.stats, ...savedStats.value };
+                    this.updateStreak();
+                }
+            },
+
+            async updateStats(success) {
+                this.stats.totalAttempts++;
+                if (success) {
+                    this.stats.totalSuccess++;
+                }
+                this.stats.lastPracticeDate = new Date().toISOString();
+                this.updateStreak();
+                this.checkMilestones();
+
+                await this.saveToStore('stats', { key: 'userStats', value: this.stats });
+            },
+
+            updateStreak() {
+                const today = new Date().toDateString();
+                const lastPractice = this.stats.lastPracticeDate ?
+                    new Date(this.stats.lastPracticeDate).toDateString() : null;
+
+                if (lastPractice === today) {
+                    return; // Already practiced today
+                }
+
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+
+                if (lastPractice === yesterday.toDateString()) {
+                    this.stats.streak++;
+                } else if (lastPractice !== today) {
+                    this.stats.streak = 1;
+                }
+            },
+
+            checkMilestones() {
+                const milestones = [];
+                const masteredCount = this.getTotalMasteredSentences();
+
+                if (masteredCount >= 1 && !this.stats.milestones.includes('first_sentence')) {
+                    milestones.push({ id: 'first_sentence', text: '🎯 First sentence completed!' });
+                    this.stats.milestones.push('first_sentence');
+                }
+                if (masteredCount >= 10 && !this.stats.milestones.includes('ten_sentences')) {
+                    milestones.push({ id: 'ten_sentences', text: '⭐ 10 sentences mastered!' });
+                    this.stats.milestones.push('ten_sentences');
+                }
+                if (masteredCount >= 25 && !this.stats.milestones.includes('twentyfive_sentences')) {
+                    milestones.push({ id: 'twentyfive_sentences', text: '🌟 25 sentences mastered!' });
+                    this.stats.milestones.push('twentyfive_sentences');
+                }
+                if (masteredCount >= 50 && !this.stats.milestones.includes('fifty_sentences')) {
+                    milestones.push({ id: 'fifty_sentences', text: '🏆 50 sentences mastered!' });
+                    this.stats.milestones.push('fifty_sentences');
+                }
+                if (this.stats.streak >= 7 && !this.stats.milestones.includes('week_streak')) {
+                    milestones.push({ id: 'week_streak', text: '🔥 7-day streak!' });
+                    this.stats.milestones.push('week_streak');
+                }
+                if (this.stats.streak >= 30 && !this.stats.milestones.includes('month_streak')) {
+                    milestones.push({ id: 'month_streak', text: '💪 30-day streak!' });
+                    this.stats.milestones.push('month_streak');
+                }
+
+                return milestones;
+            },
+
+            getTotalMasteredSentences() {
+                let total = 0;
+                Object.values(this.progress).forEach(p => {
+                    total += p.completedSentences.length;
+                });
+                return total;
+            },
+
+            getCompletedLessonsCount() {
+                const lessons = this.getAllLessons();
+                let completed = 0;
+                lessons.forEach(lesson => {
+                    const progress = this.progress[lesson.id];
+                    if (progress && progress.completedSentences.length === lesson.sentences.length) {
+                        completed++;
+                    }
+                });
+                return completed;
+            },
+
+            // Speech APIs
+            initSpeechRecognition() {
+                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    this.recognition = new SpeechRecognition();
+                    this.recognition.continuous = false;
+                    this.recognition.interimResults = false;
+
+                    this.recognition.onresult = (event) => {
+                        const transcript = event.results[0][0].transcript;
+                        this.handleSpeechResult(transcript);
+                    };
+
+                    this.recognition.onerror = (event) => {
+                        console.error('Speech recognition error:', event.error);
+                        this.showFeedback('error', 'Speech recognition error. Please try again.');
+                        this.stopRecording();
+                    };
+
+                    this.recognition.onend = () => {
+                        this.stopRecording();
+                    };
+                }
+            },
+
+            speakSentence() {
+                if ('speechSynthesis' in window) {
+                    const sentence = this.currentLesson.sentences[this.currentSentenceIndex].text;
+                    const utterance = new SpeechSynthesisUtterance(sentence);
+                    utterance.lang = this.settings.languageVariant;
+                    utterance.rate = parseFloat(this.settings.voiceSpeed);
+                    speechSynthesis.speak(utterance);
+                }
+            },
+
+            toggleRecording() {
+                if (!this.recognition) {
+                    alert('Speech recognition is not supported in your browser. Please use Chrome or Edge.');
+                    return;
+                }
+
+                if (this.isRecording) {
+                    this.stopRecording();
+                } else {
+                    this.startRecording();
+                }
+            },
+
+            startRecording() {
+                this.recognition.lang = this.settings.languageVariant;
+                this.recognition.start();
+                this.isRecording = true;
+                document.getElementById('micButton').classList.add('recording');
+                document.getElementById('micStatus').textContent = 'Listening...';
+            },
+
+            stopRecording() {
+                if (this.recognition && this.isRecording) {
+                    this.recognition.stop();
+                }
+                this.isRecording = false;
+                document.getElementById('micButton').classList.remove('recording');
+                document.getElementById('micStatus').textContent = 'Click to record';
+            },
+
+            handleSpeechResult(transcript) {
+                const target = this.currentLesson.sentences[this.currentSentenceIndex].text;
+                const similarity = this.calculateSimilarity(transcript, target);
+
+                if (similarity >= 0.8) {
+                    this.showFeedback('success', this.getSuccessMessage());
+                    this.updateProgress(this.currentLesson.id, this.currentSentenceIndex, true);
+                    if (this.settings.autoAdvance) {
+                        setTimeout(() => this.nextSentence(), 2000);
+                    }
+                } else if (similarity >= 0.5) {
+                    this.showFeedback('partial', `Almost there! You said: "${transcript}"`);
+                    this.updateProgress(this.currentLesson.id, this.currentSentenceIndex, false);
+                } else {
+                    this.showFeedback('error', `You said: "${transcript}". Expected: "${target}". Try again!`);
+                    this.updateProgress(this.currentLesson.id, this.currentSentenceIndex, false);
+                }
+            },
+
+            // Text Input Handling
+            checkTextInput() {
+                const input = document.getElementById('textInput').value.trim();
+                if (!input) return;
+
+                const target = this.currentLesson.sentences[this.currentSentenceIndex].text;
+                const similarity = this.calculateSimilarity(input, target);
+
+                if (similarity >= 0.8) {
+                    this.showFeedback('success', this.getSuccessMessage());
+                    this.updateProgress(this.currentLesson.id, this.currentSentenceIndex, true);
+                    document.getElementById('textInput').value = '';
+                    if (this.settings.autoAdvance) {
+                        setTimeout(() => this.nextSentence(), 2000);
+                    }
+                } else if (similarity >= 0.5) {
+                    this.showFeedback('partial', `Almost there! Check your spelling.`);
+                    this.updateProgress(this.currentLesson.id, this.currentSentenceIndex, false);
+                } else {
+                    this.showFeedback('error', `Try again! Expected: "${target}"`);
+                    this.updateProgress(this.currentLesson.id, this.currentSentenceIndex, false);
+                }
+            },
+
+            // Similarity Calculation
+            calculateSimilarity(str1, str2) {
+                const s1 = str1.toLowerCase().replace(/[^\w\s]/g, '').trim();
+                const s2 = str2.toLowerCase().replace(/[^\w\s]/g, '').trim();
+
+                if (s1 === s2) return 1;
+
+                const words1 = s1.split(/\s+/);
+                const words2 = s2.split(/\s+/);
+
+                let matches = 0;
+                const maxLen = Math.max(words1.length, words2.length);
+
+                words1.forEach(word1 => {
+                    if (words2.includes(word1)) {
+                        matches++;
+                    }
+                });
+
+                return matches / maxLen;
+            },
+
+            // Feedback
+            showFeedback(type, message) {
+                const feedbackArea = document.getElementById('feedbackArea');
+                feedbackArea.innerHTML = `<div class="feedback ${type}">${message}</div>`;
+
+                setTimeout(() => {
+                    feedbackArea.innerHTML = '';
+                }, 5000);
+            },
+
+            getSuccessMessage() {
+                const messages = [
+                    'Excellent! 🎉',
+                    'Perfect! Keep going! 💪',
+                    'Amazing work! ⭐',
+                    'You are doing great! 🌟',
+                    'Well done! 👏',
+                    'Fantastic! 🎊'
+                ];
+                return messages[Math.floor(Math.random() * messages.length)];
+            },
+
+            // Practice Flow
+            startLesson(lessonId) {
+                const lessons = this.getAllLessons();
+                this.currentLesson = lessons.find(l => l.id === lessonId);
+                if (!this.currentLesson) return;
+
+                this.currentSentenceIndex = 0;
+                this.showView('practiceView');
+                this.updatePracticeView();
+            },
+
+            updatePracticeView() {
+                const lesson = this.currentLesson;
+                const sentence = lesson.sentences[this.currentSentenceIndex];
+
+                document.getElementById('lessonTitle').textContent = lesson.title;
+                document.getElementById('sentenceCounter').textContent =
+                    `Sentence ${this.currentSentenceIndex + 1} of ${lesson.sentences.length}`;
+                document.getElementById('currentSentence').textContent = sentence.text;
+                document.getElementById('hintText').textContent = sentence.hint;
+
+                const progress = this.progress[lesson.id];
+                const completed = progress ? progress.completedSentences.length : 0;
+                const percent = (completed / lesson.sentences.length * 100).toFixed(0);
+                document.getElementById('practiceProgress').textContent = `Progress: ${percent}%`;
+
+                document.getElementById('feedbackArea').innerHTML = '';
+                document.getElementById('hintArea').classList.add('hidden');
+                document.getElementById('textInput').value = '';
+
+                if (this.settings.autoHints) {
+                    document.getElementById('hintArea').classList.remove('hidden');
+                }
+            },
+
+            nextSentence() {
+                if (this.currentSentenceIndex < this.currentLesson.sentences.length - 1) {
+                    this.currentSentenceIndex++;
+                    this.updatePracticeView();
+                } else {
+                    this.completLesson();
+                }
+            },
+
+            skipSentence() {
+                this.nextSentence();
+            },
+
+            completLesson() {
+                const masteredCount = this.getTotalMasteredSentences();
+                document.getElementById('celebrationTitle').textContent = 'Lesson Complete! 🎉';
+                document.getElementById('celebrationMessage').textContent =
+                    `Amazing work! You've mastered ${masteredCount} sentences in total!`;
+                document.getElementById('celebrationModal').classList.add('active');
+            },
+
+            closeCelebration() {
+                document.getElementById('celebrationModal').classList.remove('active');
+                this.continueLearning();
+            },
+
+            backToDashboard() {
+                document.getElementById('celebrationModal').classList.remove('active');
+                this.showView('dashboardView');
+                this.updateDashboard();
+            },
+
+            exitPractice() {
+                this.showView('dashboardView');
+                this.updateDashboard();
+            },
+
+            toggleHint() {
+                const hintArea = document.getElementById('hintArea');
+                hintArea.classList.toggle('hidden');
+            },
+
+            setInputMode(mode) {
+                this.inputMode = mode;
+                if (mode === 'text') {
+                    document.getElementById('textInputArea').classList.remove('hidden');
+                    document.getElementById('voiceInputArea').classList.add('hidden');
+                    document.getElementById('textModeBtn').classList.remove('btn-secondary');
+                    document.getElementById('textModeBtn').classList.add('btn-primary');
+                    document.getElementById('voiceModeBtn').classList.remove('btn-primary');
+                    document.getElementById('voiceModeBtn').classList.add('btn-secondary');
+                } else {
+                    document.getElementById('textInputArea').classList.add('hidden');
+                    document.getElementById('voiceInputArea').classList.remove('hidden');
+                    document.getElementById('voiceModeBtn').classList.remove('btn-secondary');
+                    document.getElementById('voiceModeBtn').classList.add('btn-primary');
+                    document.getElementById('textModeBtn').classList.remove('btn-primary');
+                    document.getElementById('textModeBtn').classList.add('btn-secondary');
+                }
+            },
+
+            continueLearning() {
+                const lessons = this.getAllLessons();
+
+                // Find first incomplete lesson
+                for (let lesson of lessons) {
+                    const progress = this.progress[lesson.id];
+                    if (!progress || progress.completedSentences.length < lesson.sentences.length) {
+                        this.startLesson(lesson.id);
+                        return;
+                    }
+                }
+
+                // All lessons complete, start first one
+                if (lessons.length > 0) {
+                    this.startLesson(lessons[0].id);
+                }
+            },
+
+            // View Management
+            showView(viewId) {
+                document.querySelectorAll('.view').forEach(view => {
+                    view.classList.remove('active');
+                });
+                document.getElementById(viewId).classList.add('active');
+                this.currentView = viewId;
+
+                if (viewId === 'dashboardView') {
+                    this.updateDashboard();
+                } else if (viewId === 'statisticsView') {
+                    this.updateStatistics();
+                } else if (viewId === 'lessonManagerView') {
+                    this.updateLessonManager();
+                }
+            },
+
+            startApp() {
+                this.showView('dashboardView');
+                this.updateDashboard();
+            },
+
+            // Dashboard Updates
+            async updateDashboard() {
+                await this.loadProgress();
+                await this.loadStats();
+
+                const masteredCount = this.getTotalMasteredSentences();
+                const completedLessons = this.getCompletedLessonsCount();
+                const totalLessons = this.getAllLessons().length;
+                const successRate = this.stats.totalAttempts > 0 ?
+                    ((this.stats.totalSuccess / this.stats.totalAttempts) * 100).toFixed(0) : 0;
+
+                document.getElementById('dashboardWelcome').textContent =
+                    `You've mastered ${masteredCount} sentences`;
+
+                let totalSentences = 0;
+                this.getAllLessons().forEach(lesson => {
+                    totalSentences += lesson.sentences.length;
+                });
+
+                const overallPercent = totalSentences > 0 ?
+                    ((masteredCount / totalSentences) * 100).toFixed(0) : 0;
+
+                document.getElementById('overallProgress').style.width = overallPercent + '%';
+                document.getElementById('progressText').textContent = overallPercent + '% complete';
+                document.getElementById('headerProgress').textContent = `Progress: ${overallPercent}%`;
+
+                document.getElementById('statSentences').textContent = masteredCount;
+                document.getElementById('statLessons').textContent = `${completedLessons}/${totalLessons}`;
+                document.getElementById('statSuccessRate').textContent = successRate + '%';
+                document.getElementById('statStreak').textContent = this.stats.streak;
+
+                this.updateLessonList();
+            },
+
+            updateLessonList() {
+                const lessonList = document.getElementById('lessonList');
+                const lessons = this.getAllLessons();
+
+                lessonList.innerHTML = '';
+
+                lessons.forEach((lesson, index) => {
+                    const progress = this.progress[lesson.id];
+                    const completed = progress ? progress.completedSentences.length : 0;
+                    const total = lesson.sentences.length;
+                    const isComplete = completed === total;
+                    const isStarted = completed > 0;
+
+                    let status = '🔒';
+                    if (isComplete) status = '✅';
+                    else if (isStarted) status = '⏳';
+                    else if (index === 0 || this.getCompletedLessonsCount() >= index) status = '📖';
+
+                    const item = document.createElement('div');
+                    item.className = 'lesson-item';
+                    item.innerHTML = `
+                        <div class="lesson-info">
+                            <div class="lesson-title">${lesson.category} - ${lesson.title}</div>
+                            <div class="lesson-progress-text">${completed}/${total} sentences</div>
+                        </div>
+                        <div class="lesson-status">${status}</div>
+                    `;
+
+                    item.onclick = () => this.startLesson(lesson.id);
+                    lessonList.appendChild(item);
+                });
+            },
+
+            // Statistics View
+            updateStatistics() {
+                document.getElementById('totalAttempts').textContent = this.stats.totalAttempts;
+                document.getElementById('totalSuccess').textContent = this.stats.totalSuccess;
+
+                const accuracy = this.stats.totalAttempts > 0 ?
+                    ((this.stats.totalSuccess / this.stats.totalAttempts) * 100).toFixed(0) : 0;
+                document.getElementById('averageAccuracy').textContent = accuracy + '%';
+
+                document.getElementById('practiceTime').textContent = this.stats.practiceTime || 0;
+
+                // Simple chart - last 7 days
+                const chartContainer = document.getElementById('progressChart');
+                chartContainer.innerHTML = '';
+
+                for (let i = 6; i >= 0; i--) {
+                    const height = Math.random() * 80 + 20; // Mock data
+                    const bar = document.createElement('div');
+                    bar.className = 'chart-bar';
+                    bar.style.height = height + '%';
+
+                    const label = document.createElement('div');
+                    label.className = 'chart-label';
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    label.textContent = date.toLocaleDateString('en-US', { weekday: 'short' });
+
+                    const wrapper = document.createElement('div');
+                    wrapper.style.flex = '1';
+                    wrapper.appendChild(bar);
+                    wrapper.appendChild(label);
+                    chartContainer.appendChild(wrapper);
+                }
+
+                // Milestones
+                const milestonesDiv = document.getElementById('milestones');
+                if (this.stats.milestones.length > 0) {
+                    milestonesDiv.innerHTML = this.stats.milestones
+                        .map(m => `<p>${this.getMilestoneText(m)}</p>`)
+                        .join('');
+                } else {
+                    milestonesDiv.innerHTML = '<p>🎯 Complete your first sentence to unlock milestones!</p>';
+                }
+            },
+
+            getMilestoneText(milestoneId) {
+                const texts = {
+                    'first_sentence': '🎯 First sentence completed!',
+                    'ten_sentences': '⭐ 10 sentences mastered!',
+                    'twentyfive_sentences': '🌟 25 sentences mastered!',
+                    'fifty_sentences': '🏆 50 sentences mastered!',
+                    'week_streak': '🔥 7-day streak!',
+                    'month_streak': '💪 30-day streak!'
+                };
+                return texts[milestoneId] || milestoneId;
+            },
+
+            // Lesson Manager
+            updateLessonManager() {
+                const builtInCount = this.builtInLessons.length;
+                const customCount = this.customLessons.length;
+
+                document.getElementById('builtInCount').textContent = builtInCount;
+                document.getElementById('customCount').textContent = customCount;
+
+                const managerList = document.getElementById('managerLessonList');
+                const allLessons = this.getAllLessons();
+
+                managerList.innerHTML = '';
+
+                allLessons.forEach(lesson => {
+                    const item = document.createElement('div');
+                    item.className = 'lesson-item';
+                    item.innerHTML = `
+                        <div class="lesson-info">
+                            <div class="lesson-title">
+                                ${lesson.isCustom ? '📚' : '📖'} ${lesson.category} - ${lesson.title}
+                                ${lesson.isCustom ? '(Custom)' : ''}
+                            </div>
+                            <div class="lesson-progress-text">
+                                ${lesson.sentences.length} sentences
+                            </div>
+                        </div>
+                        <div class="lesson-status">
+                            ${lesson.isActive ? '✓ Active' : ''}
+                        </div>
+                    `;
+                    managerList.appendChild(item);
+                });
+            },
+
+            // Import/Export
+            exportTemplate() {
+                const template = {
+                    packName: "My Custom Lessons",
+                    packVersion: "1.0",
+                    author: "Your Name",
+                    description: "Description of this lesson pack",
+                    lessons: [
+                        {
+                            id: "custom_001",
+                            category: "Category Name",
+                            title: "Lesson Title",
+                            level: 1,
+                            sentences: [
+                                {
+                                    text: "Sentence to practice",
+                                    hint: "Helpful tip for pronunciation"
+                                }
+                            ],
+                            isActive: true,
+                            isCustom: true
+                        }
+                    ]
+                };
+
+                const blob = new Blob([JSON.stringify(template, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'lesson_template.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            },
+
+            async importLessons(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+
+                        // Validate structure
+                        if (!data.lessons || !Array.isArray(data.lessons)) {
+                            alert('Invalid lesson pack format');
+                            return;
+                        }
+
+                        // Import lessons
+                        for (let lesson of data.lessons) {
+                            lesson.isCustom = true;
+                            await this.saveCustomLesson(lesson);
+                        }
+
+                        alert(`Successfully imported ${data.lessons.length} lessons!`);
+                        this.updateLessonManager();
+                        this.updateDashboard();
+                    } catch (error) {
+                        alert('Error importing lessons: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+
+                // Reset file input
+                event.target.value = '';
+            },
+
+            async exportProgress() {
+                const data = {
+                    progress: this.progress,
+                    stats: this.stats,
+                    settings: this.settings,
+                    exportDate: new Date().toISOString()
+                };
+
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'english-learning-progress.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            },
+
+            confirmResetProgress() {
+                document.getElementById('confirmTitle').textContent = 'Reset All Progress?';
+                document.getElementById('confirmMessage').textContent =
+                    'This will delete all your progress, statistics, and custom lessons. This cannot be undone!';
+                document.getElementById('confirmModal').classList.add('active');
+                this.confirmCallback = () => this.resetProgress();
+            },
+
+            async resetProgress() {
+                // Clear all stores
+                const stores = ['progress', 'stats'];
+                for (let storeName of stores) {
+                    const transaction = this.db.transaction([storeName], 'readwrite');
+                    const store = transaction.objectStore(storeName);
+                    await store.clear();
+                }
+
+                this.progress = {};
+                this.stats = {
+                    totalAttempts: 0,
+                    totalSuccess: 0,
+                    practiceTime: 0,
+                    streak: 0,
+                    lastPracticeDate: null,
+                    milestones: []
+                };
+
+                this.closeConfirmModal();
+                alert('All progress has been reset.');
+                this.updateDashboard();
+            },
+
+            closeConfirmModal() {
+                document.getElementById('confirmModal').classList.remove('active');
+            },
+
+            confirmAction() {
+                if (this.confirmCallback) {
+                    this.confirmCallback();
+                    this.confirmCallback = null;
+                }
+            },
+
+            // Browser Support Detection
+            checkBrowserSupport() {
+                const support = document.getElementById('browserSupport');
+                if (!support) return;
+
+                const features = [
+                    {
+                        name: 'Speech Recognition',
+                        supported: 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window
+                    },
+                    {
+                        name: 'Text-to-Speech',
+                        supported: 'speechSynthesis' in window
+                    },
+                    {
+                        name: 'IndexedDB',
+                        supported: 'indexedDB' in window
+                    }
+                ];
+
+                support.innerHTML = features.map(f => `
+                    <div class="setting-item">
+                        <div class="setting-label">${f.name}</div>
+                        <div>${f.supported ? '✅ Supported' : '❌ Not Supported'}</div>
+                    </div>
+                `).join('');
+            }
+        };
+
+        // Initialize app when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
+</body>
+</html>

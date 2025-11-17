@@ -1114,6 +1114,10 @@
             inputMode: 'text',
             recognition: null,
             isRecording: false,
+            mediaRecorder: null,
+            audioStream: null,
+            recordedChunks: [],
+            recordedAudio: null,
             settings: {
                 voiceSpeed: 0.9,
                 languageVariant: 'en-US',
@@ -1541,17 +1545,51 @@
                 }
             },
 
-            startRecording() {
-                this.recognition.lang = this.settings.languageVariant;
-                this.recognition.start();
-                this.isRecording = true;
-                document.getElementById('micButton').classList.add('recording');
-                document.getElementById('micStatus').textContent = 'Listening...';
+            async startRecording() {
+                try {
+                    // Get microphone access
+                    this.audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+                    // Setup MediaRecorder for audio playback
+                    this.recordedChunks = [];
+                    this.mediaRecorder = new MediaRecorder(this.audioStream);
+
+                    this.mediaRecorder.ondataavailable = (event) => {
+                        if (event.data.size > 0) {
+                            this.recordedChunks.push(event.data);
+                        }
+                    };
+
+                    this.mediaRecorder.onstop = () => {
+                        const blob = new Blob(this.recordedChunks, { type: 'audio/webm' });
+                        this.recordedAudio = URL.createObjectURL(blob);
+                    };
+
+                    // Start recording
+                    this.mediaRecorder.start();
+
+                    // Start speech recognition
+                    this.recognition.lang = this.settings.languageVariant;
+                    this.recognition.start();
+
+                    this.isRecording = true;
+                    document.getElementById('micButton').classList.add('recording');
+                    document.getElementById('micStatus').textContent = 'Listening...';
+                } catch (error) {
+                    console.error('Error accessing microphone:', error);
+                    alert('Could not access microphone. Please check permissions.');
+                }
             },
 
             stopRecording() {
                 if (this.recognition && this.isRecording) {
                     this.recognition.stop();
+                }
+                if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+                    this.mediaRecorder.stop();
+                }
+                if (this.audioStream) {
+                    this.audioStream.getTracks().forEach(track => track.stop());
                 }
                 this.isRecording = false;
                 document.getElementById('micButton').classList.remove('recording');
@@ -1559,6 +1597,35 @@
             },
 
             handleSpeechResult(transcript) {
+                // First, play back the recorded audio
+                if (this.recordedAudio) {
+                    this.playbackRecording(transcript);
+                } else {
+                    // Fallback if recording failed
+                    this.processSpeechResult(transcript);
+                }
+            },
+
+            playbackRecording(transcript) {
+                // Update status
+                document.getElementById('micStatus').textContent = 'Playing back...';
+
+                // Create audio element and play
+                const audio = new Audio(this.recordedAudio);
+                audio.onended = () => {
+                    // After playback, show feedback
+                    this.processSpeechResult(transcript);
+                    document.getElementById('micStatus').textContent = 'Click to record';
+                };
+                audio.onerror = () => {
+                    // If playback fails, just show feedback
+                    this.processSpeechResult(transcript);
+                    document.getElementById('micStatus').textContent = 'Click to record';
+                };
+                audio.play();
+            },
+
+            processSpeechResult(transcript) {
                 const target = this.currentLesson.sentences[this.currentSentenceIndex].text;
                 const similarity = this.calculateSimilarity(transcript, target);
 

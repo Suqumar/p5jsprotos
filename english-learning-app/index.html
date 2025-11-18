@@ -719,6 +719,169 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Breadcrumb Menu */
+        .breadcrumb-menu {
+            position: relative;
+            display: inline-block;
+        }
+
+        .breadcrumb-toggle {
+            background: none;
+            border: 1px solid var(--border-light);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .breadcrumb-toggle:hover {
+            background: var(--bg-cream);
+            border-color: var(--primary-teal);
+        }
+
+        .breadcrumb-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lifted);
+            min-width: 220px;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .breadcrumb-dropdown.active {
+            display: block;
+            animation: slideDown 0.2s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .breadcrumb-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-light);
+            transition: background 0.2s ease;
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+
+        .breadcrumb-item:last-child {
+            border-bottom: none;
+        }
+
+        .breadcrumb-item:hover {
+            background: var(--bg-cream);
+        }
+
+        .breadcrumb-item.active-mode {
+            background: var(--primary-teal);
+            color: white;
+            font-weight: 600;
+        }
+
+        .mode-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background: var(--primary-teal);
+            color: white;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        /* Feature Unlock Modal */
+        .unlock-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .unlock-modal.active {
+            display: flex;
+        }
+
+        .unlock-content {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            animation: unlockPop 0.5s ease;
+        }
+
+        @keyframes unlockPop {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .unlock-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: bounce 1s ease infinite;
+        }
+
+        .unlock-features {
+            text-align: left;
+            margin: 20px 0;
+            padding: 20px;
+            background: var(--bg-cream);
+            border-radius: 8px;
+        }
+
+        .unlock-features li {
+            margin: 8px 0;
+            font-size: 16px;
+        }
+
+        /* Progressive Mode Hints */
+        .progress-hint {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .stage-indicator {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
     </style>
 </head>
 <body>
@@ -763,7 +926,18 @@
     <div id="dashboardView" class="view">
         <div class="header">
             <div class="header-title">🌟 English Learning</div>
-            <div class="header-progress" id="headerProgress">Loading...</div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="header-progress" id="headerProgress">Loading...</div>
+                <div class="breadcrumb-menu">
+                    <button class="breadcrumb-toggle" onclick="app.toggleBreadcrumbMenu()">
+                        <span id="currentMode">Progressive</span>
+                        <span>≡</span>
+                    </button>
+                    <div class="breadcrumb-dropdown" id="breadcrumbDropdown">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="container">
@@ -810,14 +984,14 @@
                 </div>
             </div>
 
-            <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="app.showView('statisticsView')">
+            <div class="nav-buttons" id="dashboardNavButtons">
+                <button class="btn btn-secondary" id="statsButton" onclick="app.showView('statisticsView')">
                     📊 Statistics
                 </button>
-                <button class="btn btn-secondary" onclick="app.showView('lessonManagerView')">
+                <button class="btn btn-secondary" id="lessonManagerButton" onclick="app.showView('lessonManagerView')">
                     📚 Lesson Manager
                 </button>
-                <button class="btn btn-secondary" onclick="app.showView('settingsView')">
+                <button class="btn btn-secondary" id="settingsButton" onclick="app.showView('settingsView')">
                     ⚙️ Settings
                 </button>
             </div>
@@ -1129,6 +1303,21 @@
         </div>
     </div>
 
+    <!-- Feature Unlock Modal -->
+    <div id="unlockModal" class="unlock-modal">
+        <div class="unlock-content">
+            <div class="unlock-icon">🎉</div>
+            <h2 id="unlockTitle">New Features Unlocked!</h2>
+            <p id="unlockMessage">You're making great progress!</p>
+            <div class="unlock-features" id="unlockFeaturesList">
+                <!-- Populated dynamically -->
+            </div>
+            <button class="btn btn-primary btn-large" onclick="app.closeUnlockModal()">
+                Awesome! Let's Continue
+            </button>
+        </div>
+    </div>
+
     <script>
         // Application State and Logic
         const app = {
@@ -1144,6 +1333,13 @@
             recordedChunks: [],
             recordedAudio: null,
             pendingTranscript: null,
+
+            // Mode Management
+            appMode: 'progressive', // or 'allFeatures'
+            progressiveStage: 0, // 0-5
+            featuresUnlocked: [],
+            stageUnlocksSeen: {},
+
             settings: {
                 voiceSpeed: 0.9,
                 languageVariant: 'en-US',
@@ -1268,6 +1464,7 @@
             // Initialize the application
             async init() {
                 await this.initDB();
+                await this.loadModeSettings();
                 await this.loadSettings();
                 await this.loadCustomLessons();
                 await this.loadProgress();
@@ -1275,6 +1472,7 @@
                 this.initSpeechRecognition();
                 this.checkBrowserSupport();
                 this.loadSettingsUI();
+                this.updateBreadcrumbMenu();
             },
 
             // IndexedDB Initialization
@@ -1380,6 +1578,217 @@
                 document.getElementById('soundEffects').checked = this.settings.soundEffects;
             },
 
+            // Mode Management
+            async loadModeSettings() {
+                const modeData = await this.getFromStore('settings', 'modeSettings');
+                if (modeData) {
+                    this.appMode = modeData.value.appMode || 'progressive';
+                    this.progressiveStage = modeData.value.progressiveStage || 0;
+                    this.featuresUnlocked = modeData.value.featuresUnlocked || [];
+                    this.stageUnlocksSeen = modeData.value.stageUnlocksSeen || {};
+                }
+            },
+
+            async saveModeSettings() {
+                await this.saveToStore('settings', {
+                    key: 'modeSettings',
+                    value: {
+                        appMode: this.appMode,
+                        progressiveStage: this.progressiveStage,
+                        featuresUnlocked: this.featuresUnlocked,
+                        stageUnlocksSeen: this.stageUnlocksSeen
+                    }
+                });
+            },
+
+            async switchMode(newMode) {
+                this.appMode = newMode;
+                await this.saveModeSettings();
+                this.updateBreadcrumbMenu();
+
+                // Refresh current view
+                if (this.currentView === 'practiceView') {
+                    this.updatePracticeView();
+                } else if (this.currentView === 'dashboardView') {
+                    this.updateDashboard();
+                }
+            },
+
+            toggleBreadcrumbMenu() {
+                const dropdown = document.getElementById('breadcrumbDropdown');
+                dropdown.classList.toggle('active');
+
+                // Close when clicking outside
+                if (dropdown.classList.contains('active')) {
+                    setTimeout(() => {
+                        document.addEventListener('click', this.closeBreadcrumbOnOutside);
+                    }, 10);
+                }
+            },
+
+            closeBreadcrumbOnOutside(e) {
+                const menu = document.querySelector('.breadcrumb-menu');
+                if (menu && !menu.contains(e.target)) {
+                    document.getElementById('breadcrumbDropdown').classList.remove('active');
+                    document.removeEventListener('click', app.closeBreadcrumbOnOutside);
+                }
+            },
+
+            updateBreadcrumbMenu() {
+                const currentMode = document.getElementById('currentMode');
+                const dropdown = document.getElementById('breadcrumbDropdown');
+
+                if (currentMode) {
+                    currentMode.textContent = this.appMode === 'progressive' ? 'Progressive' : 'All Features';
+                }
+
+                if (dropdown) {
+                    const otherMode = this.appMode === 'progressive' ? 'allFeatures' : 'progressive';
+                    const otherModeLabel = this.appMode === 'progressive' ? 'All Features Mode' : 'Progressive Mode';
+
+                    dropdown.innerHTML = `
+                        <div class="breadcrumb-item active-mode">
+                            ${this.appMode === 'progressive' ? '🌱 Progressive Mode' : '🚀 All Features Mode'}
+                        </div>
+                        <div class="breadcrumb-item" onclick="app.switchMode('${otherMode}'); app.toggleBreadcrumbMenu();">
+                            Switch to ${otherModeLabel}
+                        </div>
+                        <div class="breadcrumb-item" onclick="app.showAboutMode(); app.toggleBreadcrumbMenu();">
+                            ℹ️ About This Mode
+                        </div>
+                    `;
+                }
+            },
+
+            showAboutMode() {
+                const messages = {
+                    progressive: `
+                        <strong>Progressive Mode</strong> is designed for beginners who may feel intimidated by English learning.<br><br>
+                        Features are revealed gradually as you make progress:<br>
+                        • Stage 0: Just one sentence at a time<br>
+                        • Stage 1: More practice tools (after 3 successes)<br>
+                        • Stage 2: Full lessons (after first lesson)<br>
+                        • Stage 3: Statistics (after 25 sentences)<br>
+                        • Stage 4: Customization (after 50 sentences)<br><br>
+                        You can switch to All Features Mode anytime from the menu above.
+                    `,
+                    allFeatures: `
+                        <strong>All Features Mode</strong> gives you complete access to everything:<br><br>
+                        • All 6 lesson categories<br>
+                        • Full statistics and progress tracking<br>
+                        • Settings and customization<br>
+                        • Lesson import/export<br>
+                        • All navigation controls<br><br>
+                        Perfect for confident learners or those returning to the app.
+                    `
+                };
+
+                alert(messages[this.appMode]);
+            },
+
+            isFeatureUnlocked(feature) {
+                if (this.appMode === 'allFeatures') return true;
+                return this.featuresUnlocked.includes(feature);
+            },
+
+            async checkAndUpdateStage() {
+                if (this.appMode !== 'progressive') return;
+
+                const masteredCount = this.getTotalMasteredSentences();
+                const successCount = this.stats.totalSuccess;
+                const completedLessons = this.getCompletedLessonsCount();
+
+                let newStage = this.progressiveStage;
+                let unlockedFeatures = [];
+
+                // Stage 1: After 3 successful attempts
+                if (successCount >= 3 && this.progressiveStage < 1) {
+                    newStage = 1;
+                    unlockedFeatures = [
+                        '✓ Type and Speak modes',
+                        '✓ Hint button for help',
+                        '✓ Mini progress dashboard',
+                        '✓ Previous button to retry'
+                    ];
+                    this.featuresUnlocked.push('dualInput', 'hints', 'miniDashboard', 'navigation');
+                }
+
+                // Stage 2: After first lesson complete
+                if (completedLessons >= 1 && this.progressiveStage < 2) {
+                    newStage = 2;
+                    unlockedFeatures = [
+                        '✓ Full dashboard view',
+                        '✓ All 6 lesson categories',
+                        '✓ Lesson picker',
+                        '✓ Skip button'
+                    ];
+                    this.featuresUnlocked.push('dashboard', 'allLessons', 'skip');
+                }
+
+                // Stage 3: After 25 sentences OR 3 lessons
+                if ((masteredCount >= 25 || completedLessons >= 3) && this.progressiveStage < 3) {
+                    newStage = 3;
+                    unlockedFeatures = [
+                        '✓ Statistics page',
+                        '✓ Progress charts',
+                        '✓ Milestones tracking'
+                    ];
+                    this.featuresUnlocked.push('statistics');
+                }
+
+                // Stage 4: After 50 sentences OR 1 week
+                if (masteredCount >= 50 && this.progressiveStage < 4) {
+                    newStage = 4;
+                    unlockedFeatures = [
+                        '✓ Settings panel',
+                        '✓ Lesson manager',
+                        '✓ Import/Export features',
+                        '✓ Full customization'
+                    ];
+                    this.featuresUnlocked.push('settings', 'lessonManager');
+                }
+
+                if (newStage > this.progressiveStage) {
+                    this.progressiveStage = newStage;
+                    await this.saveModeSettings();
+
+                    // Show unlock celebration if not seen
+                    if (!this.stageUnlocksSeen[newStage]) {
+                        this.showUnlockCelebration(newStage, unlockedFeatures);
+                        this.stageUnlocksSeen[newStage] = true;
+                        await this.saveModeSettings();
+                    }
+                }
+            },
+
+            showUnlockCelebration(stage, features) {
+                const titles = {
+                    1: "You're Getting the Hang of It! 🎉",
+                    2: "First Lesson Complete! 🏆",
+                    3: "You're Making Real Progress! 📊",
+                    4: "Advanced Learner Unlocked! 🌟"
+                };
+
+                const messages = {
+                    1: "Great job! You've completed 3 sentences successfully. Here are some new tools to help you learn:",
+                    2: "Amazing! You finished your first lesson. Ready to explore more?",
+                    3: "Wow! You're really committed to learning. Check out your progress:",
+                    4: "Incredible! You've mastered so much. Take full control of your learning:"
+                };
+
+                document.getElementById('unlockTitle').textContent = titles[stage];
+                document.getElementById('unlockMessage').textContent = messages[stage];
+
+                const featuresList = features.map(f => `<li>${f}</li>`).join('');
+                document.getElementById('unlockFeaturesList').innerHTML = `<ul>${featuresList}</ul>`;
+
+                document.getElementById('unlockModal').classList.add('active');
+            },
+
+            closeUnlockModal() {
+                document.getElementById('unlockModal').classList.remove('active');
+            },
+
             // Custom Lessons Management
             async loadCustomLessons() {
                 const lessons = await this.getAllFromStore('lessons');
@@ -1434,6 +1843,9 @@
                 if (this.currentView === 'practiceView' && this.currentLesson) {
                     this.updateMiniDashboard();
                 }
+
+                // Check for stage advancement in progressive mode
+                await this.checkAndUpdateStage();
             },
 
             // Statistics Management
@@ -1792,6 +2204,77 @@
 
                 // Update mini dashboard
                 this.updateMiniDashboard();
+
+                // Apply progressive mode restrictions
+                this.applyProgressiveMode();
+            },
+
+            applyProgressiveMode() {
+                if (this.appMode === 'allFeatures') {
+                    // Show everything
+                    this.showAllPracticeFeatures();
+                    return;
+                }
+
+                // Progressive mode - hide/show based on stage
+                const miniDashCard = document.querySelector('#practiceView .card[style*="padding: 16px"]');
+                const prevButton = document.getElementById('prevButton');
+                const skipButton = prevButton ? prevButton.parentElement.querySelector('[onclick*="skipSentence"]') : null;
+                const hintButton = prevButton ? prevButton.parentElement.querySelector('[onclick*="toggleHint"]') : null;
+                const textModeBtn = document.getElementById('textModeBtn');
+                const voiceModeBtn = document.getElementById('voiceModeBtn');
+
+                // Stage 0: Minimal UI - only one input mode
+                if (this.progressiveStage < 1) {
+                    if (miniDashCard) miniDashCard.classList.add('hidden');
+                    if (prevButton) prevButton.classList.add('hidden');
+                    if (skipButton) skipButton.classList.add('hidden');
+                    if (hintButton) hintButton.classList.add('hidden');
+
+                    // Show only voice mode by default (or text if voice not available)
+                    const hasVoice = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+                    if (hasVoice) {
+                        this.setInputMode('voice');
+                        if (textModeBtn) textModeBtn.classList.add('hidden');
+                    } else {
+                        this.setInputMode('text');
+                        if (voiceModeBtn) voiceModeBtn.classList.add('hidden');
+                    }
+                }
+
+                // Stage 1: Reveal tools
+                if (this.progressiveStage >= 1) {
+                    if (miniDashCard) miniDashCard.classList.remove('hidden');
+                    if (prevButton) prevButton.classList.remove('hidden');
+                    if (hintButton) hintButton.classList.remove('hidden');
+                    if (textModeBtn) textModeBtn.classList.remove('hidden');
+                    if (voiceModeBtn) voiceModeBtn.classList.remove('hidden');
+                }
+
+                // Stage 2: Reveal skip button
+                if (this.progressiveStage >= 2) {
+                    if (skipButton) skipButton.classList.remove('hidden');
+                }
+            },
+
+            showAllPracticeFeatures() {
+                // Show all elements
+                const elements = [
+                    document.querySelector('#practiceView .card[style*="padding: 16px"]'),
+                    document.getElementById('prevButton'),
+                    document.getElementById('textModeBtn'),
+                    document.getElementById('voiceModeBtn')
+                ];
+
+                const buttons = document.querySelectorAll('#practiceView .nav-buttons button');
+
+                elements.forEach(el => {
+                    if (el) el.classList.remove('hidden');
+                });
+
+                buttons.forEach(btn => {
+                    btn.classList.remove('hidden');
+                });
             },
 
             updateMiniDashboard() {
@@ -1918,8 +2401,13 @@
             },
 
             startApp() {
-                this.showView('dashboardView');
-                this.updateDashboard();
+                // In progressive mode stage 0, skip dashboard and go directly to first lesson
+                if (this.appMode === 'progressive' && this.progressiveStage === 0) {
+                    this.startLesson('lesson_001'); // Start with first greetings lesson
+                } else {
+                    this.showView('dashboardView');
+                    this.updateDashboard();
+                }
             },
 
             // Dashboard Updates
@@ -1954,11 +2442,58 @@
                 document.getElementById('statStreak').textContent = this.stats.streak;
 
                 this.updateLessonList();
+                this.applyDashboardMode();
+            },
+
+            applyDashboardMode() {
+                const statsButton = document.getElementById('statsButton');
+                const lessonManagerButton = document.getElementById('lessonManagerButton');
+                const settingsButton = document.getElementById('settingsButton');
+
+                if (this.appMode === 'allFeatures') {
+                    // Show all buttons
+                    if (statsButton) statsButton.classList.remove('hidden');
+                    if (lessonManagerButton) lessonManagerButton.classList.remove('hidden');
+                    if (settingsButton) settingsButton.classList.remove('hidden');
+                } else {
+                    // Progressive mode - hide based on stage
+                    // Statistics unlocked at stage 3
+                    if (statsButton) {
+                        if (this.progressiveStage >= 3) {
+                            statsButton.classList.remove('hidden');
+                        } else {
+                            statsButton.classList.add('hidden');
+                        }
+                    }
+
+                    // Lesson Manager & Settings unlocked at stage 4
+                    if (lessonManagerButton) {
+                        if (this.progressiveStage >= 4) {
+                            lessonManagerButton.classList.remove('hidden');
+                        } else {
+                            lessonManagerButton.classList.add('hidden');
+                        }
+                    }
+
+                    if (settingsButton) {
+                        if (this.progressiveStage >= 4) {
+                            settingsButton.classList.remove('hidden');
+                        } else {
+                            settingsButton.classList.add('hidden');
+                        }
+                    }
+                }
             },
 
             updateLessonList() {
                 const lessonList = document.getElementById('lessonList');
-                const lessons = this.getAllLessons();
+                let lessons = this.getAllLessons();
+
+                // In progressive mode, limit visible lessons based on stage
+                if (this.appMode === 'progressive' && this.progressiveStage < 2) {
+                    // Stage 0-1: Show only first lesson
+                    lessons = [lessons[0]];
+                }
 
                 lessonList.innerHTML = '';
 

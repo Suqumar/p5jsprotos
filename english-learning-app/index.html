@@ -837,6 +837,28 @@
                 <p id="sentenceCounter">Sentence 1 of 8</p>
             </div>
 
+            <!-- Mini Dashboard -->
+            <div class="card" style="padding: 16px; margin-bottom: 20px;">
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: var(--primary-teal);" id="miniCompleted">0</div>
+                        <div style="font-size: 12px; color: var(--text-medium);">Completed</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: var(--primary-teal);" id="miniAccuracy">0%</div>
+                        <div style="font-size: 12px; color: var(--text-medium);">Accuracy</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: var(--primary-teal);" id="miniAttempts">0</div>
+                        <div style="font-size: 12px; color: var(--text-medium);">Attempts</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: var(--primary-teal);" id="miniStreak">0</div>
+                        <div style="font-size: 12px; color: var(--text-medium);">Day Streak</div>
+                    </div>
+                </div>
+            </div>
+
             <div class="sentence-display">
                 <div class="sentence-text" id="currentSentence">Hello</div>
                 <button class="btn btn-primary" onclick="app.speakSentence()">
@@ -890,6 +912,9 @@
                 </div>
 
                 <div class="nav-buttons mt-20">
+                    <button class="btn btn-secondary" id="prevButton" onclick="app.previousSentence()">
+                        ← Previous
+                    </button>
                     <button class="btn btn-secondary" onclick="app.toggleHint()">
                         💡 Show Hint
                     </button>
@@ -1118,6 +1143,7 @@
             audioStream: null,
             recordedChunks: [],
             recordedAudio: null,
+            pendingTranscript: null,
             settings: {
                 voiceSpeed: 0.9,
                 languageVariant: 'en-US',
@@ -1403,6 +1429,11 @@
 
                 await this.saveToStore('progress', progress);
                 await this.updateStats(success);
+
+                // Update mini dashboard if in practice view
+                if (this.currentView === 'practiceView' && this.currentLesson) {
+                    this.updateMiniDashboard();
+                }
             },
 
             // Statistics Management
@@ -1507,7 +1538,8 @@
 
                     this.recognition.onresult = (event) => {
                         const transcript = event.results[0][0].transcript;
-                        this.handleSpeechResult(transcript);
+                        // Store transcript and wait for MediaRecorder to finish
+                        this.pendingTranscript = transcript;
                     };
 
                     this.recognition.onerror = (event) => {
@@ -1563,6 +1595,12 @@
                     this.mediaRecorder.onstop = () => {
                         const blob = new Blob(this.recordedChunks, { type: 'audio/webm' });
                         this.recordedAudio = URL.createObjectURL(blob);
+
+                        // Now process the pending transcript with the new recording
+                        if (this.pendingTranscript) {
+                            this.handleSpeechResult(this.pendingTranscript);
+                            this.pendingTranscript = null;
+                        }
                     };
 
                     // Start recording
@@ -1742,9 +1780,38 @@
                 document.getElementById('hintArea').classList.add('hidden');
                 document.getElementById('textInput').value = '';
 
+                // Enable/disable Previous button
+                const prevButton = document.getElementById('prevButton');
+                if (prevButton) {
+                    prevButton.disabled = this.currentSentenceIndex === 0;
+                }
+
                 if (this.settings.autoHints) {
                     document.getElementById('hintArea').classList.remove('hidden');
                 }
+
+                // Update mini dashboard
+                this.updateMiniDashboard();
+            },
+
+            updateMiniDashboard() {
+                // Update completed count for current lesson
+                const progress = this.progress[this.currentLesson.id];
+                const completed = progress ? progress.completedSentences.length : 0;
+                document.getElementById('miniCompleted').textContent =
+                    `${completed}/${this.currentLesson.sentences.length}`;
+
+                // Update accuracy for current lesson
+                const lessonAccuracy = progress && progress.attempts > 0 ?
+                    ((progress.successCount / progress.attempts) * 100).toFixed(0) : 0;
+                document.getElementById('miniAccuracy').textContent = lessonAccuracy + '%';
+
+                // Update total attempts for current lesson
+                const lessonAttempts = progress ? progress.attempts : 0;
+                document.getElementById('miniAttempts').textContent = lessonAttempts;
+
+                // Update streak
+                document.getElementById('miniStreak').textContent = this.stats.streak;
             },
 
             nextSentence() {
@@ -1758,6 +1825,13 @@
 
             skipSentence() {
                 this.nextSentence();
+            },
+
+            previousSentence() {
+                if (this.currentSentenceIndex > 0) {
+                    this.currentSentenceIndex--;
+                    this.updatePracticeView();
+                }
             },
 
             completLesson() {

@@ -1388,6 +1388,7 @@
             progressiveStage: 0, // 0-5
             featuresUnlocked: [],
             stageUnlocksSeen: {},
+            modeSelected: false,
 
             settings: {
                 voiceSpeed: 0.9,
@@ -1522,6 +1523,10 @@
                 this.checkBrowserSupport();
                 this.loadSettingsUI();
                 this.updateBreadcrumbMenu();
+
+                if (this.modeSelected) {
+                    this.startApp();
+                }
             },
 
             // IndexedDB Initialization
@@ -1630,12 +1635,37 @@
             // Mode Management
             async loadModeSettings() {
                 const modeData = await this.getFromStore('settings', 'modeSettings');
-                if (modeData) {
+                if (modeData && modeData.value) {
+                    this.modeSelected = true;
                     this.appMode = modeData.value.appMode || 'progressive';
                     this.progressiveStage = modeData.value.progressiveStage || 0;
                     this.featuresUnlocked = modeData.value.featuresUnlocked || [];
                     this.stageUnlocksSeen = modeData.value.stageUnlocksSeen || {};
+                } else {
+                    this.modeSelected = false;
                 }
+            },
+
+            async selectMode(mode) {
+                this.appMode = mode;
+                this.modeSelected = true;
+
+                if (mode === 'progressive') {
+                    this.progressiveStage = 0;
+                    this.featuresUnlocked = [];
+                } else {
+                    this.progressiveStage = 4;
+                    this.featuresUnlocked = [
+                        'dualInput', 'hints', 'miniDashboard', 'navigation',
+                        'dashboard', 'allLessons', 'skip',
+                        'statistics', 'settings', 'lessonManager'
+                    ];
+                }
+
+                this.stageUnlocksSeen = {};
+                await this.saveModeSettings();
+                this.updateBreadcrumbMenu();
+                this.startApp();
             },
 
             async saveModeSettings() {

@@ -1016,6 +1016,45 @@
                 transform: translateX(0);
             }
         }
+
+        /* Locked Features - Show but disabled/grayed out */
+        .locked-feature {
+            opacity: 0.4;
+            pointer-events: none;
+            position: relative;
+            filter: grayscale(60%);
+        }
+
+        .locked-feature::after {
+            content: "🔒";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            opacity: 0.8;
+        }
+
+        button.locked-feature {
+            cursor: not-allowed;
+            background: var(--text-medium);
+        }
+
+        button.locked-feature:hover {
+            background: var(--text-medium);
+        }
+
+        .lesson-card.locked-feature::after {
+            font-size: 48px;
+            z-index: 10;
+        }
+
+        .locked-feature-tooltip {
+            font-size: 12px;
+            color: var(--text-medium);
+            font-style: italic;
+            margin-top: 4px;
+        }
     </style>
 </head>
 <body>
@@ -1950,44 +1989,9 @@
             },
 
             showAllFeatures() {
-                // Show all features for All Features mode
-                // Input mode toggle
-                const inputModeToggles = document.querySelectorAll('.input-mode-toggle');
-                inputModeToggles.forEach(el => el.style.display = 'flex');
-
-                // Hints button
-                const hintButtons = document.querySelectorAll('[onclick*="showHint"]');
-                hintButtons.forEach(el => el.style.display = 'inline-block');
-
-                // Mini dashboard
-                const miniDashboards = document.querySelectorAll('#practiceView .card');
-                if (miniDashboards.length > 0) {
-                    miniDashboards[0].style.display = 'block';
-                }
-
-                // Previous button
-                const prevButtons = document.querySelectorAll('[onclick*="previousSentence"]');
-                prevButtons.forEach(el => el.style.display = 'inline-block');
-
-                // Skip button
-                const skipButtons = document.querySelectorAll('[onclick*="skipSentence"]');
-                skipButtons.forEach(el => el.style.display = 'inline-block');
-
-                // Dashboard lessons (show all)
-                const lessonCards = document.querySelectorAll('.lesson-card');
-                lessonCards.forEach(el => el.style.display = 'block');
-
-                // Statistics section
-                const statsGrid = document.querySelector('#dashboardView .stats-grid');
-                if (statsGrid) statsGrid.style.display = 'grid';
-
-                // Settings button
-                const settingsButtons = document.querySelectorAll('[onclick*="showView(\'settingsView\')"]');
-                settingsButtons.forEach(el => el.style.display = 'inline-block');
-
-                // Lesson manager button
-                const lessonManagerButtons = document.querySelectorAll('[onclick*="showView(\'lessonManagerView\')"]');
-                lessonManagerButtons.forEach(el => el.style.display = 'inline-block');
+                // Remove all locked-feature classes to unlock everything in All Features mode
+                const allLockedElements = document.querySelectorAll('.locked-feature');
+                allLockedElements.forEach(el => el.classList.remove('locked-feature'));
             },
 
             applyProgressiveRestrictions() {
@@ -1995,121 +1999,71 @@
                     return; // Don't apply restrictions on welcome screen
                 }
 
-                // Always hide certain elements first, then selectively show based on stage
                 const stage = this.progressiveStage;
 
-                // Stage 0: Minimal UI - hide everything except basics
+                // Get all feature elements
+                const inputModeToggles = document.querySelectorAll('.input-mode-toggle');
+                const voiceModeButtons = document.querySelectorAll('#voiceModeBtn');
+                const hintButtons = document.querySelectorAll('[onclick*="showHint"]');
+                const miniDashboards = document.querySelectorAll('#practiceView > .container > .card');
+                const prevButtons = document.querySelectorAll('[onclick*="previousSentence"]');
+                const skipButtons = document.querySelectorAll('[onclick*="skipSentence"]');
+                const lessonCards = document.querySelectorAll('.lesson-card');
+                const statsGrid = document.querySelector('#dashboardView .stats-grid');
+                const settingsButtons = document.querySelectorAll('[onclick*="showView(\'settingsView\')"]');
+                const lessonManagerButtons = document.querySelectorAll('[onclick*="showView(\'lessonManagerView\')"]');
+
+                // Stage 0: Lock everything except basics
                 if (stage === 0) {
-                    // Hide input mode toggle (force one mode)
-                    const inputModeToggles = document.querySelectorAll('.input-mode-toggle');
-                    inputModeToggles.forEach(el => el.style.display = 'none');
+                    // Lock voice mode button (only text input available)
+                    voiceModeButtons.forEach(el => el.classList.add('locked-feature'));
 
-                    // Hide hints button
-                    const hintButtons = document.querySelectorAll('[onclick*="showHint"]');
-                    hintButtons.forEach(el => el.style.display = 'none');
+                    hintButtons.forEach(el => el.classList.add('locked-feature'));
 
-                    // Hide mini dashboard
-                    const miniDashboards = document.querySelectorAll('#practiceView .card');
                     if (miniDashboards.length > 0) {
-                        miniDashboards[0].style.display = 'none';
+                        miniDashboards[0].classList.add('locked-feature');
                     }
 
-                    // Hide previous button
-                    const prevButtons = document.querySelectorAll('[onclick*="previousSentence"]');
-                    prevButtons.forEach(el => el.style.display = 'none');
+                    prevButtons.forEach(el => el.classList.add('locked-feature'));
+                    skipButtons.forEach(el => el.classList.add('locked-feature'));
 
-                    // Hide skip button
-                    const skipButtons = document.querySelectorAll('[onclick*="skipSentence"]');
-                    skipButtons.forEach(el => el.style.display = 'none');
-
-                    // Hide all lessons except first
-                    const lessonCards = document.querySelectorAll('.lesson-card');
+                    // Lock all lessons except first
                     lessonCards.forEach((el, idx) => {
-                        if (idx > 0) el.style.display = 'none';
+                        if (idx > 0) el.classList.add('locked-feature');
                     });
 
-                    // Hide statistics
-                    const statsGrid = document.querySelector('#dashboardView .stats-grid');
-                    if (statsGrid) statsGrid.style.display = 'none';
-
-                    // Hide settings and lesson manager
-                    const settingsButtons = document.querySelectorAll('[onclick*="showView(\'settingsView\')"]');
-                    settingsButtons.forEach(el => el.style.display = 'none');
-                    const lessonManagerButtons = document.querySelectorAll('[onclick*="showView(\'lessonManagerView\')"]');
-                    lessonManagerButtons.forEach(el => el.style.display = 'none');
+                    if (statsGrid) statsGrid.classList.add('locked-feature');
+                    settingsButtons.forEach(el => el.classList.add('locked-feature'));
+                    lessonManagerButtons.forEach(el => el.classList.add('locked-feature'));
                 }
 
-                // Stage 1: Show input toggle, hints, mini dashboard, previous button
+                // Stage 1: Unlock input toggle, hints, mini dashboard, previous button
                 if (stage >= 1) {
-                    const inputModeToggles = document.querySelectorAll('.input-mode-toggle');
-                    inputModeToggles.forEach(el => el.style.display = 'flex');
+                    voiceModeButtons.forEach(el => el.classList.remove('locked-feature'));
+                    hintButtons.forEach(el => el.classList.remove('locked-feature'));
 
-                    const hintButtons = document.querySelectorAll('[onclick*="showHint"]');
-                    hintButtons.forEach(el => el.style.display = 'inline-block');
-
-                    const miniDashboards = document.querySelectorAll('#practiceView .card');
                     if (miniDashboards.length > 0) {
-                        miniDashboards[0].style.display = 'block';
+                        miniDashboards[0].classList.remove('locked-feature');
                     }
 
-                    const prevButtons = document.querySelectorAll('[onclick*="previousSentence"]');
-                    prevButtons.forEach(el => el.style.display = 'inline-block');
-
-                    // Still hide: skip, other lessons, stats, settings
-                    const skipButtons = document.querySelectorAll('[onclick*="skipSentence"]');
-                    skipButtons.forEach(el => el.style.display = 'none');
-
-                    const lessonCards = document.querySelectorAll('.lesson-card');
-                    lessonCards.forEach((el, idx) => {
-                        if (idx > 0) el.style.display = 'none';
-                    });
-
-                    const statsGrid = document.querySelector('#dashboardView .stats-grid');
-                    if (statsGrid) statsGrid.style.display = 'none';
-
-                    const settingsButtons = document.querySelectorAll('[onclick*="showView(\'settingsView\')"]');
-                    settingsButtons.forEach(el => el.style.display = 'none');
-                    const lessonManagerButtons = document.querySelectorAll('[onclick*="showView(\'lessonManagerView\')"]');
-                    lessonManagerButtons.forEach(el => el.style.display = 'none');
+                    prevButtons.forEach(el => el.classList.remove('locked-feature'));
                 }
 
-                // Stage 2: Show skip, all lessons, dashboard access
+                // Stage 2: Unlock skip, all lessons
                 if (stage >= 2) {
-                    const skipButtons = document.querySelectorAll('[onclick*="skipSentence"]');
-                    skipButtons.forEach(el => el.style.display = 'inline-block');
-
-                    const lessonCards = document.querySelectorAll('.lesson-card');
-                    lessonCards.forEach(el => el.style.display = 'block');
-
-                    // Still hide: stats, settings
-                    const statsGrid = document.querySelector('#dashboardView .stats-grid');
-                    if (statsGrid) statsGrid.style.display = 'none';
-
-                    const settingsButtons = document.querySelectorAll('[onclick*="showView(\'settingsView\')"]');
-                    settingsButtons.forEach(el => el.style.display = 'none');
-                    const lessonManagerButtons = document.querySelectorAll('[onclick*="showView(\'lessonManagerView\')"]');
-                    lessonManagerButtons.forEach(el => el.style.display = 'none');
+                    skipButtons.forEach(el => el.classList.remove('locked-feature'));
+                    lessonCards.forEach(el => el.classList.remove('locked-feature'));
                 }
 
-                // Stage 3: Show statistics
+                // Stage 3: Unlock statistics
                 if (stage >= 3) {
-                    const statsGrid = document.querySelector('#dashboardView .stats-grid');
-                    if (statsGrid) statsGrid.style.display = 'grid';
-
-                    // Still hide: settings
-                    const settingsButtons = document.querySelectorAll('[onclick*="showView(\'settingsView\')"]');
-                    settingsButtons.forEach(el => el.style.display = 'none');
-                    const lessonManagerButtons = document.querySelectorAll('[onclick*="showView(\'lessonManagerView\')"]');
-                    lessonManagerButtons.forEach(el => el.style.display = 'none');
+                    if (statsGrid) statsGrid.classList.remove('locked-feature');
                 }
 
-                // Stage 4: Show everything (settings, lesson manager)
+                // Stage 4: Unlock settings and lesson manager
                 if (stage >= 4) {
-                    const settingsButtons = document.querySelectorAll('[onclick*="showView(\'settingsView\')"]');
-                    settingsButtons.forEach(el => el.style.display = 'inline-block');
-
-                    const lessonManagerButtons = document.querySelectorAll('[onclick*="showView(\'lessonManagerView\')"]');
-                    lessonManagerButtons.forEach(el => el.style.display = 'inline-block');
+                    settingsButtons.forEach(el => el.classList.remove('locked-feature'));
+                    lessonManagerButtons.forEach(el => el.classList.remove('locked-feature'));
                 }
             },
 
@@ -2519,8 +2473,14 @@
             },
 
             processSpeechResult(transcript) {
-                const target = this.currentLesson.sentences[this.currentSentenceIndex].text;
-                const similarity = this.calculateSimilarity(transcript, target);
+                const sentence = this.currentLesson.sentences[this.currentSentenceIndex];
+                const targetDevanagari = sentence.text;
+                const targetRomanized = sentence.romanization || '';
+
+                // Check similarity against both Devanagari and Romanized versions
+                const similarityDevanagari = this.calculateSimilarity(transcript, targetDevanagari);
+                const similarityRomanized = targetRomanized ? this.calculateSimilarity(transcript, targetRomanized) : 0;
+                const similarity = Math.max(similarityDevanagari, similarityRomanized);
 
                 if (similarity >= 0.8) {
                     this.showFeedback('success', this.getSuccessMessage());
@@ -2532,7 +2492,7 @@
                     this.showFeedback('partial', `Almost there! You said: "${transcript}"`);
                     this.updateProgress(this.currentLesson.id, this.currentSentenceIndex, false);
                 } else {
-                    this.showFeedback('error', `You said: "${transcript}". Expected: "${target}". Try again!`);
+                    this.showFeedback('error', `You said: "${transcript}". Expected: "${targetDevanagari}" (${targetRomanized}). Try again!`);
                     this.updateProgress(this.currentLesson.id, this.currentSentenceIndex, false);
                 }
             },
@@ -2542,8 +2502,14 @@
                 const input = document.getElementById('textInput').value.trim();
                 if (!input) return;
 
-                const target = this.currentLesson.sentences[this.currentSentenceIndex].text;
-                const similarity = this.calculateSimilarity(input, target);
+                const sentence = this.currentLesson.sentences[this.currentSentenceIndex];
+                const targetDevanagari = sentence.text;
+                const targetRomanized = sentence.romanization || '';
+
+                // Check similarity against both Devanagari and Romanized versions
+                const similarityDevanagari = this.calculateSimilarity(input, targetDevanagari);
+                const similarityRomanized = targetRomanized ? this.calculateSimilarity(input, targetRomanized) : 0;
+                const similarity = Math.max(similarityDevanagari, similarityRomanized);
 
                 if (similarity >= 0.8) {
                     this.showFeedback('success', this.getSuccessMessage());
@@ -2556,7 +2522,7 @@
                     this.showFeedback('partial', `Almost there! Check your spelling.`);
                     this.updateProgress(this.currentLesson.id, this.currentSentenceIndex, false);
                 } else {
-                    this.showFeedback('error', `Try again! Expected: "${target}"`);
+                    this.showFeedback('error', `Try again! You can type in Devanagari (${targetDevanagari}) or Romanized (${targetRomanized})`);
                     this.updateProgress(this.currentLesson.id, this.currentSentenceIndex, false);
                 }
             },

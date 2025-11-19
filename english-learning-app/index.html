@@ -720,106 +720,51 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Mode Choice Cards */
-        .choice-card {
-            background: var(--card-bg);
-            border: 2px solid var(--border-light);
-            border-radius: 12px;
-            padding: 30px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .choice-card:hover {
-            border-color: var(--primary-teal);
-            box-shadow: var(--shadow-lifted);
-            transform: translateY(-4px);
-        }
-
-        .choice-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-        }
-
-        .choice-card h3 {
-            color: var(--text-dark);
-            margin-bottom: 10px;
-        }
-
-        .choice-card ul {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        .choice-card li {
-            padding: 5px 0;
-            padding-left: 20px;
-            position: relative;
-        }
-
-        .choice-card li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: var(--primary-teal);
-            font-weight: bold;
-        }
-
-        @media (max-width: 768px) {
-            .choice-card {
-                padding: 20px;
-            }
-
-            div[style*="grid-template-columns: 1fr 1fr"] {
-                grid-template-columns: 1fr !important;
-            }
-        }
-
-        /* Breadcrumb Menu for Mode Switching */
+        /* Breadcrumb Menu */
         .breadcrumb-menu {
             position: relative;
             display: inline-block;
         }
 
         .breadcrumb-toggle {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
+            background: none;
+            border: 1px solid var(--border-light);
             padding: 8px 16px;
-            border-radius: 20px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
+            color: var(--text-dark);
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .breadcrumb-toggle:hover {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.5);
+            background: var(--bg-cream);
+            border-color: var(--primary-teal);
         }
 
         .breadcrumb-dropdown {
+            display: none;
             position: absolute;
             top: 100%;
             right: 0;
             margin-top: 8px;
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            min-width: 300px;
-            display: none;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lifted);
+            min-width: 220px;
             z-index: 1000;
             overflow: hidden;
         }
 
         .breadcrumb-dropdown.active {
             display: block;
-            animation: dropdownFadeIn 0.3s ease;
+            animation: slideDown 0.2s ease;
         }
 
-        @keyframes dropdownFadeIn {
+        @keyframes slideDown {
             from {
                 opacity: 0;
                 transform: translateY(-10px);
@@ -830,191 +775,112 @@
             }
         }
 
-        .breadcrumb-dropdown-header {
-            padding: 16px;
-            background: var(--gradient-primary);
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .breadcrumb-dropdown-content {
-            padding: 12px;
-        }
-
-        .mode-option {
-            padding: 12px;
-            border-radius: 8px;
+        .breadcrumb-item {
+            padding: 12px 16px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.2s ease;
-            margin-bottom: 8px;
-            border: 2px solid transparent;
-        }
-
-        .mode-option:hover {
-            background: var(--light-bg);
-        }
-
-        .mode-option.active {
-            background: rgba(78, 205, 196, 0.1);
-            border-color: var(--primary-teal);
-        }
-
-        .mode-option-icon {
-            font-size: 24px;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--light-bg);
-            border-radius: 8px;
-        }
-
-        .mode-option.active .mode-option-icon {
-            background: var(--primary-teal);
-        }
-
-        .mode-option-content {
-            flex: 1;
-        }
-
-        .mode-option-title {
-            font-weight: bold;
+            border-bottom: 1px solid var(--border-light);
+            transition: background 0.2s ease;
+            font-size: 14px;
             color: var(--text-dark);
-            margin-bottom: 4px;
         }
 
-        .mode-option-desc {
-            font-size: 12px;
-            color: var(--text-medium);
+        .breadcrumb-item:last-child {
+            border-bottom: none;
         }
 
-        .mode-option-badge {
+        .breadcrumb-item:hover {
+            background: var(--bg-cream);
+        }
+
+        .breadcrumb-item.active-mode {
             background: var(--primary-teal);
             color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .mode-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background: var(--primary-teal);
+            color: white;
+            border-radius: 4px;
             font-size: 11px;
-            font-weight: bold;
+            font-weight: 600;
+            margin-left: 8px;
         }
 
-        .breadcrumb-dropdown-footer {
-            padding: 12px;
-            border-top: 1px solid var(--border-color);
-            font-size: 12px;
-            color: var(--text-medium);
-            text-align: center;
-        }
-
-        /* Unlock Celebration Modal */
-        .unlock-modal-overlay {
+        /* Feature Unlock Modal */
+        .unlock-modal {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
             align-items: center;
             justify-content: center;
-            z-index: 10000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
         }
 
-        .unlock-modal-overlay.active {
-            opacity: 1;
+        .unlock-modal.active {
+            display: flex;
         }
 
-        .unlock-modal {
+        .unlock-content {
             background: white;
-            border-radius: 20px;
             padding: 40px;
+            border-radius: 16px;
             max-width: 500px;
+            width: 90%;
             text-align: center;
-            position: relative;
-            transform: scale(0.8);
-            transition: transform 0.3s ease;
+            animation: unlockPop 0.5s ease;
         }
 
-        .unlock-modal-overlay.active .unlock-modal {
-            transform: scale(1);
-        }
-
-        .unlock-confetti {
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 60px;
-            animation: confettiBounce 1s ease infinite;
-        }
-
-        @keyframes confettiBounce {
-            0%, 100% { transform: translateX(-50%) translateY(0) rotate(-10deg); }
-            50% { transform: translateX(-50%) translateY(-20px) rotate(10deg); }
+        @keyframes unlockPop {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .unlock-icon {
-            font-size: 80px;
-            margin: 20px 0;
-            animation: iconPulse 2s ease infinite;
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: bounce 1s ease infinite;
         }
 
-        @keyframes iconPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        .unlock-modal h2 {
-            color: var(--primary-teal);
-            margin: 10px 0;
-            font-size: 32px;
-        }
-
-        .unlock-modal h3 {
-            color: var(--text-dark);
-            margin: 10px 0;
-            font-size: 24px;
-        }
-
-        .unlock-features-list {
+        .unlock-features {
             text-align: left;
-            list-style: none;
-            padding: 0;
             margin: 20px 0;
-        }
-
-        .unlock-features-list li {
-            padding: 12px;
-            margin: 8px 0;
-            background: var(--light-bg);
+            padding: 20px;
+            background: var(--bg-cream);
             border-radius: 8px;
-            border-left: 4px solid var(--primary-teal);
-            font-size: 16px;
-            color: var(--text-dark);
-            animation: featureSlideIn 0.5s ease forwards;
-            opacity: 0;
         }
 
-        .unlock-features-list li:nth-child(1) { animation-delay: 0.1s; }
-        .unlock-features-list li:nth-child(2) { animation-delay: 0.2s; }
-        .unlock-features-list li:nth-child(3) { animation-delay: 0.3s; }
-        .unlock-features-list li:nth-child(4) { animation-delay: 0.4s; }
+        .unlock-features li {
+            margin: 8px 0;
+            font-size: 16px;
+        }
 
-        @keyframes featureSlideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+        /* Progressive Mode Hints */
+        .progress-hint {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .stage-indicator {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 8px;
         }
     </style>
 </head>
@@ -1077,39 +943,18 @@
     <div id="dashboardView" class="view">
         <div class="header">
             <div class="header-title">🌟 English Learning</div>
-            <div class="breadcrumb-menu">
-                <div class="breadcrumb-toggle" onclick="app.toggleModeMenu(event)">
-                    <span id="currentModeLabel">All Features</span>
-                    <span>▼</span>
-                </div>
-                <div class="breadcrumb-dropdown" id="modeDropdown">
-                    <div class="breadcrumb-dropdown-header">
-                        Switch Learning Mode
-                    </div>
-                    <div class="breadcrumb-dropdown-content">
-                        <div class="mode-option" onclick="app.switchMode('progressive', event)">
-                            <div class="mode-option-icon">🌱</div>
-                            <div class="mode-option-content">
-                                <div class="mode-option-title">Progressive Mode</div>
-                                <div class="mode-option-desc">Unlock features as you learn</div>
-                            </div>
-                            <div class="mode-option-badge" style="display: none;" id="progressiveBadge">Active</div>
-                        </div>
-                        <div class="mode-option" onclick="app.switchMode('allFeatures', event)">
-                            <div class="mode-option-icon">🚀</div>
-                            <div class="mode-option-content">
-                                <div class="mode-option-title">All Features</div>
-                                <div class="mode-option-desc">Full access to everything</div>
-                            </div>
-                            <div class="mode-option-badge" style="display: none;" id="allFeaturesBadge">Active</div>
-                        </div>
-                    </div>
-                    <div class="breadcrumb-dropdown-footer">
-                        You can switch modes anytime
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="header-progress" id="headerProgress">Loading...</div>
+                <div class="breadcrumb-menu">
+                    <button class="breadcrumb-toggle" onclick="app.toggleBreadcrumbMenu()">
+                        <span id="currentMode">Progressive</span>
+                        <span>≡</span>
+                    </button>
+                    <div class="breadcrumb-dropdown" id="breadcrumbDropdown">
+                        <!-- Populated dynamically -->
                     </div>
                 </div>
             </div>
-            <div class="header-progress" id="headerProgress">Loading...</div>
         </div>
 
         <div class="container">
@@ -1156,14 +1001,14 @@
                 </div>
             </div>
 
-            <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="app.showView('statisticsView')">
+            <div class="nav-buttons" id="dashboardNavButtons">
+                <button class="btn btn-secondary" id="statsButton" onclick="app.showView('statisticsView')">
                     📊 Statistics
                 </button>
-                <button class="btn btn-secondary" onclick="app.showView('lessonManagerView')">
+                <button class="btn btn-secondary" id="lessonManagerButton" onclick="app.showView('lessonManagerView')">
                     📚 Lesson Manager
                 </button>
-                <button class="btn btn-secondary" onclick="app.showView('settingsView')">
+                <button class="btn btn-secondary" id="settingsButton" onclick="app.showView('settingsView')">
                     ⚙️ Settings
                 </button>
             </div>
@@ -1507,6 +1352,21 @@
         </div>
     </div>
 
+    <!-- Feature Unlock Modal -->
+    <div id="unlockModal" class="unlock-modal">
+        <div class="unlock-content">
+            <div class="unlock-icon">🎉</div>
+            <h2 id="unlockTitle">New Features Unlocked!</h2>
+            <p id="unlockMessage">You're making great progress!</p>
+            <div class="unlock-features" id="unlockFeaturesList">
+                <!-- Populated dynamically -->
+            </div>
+            <button class="btn btn-primary btn-large" onclick="app.closeUnlockModal()">
+                Awesome! Let's Continue
+            </button>
+        </div>
+    </div>
+
     <script>
         // Application State and Logic
         const app = {
@@ -1524,10 +1384,10 @@
             pendingTranscript: null,
 
             // Mode Management
-            appMode: null, // Will be set on first load: 'progressive' or 'allFeatures'
-            progressiveStage: 0, // 0-4 for progressive mode
+            appMode: 'progressive', // or 'allFeatures'
+            progressiveStage: 0, // 0-5
             featuresUnlocked: [],
-            hasChosenMode: false, // Track if user has made initial choice
+            stageUnlocksSeen: {},
 
             settings: {
                 voiceSpeed: 0.9,
@@ -1661,19 +1521,7 @@
                 this.initSpeechRecognition();
                 this.checkBrowserSupport();
                 this.loadSettingsUI();
-
-                // Update mode menu UI based on current mode
-                this.updateModeMenuUI();
-
-                // If user hasn't chosen a mode yet, keep showing welcome screen
-                // Otherwise, hide welcome and show appropriate view
-                if (this.hasChosenMode) {
-                    document.getElementById('welcomeView').classList.remove('active');
-                    // Apply mode restrictions after initialization
-                    setTimeout(() => {
-                        this.applyModeRestrictions();
-                    }, 100);
-                }
+                this.updateBreadcrumbMenu();
             },
 
             // IndexedDB Initialization
@@ -1782,11 +1630,11 @@
             // Mode Management
             async loadModeSettings() {
                 const modeData = await this.getFromStore('settings', 'modeSettings');
-                if (modeData && modeData.value) {
-                    this.appMode = modeData.value.appMode || null;
+                if (modeData) {
+                    this.appMode = modeData.value.appMode || 'progressive';
                     this.progressiveStage = modeData.value.progressiveStage || 0;
                     this.featuresUnlocked = modeData.value.featuresUnlocked || [];
-                    this.hasChosenMode = modeData.value.hasChosenMode || false;
+                    this.stageUnlocksSeen = modeData.value.stageUnlocksSeen || {};
                 }
             },
 
@@ -1797,423 +1645,197 @@
                         appMode: this.appMode,
                         progressiveStage: this.progressiveStage,
                         featuresUnlocked: this.featuresUnlocked,
-                        hasChosenMode: this.hasChosenMode
+                        stageUnlocksSeen: this.stageUnlocksSeen
                     }
                 });
             },
 
-            async selectMode(mode) {
-                this.appMode = mode;
-                this.hasChosenMode = true;
+            async switchMode(newMode) {
+                this.appMode = newMode;
                 await this.saveModeSettings();
+                this.updateBreadcrumbMenu();
 
-                // Start the app based on selected mode
-                if (mode === 'progressive') {
-                    // Progressive mode: go directly to first lesson
-                    this.startLesson('lesson_001');
-                } else {
-                    // All Features mode: show dashboard
-                    this.showView('dashboardView');
+                // Refresh current view
+                if (this.currentView === 'practiceView') {
+                    this.updatePracticeView();
+                } else if (this.currentView === 'dashboardView') {
                     this.updateDashboard();
                 }
             },
 
-            toggleModeMenu(event) {
-                event.stopPropagation();
-                const dropdowns = document.querySelectorAll('.breadcrumb-dropdown');
-                dropdowns.forEach(dropdown => {
-                    dropdown.classList.toggle('active');
-                });
+            toggleBreadcrumbMenu() {
+                const dropdown = document.getElementById('breadcrumbDropdown');
+                dropdown.classList.toggle('active');
 
-                // Update the active state for the current mode
-                this.updateModeMenuUI();
+                // Close when clicking outside
+                if (dropdown.classList.contains('active')) {
+                    setTimeout(() => {
+                        document.addEventListener('click', this.closeBreadcrumbOnOutside);
+                    }, 10);
+                }
+            },
 
-                // Close dropdown when clicking outside
-                const closeDropdown = (e) => {
-                    if (!e.target.closest('.breadcrumb-menu')) {
-                        dropdowns.forEach(dropdown => {
-                            dropdown.classList.remove('active');
-                        });
-                        document.removeEventListener('click', closeDropdown);
-                    }
+            closeBreadcrumbOnOutside(e) {
+                const menu = document.querySelector('.breadcrumb-menu');
+                if (menu && !menu.contains(e.target)) {
+                    document.getElementById('breadcrumbDropdown').classList.remove('active');
+                    document.removeEventListener('click', app.closeBreadcrumbOnOutside);
+                }
+            },
+
+            updateBreadcrumbMenu() {
+                const currentMode = document.getElementById('currentMode');
+                const dropdown = document.getElementById('breadcrumbDropdown');
+
+                if (currentMode) {
+                    currentMode.textContent = this.appMode === 'progressive' ? 'Progressive' : 'All Features';
+                }
+
+                if (dropdown) {
+                    const otherMode = this.appMode === 'progressive' ? 'allFeatures' : 'progressive';
+                    const otherModeLabel = this.appMode === 'progressive' ? 'All Features Mode' : 'Progressive Mode';
+
+                    dropdown.innerHTML = `
+                        <div class="breadcrumb-item active-mode">
+                            ${this.appMode === 'progressive' ? '🌱 Progressive Mode' : '🚀 All Features Mode'}
+                        </div>
+                        <div class="breadcrumb-item" onclick="app.switchMode('${otherMode}'); app.toggleBreadcrumbMenu();">
+                            Switch to ${otherModeLabel}
+                        </div>
+                        <div class="breadcrumb-item" onclick="app.showAboutMode(); app.toggleBreadcrumbMenu();">
+                            ℹ️ About This Mode
+                        </div>
+                    `;
+                }
+            },
+
+            showAboutMode() {
+                const messages = {
+                    progressive: `
+                        <strong>Progressive Mode</strong> is designed for beginners who may feel intimidated by English learning.<br><br>
+                        Features are revealed gradually as you make progress:<br>
+                        • Stage 0: Just one sentence at a time<br>
+                        • Stage 1: More practice tools (after 3 successes)<br>
+                        • Stage 2: Full lessons (after first lesson)<br>
+                        • Stage 3: Statistics (after 25 sentences)<br>
+                        • Stage 4: Customization (after 50 sentences)<br><br>
+                        You can switch to All Features Mode anytime from the menu above.
+                    `,
+                    allFeatures: `
+                        <strong>All Features Mode</strong> gives you complete access to everything:<br><br>
+                        • All 6 lesson categories<br>
+                        • Full statistics and progress tracking<br>
+                        • Settings and customization<br>
+                        • Lesson import/export<br>
+                        • All navigation controls<br><br>
+                        Perfect for confident learners or those returning to the app.
+                    `
                 };
-                setTimeout(() => {
-                    document.addEventListener('click', closeDropdown);
-                }, 0);
+
+                alert(messages[this.appMode]);
             },
 
-            updateModeMenuUI() {
-                // Update labels
-                const labels = document.querySelectorAll('#currentModeLabel, #currentModeLabelPractice');
-                labels.forEach(label => {
-                    label.textContent = this.appMode === 'progressive' ? 'Progressive Mode' : 'All Features';
-                });
-
-                // Update badges and active states
-                const progressiveBadges = document.querySelectorAll('#progressiveBadge, #progressiveBadgePractice');
-                const allFeaturesBadges = document.querySelectorAll('#allFeaturesBadge, #allFeaturesBadgePractice');
-                const progressiveOptions = document.querySelectorAll('.mode-option:first-child');
-                const allFeaturesOptions = document.querySelectorAll('.mode-option:last-child');
-
-                if (this.appMode === 'progressive') {
-                    progressiveBadges.forEach(badge => badge.style.display = 'block');
-                    allFeaturesBadges.forEach(badge => badge.style.display = 'none');
-                    progressiveOptions.forEach(option => option.classList.add('active'));
-                    allFeaturesOptions.forEach(option => option.classList.remove('active'));
-                } else {
-                    progressiveBadges.forEach(badge => badge.style.display = 'none');
-                    allFeaturesBadges.forEach(badge => badge.style.display = 'block');
-                    progressiveOptions.forEach(option => option.classList.remove('active'));
-                    allFeaturesOptions.forEach(option => option.classList.add('active'));
-                }
+            isFeatureUnlocked(feature) {
+                if (this.appMode === 'allFeatures') return true;
+                return this.featuresUnlocked.includes(feature);
             },
 
-            async switchMode(mode, event) {
-                if (event) {
-                    event.stopPropagation();
-                }
+            async checkAndUpdateStage() {
+                if (this.appMode !== 'progressive') return;
 
-                // Don't switch if already in that mode
-                if (this.appMode === mode) {
-                    // Close the dropdown
-                    const dropdowns = document.querySelectorAll('.breadcrumb-dropdown');
-                    dropdowns.forEach(dropdown => dropdown.classList.remove('active'));
-                    return;
-                }
-
-                // Save the new mode
-                this.appMode = mode;
-                await this.saveModeSettings();
-
-                // Update UI
-                this.updateModeMenuUI();
-
-                // Close the dropdown
-                const dropdowns = document.querySelectorAll('.breadcrumb-dropdown');
-                dropdowns.forEach(dropdown => dropdown.classList.remove('active'));
-
-                // Apply UI restrictions based on mode
-                this.applyModeRestrictions();
-
-                // Show a toast notification
-                this.showToast(
-                    mode === 'progressive'
-                        ? '🌱 Switched to Progressive Mode - Features will unlock as you learn!'
-                        : '🚀 Switched to All Features Mode - Everything is now available!',
-                    'success'
-                );
-
-                // If switching to progressive mode, reset to appropriate view
-                if (mode === 'progressive') {
-                    // If currently in practice, stay there
-                    if (this.currentView === 'practiceView') {
-                        // Just apply restrictions
-                        this.applyModeRestrictions();
-                    } else {
-                        // Go to first lesson
-                        this.startLesson('lesson_001');
-                    }
-                } else {
-                    // If switching to all features, just refresh current view
-                    if (this.currentView === 'dashboardView') {
-                        this.updateDashboard();
-                    }
-                }
-            },
-
-            applyModeRestrictions() {
-                // This function will hide/show features based on the current mode and stage
-                // Will be implemented in the next step
-                if (this.appMode === 'allFeatures') {
-                    // Show all features
-                    this.showAllFeatures();
-                } else {
-                    // Hide features based on progressive stage
-                    this.applyProgressiveRestrictions();
-                }
-            },
-
-            showAllFeatures() {
-                // Show all features for All Features mode
-                // Input mode toggle
-                const inputModeToggles = document.querySelectorAll('.input-mode-toggle');
-                inputModeToggles.forEach(el => el.style.display = 'flex');
-
-                // Hints button
-                const hintButtons = document.querySelectorAll('[onclick*="showHint"]');
-                hintButtons.forEach(el => el.style.display = 'inline-block');
-
-                // Mini dashboard
-                const miniDashboards = document.querySelectorAll('#practiceView .card');
-                if (miniDashboards.length > 0) {
-                    miniDashboards[0].style.display = 'block';
-                }
-
-                // Previous button
-                const prevButtons = document.querySelectorAll('[onclick*="previousSentence"]');
-                prevButtons.forEach(el => el.style.display = 'inline-block');
-
-                // Skip button
-                const skipButtons = document.querySelectorAll('[onclick*="skipSentence"]');
-                skipButtons.forEach(el => el.style.display = 'inline-block');
-
-                // Dashboard lessons (show all)
-                const lessonCards = document.querySelectorAll('.lesson-card');
-                lessonCards.forEach(el => el.style.display = 'block');
-
-                // Statistics section
-                const statsGrid = document.querySelector('#dashboardView .stats-grid');
-                if (statsGrid) statsGrid.style.display = 'grid';
-
-                // Settings button
-                const settingsButtons = document.querySelectorAll('[onclick*="showView(\'settingsView\')"]');
-                settingsButtons.forEach(el => el.style.display = 'inline-block');
-
-                // Lesson manager button
-                const lessonManagerButtons = document.querySelectorAll('[onclick*="showView(\'lessonManagerView\')"]');
-                lessonManagerButtons.forEach(el => el.style.display = 'inline-block');
-            },
-
-            applyProgressiveRestrictions() {
-                if (this.currentView === 'welcomeView') {
-                    return; // Don't apply restrictions on welcome screen
-                }
-
-                // Always hide certain elements first, then selectively show based on stage
-                const stage = this.progressiveStage;
-
-                // Stage 0: Minimal UI - hide everything except basics
-                if (stage === 0) {
-                    // Hide input mode toggle (force one mode)
-                    const inputModeToggles = document.querySelectorAll('.input-mode-toggle');
-                    inputModeToggles.forEach(el => el.style.display = 'none');
-
-                    // Hide hints button
-                    const hintButtons = document.querySelectorAll('[onclick*="showHint"]');
-                    hintButtons.forEach(el => el.style.display = 'none');
-
-                    // Hide mini dashboard
-                    const miniDashboards = document.querySelectorAll('#practiceView .card');
-                    if (miniDashboards.length > 0) {
-                        miniDashboards[0].style.display = 'none';
-                    }
-
-                    // Hide previous button
-                    const prevButtons = document.querySelectorAll('[onclick*="previousSentence"]');
-                    prevButtons.forEach(el => el.style.display = 'none');
-
-                    // Hide skip button
-                    const skipButtons = document.querySelectorAll('[onclick*="skipSentence"]');
-                    skipButtons.forEach(el => el.style.display = 'none');
-
-                    // Hide all lessons except first
-                    const lessonCards = document.querySelectorAll('.lesson-card');
-                    lessonCards.forEach((el, idx) => {
-                        if (idx > 0) el.style.display = 'none';
-                    });
-
-                    // Hide statistics
-                    const statsGrid = document.querySelector('#dashboardView .stats-grid');
-                    if (statsGrid) statsGrid.style.display = 'none';
-
-                    // Hide settings and lesson manager
-                    const settingsButtons = document.querySelectorAll('[onclick*="showView(\'settingsView\')"]');
-                    settingsButtons.forEach(el => el.style.display = 'none');
-                    const lessonManagerButtons = document.querySelectorAll('[onclick*="showView(\'lessonManagerView\')"]');
-                    lessonManagerButtons.forEach(el => el.style.display = 'none');
-                }
-
-                // Stage 1: Show input toggle, hints, mini dashboard, previous button
-                if (stage >= 1) {
-                    const inputModeToggles = document.querySelectorAll('.input-mode-toggle');
-                    inputModeToggles.forEach(el => el.style.display = 'flex');
-
-                    const hintButtons = document.querySelectorAll('[onclick*="showHint"]');
-                    hintButtons.forEach(el => el.style.display = 'inline-block');
-
-                    const miniDashboards = document.querySelectorAll('#practiceView .card');
-                    if (miniDashboards.length > 0) {
-                        miniDashboards[0].style.display = 'block';
-                    }
-
-                    const prevButtons = document.querySelectorAll('[onclick*="previousSentence"]');
-                    prevButtons.forEach(el => el.style.display = 'inline-block');
-
-                    // Still hide: skip, other lessons, stats, settings
-                    const skipButtons = document.querySelectorAll('[onclick*="skipSentence"]');
-                    skipButtons.forEach(el => el.style.display = 'none');
-
-                    const lessonCards = document.querySelectorAll('.lesson-card');
-                    lessonCards.forEach((el, idx) => {
-                        if (idx > 0) el.style.display = 'none';
-                    });
-
-                    const statsGrid = document.querySelector('#dashboardView .stats-grid');
-                    if (statsGrid) statsGrid.style.display = 'none';
-
-                    const settingsButtons = document.querySelectorAll('[onclick*="showView(\'settingsView\')"]');
-                    settingsButtons.forEach(el => el.style.display = 'none');
-                    const lessonManagerButtons = document.querySelectorAll('[onclick*="showView(\'lessonManagerView\')"]');
-                    lessonManagerButtons.forEach(el => el.style.display = 'none');
-                }
-
-                // Stage 2: Show skip, all lessons, dashboard access
-                if (stage >= 2) {
-                    const skipButtons = document.querySelectorAll('[onclick*="skipSentence"]');
-                    skipButtons.forEach(el => el.style.display = 'inline-block');
-
-                    const lessonCards = document.querySelectorAll('.lesson-card');
-                    lessonCards.forEach(el => el.style.display = 'block');
-
-                    // Still hide: stats, settings
-                    const statsGrid = document.querySelector('#dashboardView .stats-grid');
-                    if (statsGrid) statsGrid.style.display = 'none';
-
-                    const settingsButtons = document.querySelectorAll('[onclick*="showView(\'settingsView\')"]');
-                    settingsButtons.forEach(el => el.style.display = 'none');
-                    const lessonManagerButtons = document.querySelectorAll('[onclick*="showView(\'lessonManagerView\')"]');
-                    lessonManagerButtons.forEach(el => el.style.display = 'none');
-                }
-
-                // Stage 3: Show statistics
-                if (stage >= 3) {
-                    const statsGrid = document.querySelector('#dashboardView .stats-grid');
-                    if (statsGrid) statsGrid.style.display = 'grid';
-
-                    // Still hide: settings
-                    const settingsButtons = document.querySelectorAll('[onclick*="showView(\'settingsView\')"]');
-                    settingsButtons.forEach(el => el.style.display = 'none');
-                    const lessonManagerButtons = document.querySelectorAll('[onclick*="showView(\'lessonManagerView\')"]');
-                    lessonManagerButtons.forEach(el => el.style.display = 'none');
-                }
-
-                // Stage 4: Show everything (settings, lesson manager)
-                if (stage >= 4) {
-                    const settingsButtons = document.querySelectorAll('[onclick*="showView(\'settingsView\')"]');
-                    settingsButtons.forEach(el => el.style.display = 'inline-block');
-
-                    const lessonManagerButtons = document.querySelectorAll('[onclick*="showView(\'lessonManagerView\')"]');
-                    lessonManagerButtons.forEach(el => el.style.display = 'inline-block');
-                }
-            },
-
-            async checkAndAdvanceStage() {
-                if (this.appMode !== 'progressive') {
-                    return; // Only advance in progressive mode
-                }
-
-                const stats = this.calculateStats();
-                const totalSuccesses = stats.totalAttempts > 0 ? Math.round((stats.successRate / 100) * stats.totalAttempts) : 0;
-                const lessonsCompleted = stats.lessonsCompleted;
-                const sentencesMastered = stats.sentencesMastered;
+                const masteredCount = this.getTotalMasteredSentences();
+                const successCount = this.stats.totalSuccess;
+                const completedLessons = this.getCompletedLessonsCount();
 
                 let newStage = this.progressiveStage;
                 let unlockedFeatures = [];
 
-                // Stage 0 → Stage 1: After 3 successful attempts
-                if (this.progressiveStage === 0 && totalSuccesses >= 3) {
+                // Stage 1: After 3 successful attempts
+                if (successCount >= 3 && this.progressiveStage < 1) {
                     newStage = 1;
                     unlockedFeatures = [
-                        '⌨️ Type & Speak - Switch between input modes',
-                        '💡 Hints - Get help when you need it',
-                        '📊 Mini Dashboard - Track your progress in real-time',
-                        '⬅️ Previous Button - Go back to practice again'
+                        '✓ Type and Speak modes',
+                        '✓ Hint button for help',
+                        '✓ Mini progress dashboard',
+                        '✓ Previous button to retry'
                     ];
+                    this.featuresUnlocked.push('dualInput', 'hints', 'miniDashboard', 'navigation');
                 }
 
-                // Stage 1 → Stage 2: After completing 1st lesson
-                if (this.progressiveStage === 1 && lessonsCompleted >= 1) {
+                // Stage 2: After first lesson complete
+                if (completedLessons >= 1 && this.progressiveStage < 2) {
                     newStage = 2;
                     unlockedFeatures = [
-                        '🏠 Full Dashboard - See your complete progress',
-                        '📚 All Lessons - Access all 6 lesson categories',
-                        '⏭️ Skip Button - Move to the next sentence'
+                        '✓ Full dashboard view',
+                        '✓ All 6 lesson categories',
+                        '✓ Lesson picker',
+                        '✓ Skip button'
                     ];
+                    this.featuresUnlocked.push('dashboard', 'allLessons', 'skip');
                 }
 
-                // Stage 2 → Stage 3: After 25 sentences mastered
-                if (this.progressiveStage === 2 && sentencesMastered >= 25) {
+                // Stage 3: After 25 sentences OR 3 lessons
+                if ((masteredCount >= 25 || completedLessons >= 3) && this.progressiveStage < 3) {
                     newStage = 3;
                     unlockedFeatures = [
-                        '📈 Statistics - View detailed performance metrics',
-                        '🏆 Success Rate - Track your accuracy',
-                        '🔥 Streak Counter - Monitor your learning consistency'
+                        '✓ Statistics page',
+                        '✓ Progress charts',
+                        '✓ Milestones tracking'
                     ];
+                    this.featuresUnlocked.push('statistics');
                 }
 
-                // Stage 3 → Stage 4: After 50 sentences mastered
-                if (this.progressiveStage === 3 && sentencesMastered >= 50) {
+                // Stage 4: After 50 sentences OR 1 week
+                if (masteredCount >= 50 && this.progressiveStage < 4) {
                     newStage = 4;
                     unlockedFeatures = [
-                        '⚙️ Settings - Customize voice speed, language variant, and more',
-                        '📝 Lesson Manager - Import/export custom lessons',
-                        '🎨 Full Customization - Make the app truly yours'
+                        '✓ Settings panel',
+                        '✓ Lesson manager',
+                        '✓ Import/Export features',
+                        '✓ Full customization'
                     ];
+                    this.featuresUnlocked.push('settings', 'lessonManager');
                 }
 
-                // If stage advanced, save and show celebration
                 if (newStage > this.progressiveStage) {
                     this.progressiveStage = newStage;
-                    this.featuresUnlocked.push(...unlockedFeatures);
                     await this.saveModeSettings();
 
-                    // Apply new restrictions
-                    this.applyModeRestrictions();
-
-                    // Show unlock celebration
-                    this.showUnlockCelebration(newStage, unlockedFeatures);
+                    // Show unlock celebration if not seen
+                    if (!this.stageUnlocksSeen[newStage]) {
+                        this.showUnlockCelebration(newStage, unlockedFeatures);
+                        this.stageUnlocksSeen[newStage] = true;
+                        await this.saveModeSettings();
+                    }
                 }
             },
 
             showUnlockCelebration(stage, features) {
-                const stageNames = [
-                    'Getting Started',
-                    'Building Confidence',
-                    'Expanding Horizons',
-                    'Tracking Success',
-                    'Full Mastery'
-                ];
+                const titles = {
+                    1: "You're Getting the Hang of It! 🎉",
+                    2: "First Lesson Complete! 🏆",
+                    3: "You're Making Real Progress! 📊",
+                    4: "Advanced Learner Unlocked! 🌟"
+                };
 
-                const stageEmojis = ['🌱', '🌿', '🌳', '🌟', '🚀'];
+                const messages = {
+                    1: "Great job! You've completed 3 sentences successfully. Here are some new tools to help you learn:",
+                    2: "Amazing! You finished your first lesson. Ready to explore more?",
+                    3: "Wow! You're really committed to learning. Check out your progress:",
+                    4: "Incredible! You've mastered so much. Take full control of your learning:"
+                };
 
-                // Create modal HTML
-                const modalHTML = `
-                    <div class="unlock-modal-overlay" id="unlockModal">
-                        <div class="unlock-modal">
-                            <div class="unlock-confetti">🎉</div>
-                            <div class="unlock-icon">${stageEmojis[stage]}</div>
-                            <h2>Level Up!</h2>
-                            <h3>Stage ${stage}: ${stageNames[stage]}</h3>
-                            <p style="margin: 20px 0; color: var(--text-medium);">
-                                You've unlocked new features:
-                            </p>
-                            <ul class="unlock-features-list">
-                                ${features.map(f => `<li>${f}</li>`).join('')}
-                            </ul>
-                            <button class="btn btn-primary btn-large" onclick="app.closeUnlockModal()" style="margin-top: 30px;">
-                                Continue Learning 🎯
-                            </button>
-                        </div>
-                    </div>
-                `;
+                document.getElementById('unlockTitle').textContent = titles[stage];
+                document.getElementById('unlockMessage').textContent = messages[stage];
 
-                // Add to body
-                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                const featuresList = features.map(f => `<li>${f}</li>`).join('');
+                document.getElementById('unlockFeaturesList').innerHTML = `<ul>${featuresList}</ul>`;
 
-                // Trigger animation
-                setTimeout(() => {
-                    document.getElementById('unlockModal').classList.add('active');
-                }, 10);
+                document.getElementById('unlockModal').classList.add('active');
             },
 
             closeUnlockModal() {
-                const modal = document.getElementById('unlockModal');
-                if (modal) {
-                    modal.classList.remove('active');
-                    setTimeout(() => {
-                        modal.remove();
-                    }, 300);
-                }
+                document.getElementById('unlockModal').classList.remove('active');
             },
 
             // Custom Lessons Management
@@ -2273,6 +1895,9 @@
                 if (this.currentView === 'practiceView' && this.currentLesson) {
                     this.updateMiniDashboard();
                 }
+
+                // Check for stage advancement in progressive mode
+                await this.checkAndUpdateStage();
             },
 
             // Statistics Management
@@ -2632,10 +2257,76 @@
                 // Update mini dashboard
                 this.updateMiniDashboard();
 
-                // Apply mode restrictions to practice view
-                setTimeout(() => {
-                    this.applyModeRestrictions();
-                }, 50);
+                // Apply progressive mode restrictions
+                this.applyProgressiveMode();
+            },
+
+            applyProgressiveMode() {
+                if (this.appMode === 'allFeatures') {
+                    // Show everything
+                    this.showAllPracticeFeatures();
+                    return;
+                }
+
+                // Progressive mode - hide/show based on stage
+                const miniDashCard = document.querySelector('#practiceView .card[style*="padding: 16px"]');
+                const prevButton = document.getElementById('prevButton');
+                const skipButton = prevButton ? prevButton.parentElement.querySelector('[onclick*="skipSentence"]') : null;
+                const hintButton = prevButton ? prevButton.parentElement.querySelector('[onclick*="toggleHint"]') : null;
+                const textModeBtn = document.getElementById('textModeBtn');
+                const voiceModeBtn = document.getElementById('voiceModeBtn');
+
+                // Stage 0: Minimal UI - only one input mode
+                if (this.progressiveStage < 1) {
+                    if (miniDashCard) miniDashCard.classList.add('hidden');
+                    if (prevButton) prevButton.classList.add('hidden');
+                    if (skipButton) skipButton.classList.add('hidden');
+                    if (hintButton) hintButton.classList.add('hidden');
+
+                    // Show only voice mode by default (or text if voice not available)
+                    const hasVoice = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+                    if (hasVoice) {
+                        this.setInputMode('voice');
+                        if (textModeBtn) textModeBtn.classList.add('hidden');
+                    } else {
+                        this.setInputMode('text');
+                        if (voiceModeBtn) voiceModeBtn.classList.add('hidden');
+                    }
+                }
+
+                // Stage 1: Reveal tools
+                if (this.progressiveStage >= 1) {
+                    if (miniDashCard) miniDashCard.classList.remove('hidden');
+                    if (prevButton) prevButton.classList.remove('hidden');
+                    if (hintButton) hintButton.classList.remove('hidden');
+                    if (textModeBtn) textModeBtn.classList.remove('hidden');
+                    if (voiceModeBtn) voiceModeBtn.classList.remove('hidden');
+                }
+
+                // Stage 2: Reveal skip button
+                if (this.progressiveStage >= 2) {
+                    if (skipButton) skipButton.classList.remove('hidden');
+                }
+            },
+
+            showAllPracticeFeatures() {
+                // Show all elements
+                const elements = [
+                    document.querySelector('#practiceView .card[style*="padding: 16px"]'),
+                    document.getElementById('prevButton'),
+                    document.getElementById('textModeBtn'),
+                    document.getElementById('voiceModeBtn')
+                ];
+
+                const buttons = document.querySelectorAll('#practiceView .nav-buttons button');
+
+                elements.forEach(el => {
+                    if (el) el.classList.remove('hidden');
+                });
+
+                buttons.forEach(btn => {
+                    btn.classList.remove('hidden');
+                });
             },
 
             updateMiniDashboard() {
@@ -2767,8 +2458,13 @@
             },
 
             startApp() {
-                this.showView('dashboardView');
-                this.updateDashboard();
+                // In progressive mode stage 0, skip dashboard and go directly to first lesson
+                if (this.appMode === 'progressive' && this.progressiveStage === 0) {
+                    this.startLesson('lesson_001'); // Start with first greetings lesson
+                } else {
+                    this.showView('dashboardView');
+                    this.updateDashboard();
+                }
             },
 
             // Dashboard Updates
@@ -2803,11 +2499,58 @@
                 document.getElementById('statStreak').textContent = this.stats.streak;
 
                 this.updateLessonList();
+                this.applyDashboardMode();
+            },
+
+            applyDashboardMode() {
+                const statsButton = document.getElementById('statsButton');
+                const lessonManagerButton = document.getElementById('lessonManagerButton');
+                const settingsButton = document.getElementById('settingsButton');
+
+                if (this.appMode === 'allFeatures') {
+                    // Show all buttons
+                    if (statsButton) statsButton.classList.remove('hidden');
+                    if (lessonManagerButton) lessonManagerButton.classList.remove('hidden');
+                    if (settingsButton) settingsButton.classList.remove('hidden');
+                } else {
+                    // Progressive mode - hide based on stage
+                    // Statistics unlocked at stage 3
+                    if (statsButton) {
+                        if (this.progressiveStage >= 3) {
+                            statsButton.classList.remove('hidden');
+                        } else {
+                            statsButton.classList.add('hidden');
+                        }
+                    }
+
+                    // Lesson Manager & Settings unlocked at stage 4
+                    if (lessonManagerButton) {
+                        if (this.progressiveStage >= 4) {
+                            lessonManagerButton.classList.remove('hidden');
+                        } else {
+                            lessonManagerButton.classList.add('hidden');
+                        }
+                    }
+
+                    if (settingsButton) {
+                        if (this.progressiveStage >= 4) {
+                            settingsButton.classList.remove('hidden');
+                        } else {
+                            settingsButton.classList.add('hidden');
+                        }
+                    }
+                }
             },
 
             updateLessonList() {
                 const lessonList = document.getElementById('lessonList');
-                const lessons = this.getAllLessons();
+                let lessons = this.getAllLessons();
+
+                // In progressive mode, limit visible lessons based on stage
+                if (this.appMode === 'progressive' && this.progressiveStage < 2) {
+                    // Stage 0-1: Show only first lesson
+                    lessons = [lessons[0]];
+                }
 
                 lessonList.innerHTML = '';
 

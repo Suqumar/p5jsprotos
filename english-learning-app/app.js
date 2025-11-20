@@ -759,22 +759,46 @@ document.getElementById('skipSentence').addEventListener('click', skipSentence);
 
 document.getElementById('prevSentence').addEventListener('click', prevSentence);
 
+// Global timer used to debounce auto-submit
+let autoSubmitTimer = null;
+
 document.getElementById('micBtn').addEventListener('click', () => {
   const recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!recognition) {
     toast('Speech recognition is unavailable in this browser.');
     return;
   }
+
   const recognizer = new recognition();
   recognizer.lang = 'en-US';
   recognizer.start();
+
   recognizer.onresult = (event) => {
-    document.getElementById('textInput').value = event.results[0][0].transcript;
-    toggleInput(false);
-    toast('Voice captured! Review and submit.');
+    const transcript = (event.results[0][0].transcript || '').trim();
+
+    // Put recognized speech into text input so submitSentence() evaluates it
+    const textInput = document.getElementById('textInput');
+    textInput.value = transcript;
+
+    // 🔸 Small guard for accidental noise captures or partial speech
+    if (transcript.length < 3) {
+      toast("Didn't catch that, please try again.");
+      return;
+    }
+
+    // If another partial result comes in, cancel it
+    clearTimeout(autoSubmitTimer);
+
+    // 🔸 Delay ensures we submit the FINAL recognition result
+    autoSubmitTimer = setTimeout(() => {
+      // Auto-submit the captured response
+      submitSentence();
+    }, 300);
   };
+
   recognizer.onerror = () => toast('Voice capture failed. Please try again.');
 });
+
 
 document.getElementById('nextLessonBtn').addEventListener('click', loadNextLesson);
 

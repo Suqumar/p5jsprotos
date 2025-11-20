@@ -779,27 +779,26 @@ document.getElementById('micBtn').addEventListener('click', () => {
   recognizer.start();
 
   recognizer.onresult = (event) => {
-    const transcript = (event.results[0][0].transcript || '').trim();
+  const transcript = (event.results[0][0].transcript || '').trim();
 
-    // Put recognized speech into text input so submitSentence() evaluates it
-    const textInput = document.getElementById('textInput');
-    textInput.value = transcript;
+  const textInput = document.getElementById('textInput');
+  textInput.value = transcript;
 
-    // 🔸 Small guard for accidental noise captures or partial speech
-    if (transcript.length < 3) {
-      toast("Didn't catch that, please try again.");
-      return;
-    }
+  // ⭐ Show what was recognized ⭐
+  document.getElementById('voiceTranscript').textContent = transcript;
 
-    // If another partial result comes in, cancel it
-    clearTimeout(autoSubmitTimer);
+  if (transcript.length < 3) {
+    toast("Didn't catch that, please try again.");
+    return;
+  }
 
-    // 🔸 Delay ensures we submit the FINAL recognition result
-    autoSubmitTimer = setTimeout(() => {
-      // Auto-submit the captured response
-      submitSentence();
-    }, 300);
-  };
+  clearTimeout(autoSubmitTimer);
+
+  autoSubmitTimer = setTimeout(() => {
+    submitSentence();
+  }, 300);
+};
+
 
   recognizer.onerror = () => toast('Voice capture failed. Please try again.');
 });

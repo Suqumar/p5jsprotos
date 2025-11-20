@@ -648,16 +648,14 @@ function submitSentence() {
   state.stats.minutes = (state.stats.minutes || 0) + 1;
   state.stats.streak = Math.max(state.stats.streak || 0, 1);
 
-  const cleanedExpected = normalizeTextForSimilarity(sentence.text);
-const cleanedActual   = normalizeTextForSimilarity(userInput);
+ const cleanedExpected = normalizeTextForSimilarity(sentence.text);
+const cleanedActual = normalizeTextForSimilarity(userInput);
 
 const similarity = wordSimilarity(cleanedExpected, cleanedActual);
 
-
-// Voice mode threshold can be lower
 const threshold = isVoiceMode ? 0.65 : 0.80;
-
 const correct = similarity >= threshold;
+
 
   if (correct) {
     state.stats.successes += 1;
@@ -997,99 +995,72 @@ window.addEventListener('load', () => {
   init();
 });
 
-function normalizeNumbers(str) {
-  const numberWords = {
-    0:  "zero",
-    1:  "one",
-    2:  "two",
-    3:  "three",
-    4:  "four",
-    5:  "five",
-    6:  "six",
-    7:  "seven",
-    8:  "eight",
-    9:  "nine",
-    10: "ten",
-    11: "eleven",
-    12: "twelve",
-    13: "thirteen",
-    14: "fourteen",
-    15: "fifteen",
-    16: "sixteen",
-    17: "seventeen",
-    18: "eighteen",
-    19: "nineteen",
-    20: "twenty",
-    30: "thirty",
-    40: "forty",
-    50: "fifty",
-    60: "sixty",
-    70: "seventy",
-    80: "eighty",
-    90: "ninety",
-    100: "hundred"
-  };
-
-  // Convert standalone numbers up to 100
-  return str.replace(/\b\d+\b/g, num => {
-    num = parseInt(num, 10);
-
-    if (num <= 20) return numberWords[num];
-
-    if (num < 100) {
-      const tens = Math.floor(num / 10) * 10;
-      const ones = num % 10;
-      if (ones === 0) return numberWords[tens];
-      return numberWords[tens] + " " + numberWords[ones];
-    }
-
-    // For > 100 leave unchanged
-    return num.toString();
-  });
-}
-
-
-function normalizeContractions(str) {
-  return str
-    .toLowerCase()
-    .replace(/n't/g, " not")
-    .replace(/i'm/g, "i am")
-    .replace(/it's/g, "it is")
-    .replace(/that's/g, "that is")
-    .replace(/what's/g, "what is")
-    .replace(/who's/g, "who is")
-    .replace(/let's/g, "let us")
-    .replace(/you're/g, "you are")
-    .replace(/we're/g, "we are")
-    .replace(/they're/g, "they are")
-    .replace(/i've/g, "i have")
-    .replace(/you've/g, "you have")
-    .replace(/we've/g, "we have")
-    .replace(/they've/g, "they have")
-    .replace(/i'll/g, "i will")
-    .replace(/you'll/g, "you will")
-    .replace(/it'll/g, "it will")
-    .replace(/he'll/g, "he will")
-    .replace(/she'll/g, "she will")
-    .replace(/they'll/g, "they will");
-}
-
 function normalizeTextForSimilarity(str) {
   if (!str) return "";
 
-  // Step 1: convert numbers to words
-  str = normalizeNumbers(str);
+  str = str.toLowerCase().trim();
 
-  // Step 2: lowercase
-  str = str.toLowerCase();
+  // Expand contractions
+  const contractions = {
+    "it's": "it is",
+    "i'm": "i am",
+    "don't": "do not",
+    "can't": "cannot",
+    "won't": "will not",
+    "that's": "that is",
+    "what's": "what is",
+    "let's": "let us",
+    "you're": "you are",
+    "they're": "they are",
+    "we're": "we are",
+    "i've": "i have",
+    "you're": "you are",
+    "isn't": "is not",
+    "aren't": "are not"
+  };
 
-  // Step 3: remove punctuation except spaces
+  for (const c in contractions) {
+    str = str.replace(new RegExp(c, "g"), contractions[c]);
+  }
+
+  // Convert digits → words
+  const numberWords = {
+    "0": "zero",
+    "1": "one",
+    "2": "two",
+    "3": "three",
+    "4": "four",
+    "5": "five",
+    "6": "six",
+    "7": "seven",
+    "8": "eight",
+    "9": "nine",
+    "10": "ten",
+    "11": "eleven",
+    "12": "twelve",
+    "13": "thirteen",
+    "14": "fourteen",
+    "15": "fifteen",
+    "16": "sixteen",
+    "17": "seventeen",
+    "18": "eighteen",
+    "19": "nineteen",
+    "20": "twenty",
+    "30": "thirty",
+    "40": "forty",
+    "50": "fifty",
+    "60": "sixty",
+    "70": "seventy",
+    "80": "eighty",
+    "90": "ninety"
+  };
+
+  // Convert any standalone number token into words
+  str = str.replace(/\b\d+\b/g, (num) => numberWords[num] ?? num);
+
+  // Final cleanup
   str = str.replace(/[^a-z\s]/g, "");
-
-  // Step 4: collapse double spaces
-  str = str.replace(/\s+/g, " ").trim();
-
-  return str;
+  return str.trim();
 }
 
 

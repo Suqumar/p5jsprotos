@@ -771,6 +771,11 @@ document.getElementById('micBtn').addEventListener('click', () => {
 
   const recognizer = new recognition();
   recognizer.lang = 'en-US';
+
+   // ⭐ REQUIRED FOR FINAL RESULT TO FIRE ⭐
+  recognizer.continuous = false;
+  recognizer.interimResults = false;
+  
   recognizer.start();
 
   recognizer.onresult = (event) => {

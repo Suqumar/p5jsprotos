@@ -586,10 +586,11 @@ function submitSentence() {
   state.stats.minutes = (state.stats.minutes || 0) + 1;
   state.stats.streak = Math.max(state.stats.streak || 0, 1);
 
-  const normalizedAnswer = sentence.text.replace(/[^a-z]/gi, '').toLowerCase();
-  const normalizedInput = userInput.replace(/[^a-z]/gi, '').toLowerCase();
+  const cleanedExpected = normalizeTextForSimilarity(sentence.text);
+const cleanedActual   = normalizeTextForSimilarity(userInput);
 
- const similarity = wordSimilarity(sentence.text, userInput);
+const similarity = wordSimilarity(cleanedExpected, cleanedActual);
+
 
 // Voice mode threshold can be lower
 const threshold = isVoiceMode ? 0.65 : 0.80;
@@ -933,6 +934,39 @@ window.addEventListener('load', () => {
   }
   init();
 });
+
+function normalizeContractions(str) {
+  return str
+    .toLowerCase()
+    .replace(/n't/g, " not")
+    .replace(/i'm/g, "i am")
+    .replace(/it's/g, "it is")
+    .replace(/that's/g, "that is")
+    .replace(/what's/g, "what is")
+    .replace(/who's/g, "who is")
+    .replace(/let's/g, "let us")
+    .replace(/you're/g, "you are")
+    .replace(/we're/g, "we are")
+    .replace(/they're/g, "they are")
+    .replace(/i've/g, "i have")
+    .replace(/you've/g, "you have")
+    .replace(/we've/g, "we have")
+    .replace(/they've/g, "they have")
+    .replace(/i'll/g, "i will")
+    .replace(/you'll/g, "you will")
+    .replace(/it'll/g, "it will")
+    .replace(/he'll/g, "he will")
+    .replace(/she'll/g, "she will")
+    .replace(/they'll/g, "they will");
+}
+
+function normalizeTextForSimilarity(str) {
+  return normalizeContractions(str)   // convert it's → it is
+    .replace(/[^a-z\s]/gi, '')        // remove non-letters except space
+    .replace(/\s+/g, ' ')             // collapse multiple spaces
+    .trim()
+    .toLowerCase();
+}
 
 function levenshtein(a, b) {
   const matrix = [];

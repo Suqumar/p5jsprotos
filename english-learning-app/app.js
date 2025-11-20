@@ -1,74 +1,136 @@
 const defaultThemes = [
   {
     id: 'greetings',
-    title: 'Greetings & Small Talk',
-    description: 'Confidently introduce yourself and start any conversation.',
+    title: 'Greetings',
+    description: 'Basic greetings and polite expressions.',
     builtIn: true,
     lessons: [
       {
-        id: 'greet-1',
-        title: 'Hello and Introductions',
+        id: 'greetings-1',
+        title: 'Basic Greetings',
         sentences: [
-          { text: 'Hello! It is great to meet you.', hint: 'Friendly, upbeat greeting.' },
-          { text: 'My name is Maya, what is yours?', hint: 'Introduce yourself and ask their name.' },
-          { text: 'Where are you visiting from today?', hint: 'Great follow-up for travelers.' }
-        ]
-      },
-      {
-        id: 'greet-2',
-        title: 'Checking In',
-        sentences: [
-          { text: 'How has your day been so far?', hint: 'Ask about their day.' },
-          { text: 'Would you like to grab a coffee sometime?', hint: 'Friendly invitation.' },
-          { text: 'Let us stay in touch after this event.', hint: 'Closing statement.' }
+          { text: 'Hello', hint: 'Say it clearly with a smile' },
+          { text: 'Good morning', hint: 'Emphasize "good"' },
+          { text: 'Good afternoon', hint: 'Speak clearly and warmly' },
+          { text: 'Good evening', hint: 'Soft and welcoming tone' },
+          { text: 'How are you?', hint: 'Rising intonation at the end' },
+          { text: 'I am fine', hint: 'Stress on "fine"' },
+          { text: 'Nice to meet you', hint: 'Friendly and clear' },
+          { text: 'Have a good day', hint: 'Warm and encouraging' }
         ]
       }
     ]
   },
+
   {
-    id: 'travel',
-    title: 'Travel Helpers',
-    description: 'Handle airports, hotels, and help requests on the go.',
+    id: 'introductions',
+    title: 'Introductions',
+    description: 'Learn how to introduce yourself and others.',
     builtIn: true,
     lessons: [
       {
-        id: 'travel-1',
-        title: 'Airport Basics',
+        id: 'introductions-1',
+        title: 'Introducing Yourself',
         sentences: [
-          { text: 'Where can I check my luggage?', hint: 'Ask airline staff politely.' },
-          { text: 'What time does boarding begin for this flight?', hint: 'Confirm schedule.' },
-          { text: 'Could you help me find my gate, please?', hint: 'Request assistance.' }
-        ]
-      },
-      {
-        id: 'travel-2',
-        title: 'Hotel Conversations',
-        sentences: [
-          { text: 'I have a reservation for tonight.', hint: 'Check-in phrase.' },
-          { text: 'Could you recommend a nearby restaurant?', hint: 'Ask concierge for help.' },
-          { text: 'Is breakfast included with the stay?', hint: 'Confirm amenities.' }
+          { text: 'My name is John', hint: 'Emphasize your name' },
+          { text: 'I am from America', hint: 'Clear pronunciation of country' },
+          { text: 'I live in New York', hint: 'Stress on city name' },
+          { text: 'I am a student', hint: 'Clear "student"' },
+          { text: 'I am a teacher', hint: 'Emphasize "teacher"' },
+          { text: 'Nice to meet you', hint: 'Friendly tone' },
+          { text: 'What is your name?', hint: 'Rising intonation' }
         ]
       }
     ]
   },
+
   {
-    id: 'questions',
-    title: 'Everyday Questions',
-    description: 'Ask and answer polite questions in daily life.',
+    id: 'basic_questions',
+    title: 'Basic Questions',
+    description: 'Learn to ask and answer common questions.',
     builtIn: true,
     lessons: [
       {
-        id: 'quest-1',
-        title: 'Curiosity Sparks',
+        id: 'basic_questions-1',
+        title: 'Asking Questions',
         sentences: [
-          { text: 'What inspired you to learn English?', hint: 'Encourage a deeper response.' },
-          { text: 'How often do you practice speaking?', hint: 'Understand their routine.' },
-          { text: 'Which topics are the most fun for you?', hint: 'Learn their interests.' }
+          { text: 'What is your name?', hint: 'Rising tone at end' },
+          { text: 'Where are you from?', hint: 'Emphasize "where"' },
+          { text: 'How old are you?', hint: 'Polite and clear' },
+          { text: 'What do you do?', hint: 'Asking about occupation' },
+          { text: 'Do you speak English?', hint: 'Clear "English"' },
+          { text: 'Can you help me?', hint: 'Polite request' },
+          { text: 'Where is the bathroom?', hint: 'Clear and direct' }
+        ]
+      }
+    ]
+  },
+
+  {
+    id: 'daily_activities',
+    title: 'Daily Activities',
+    description: 'Learn how to talk about your daily routine.',
+    builtIn: true,
+    lessons: [
+      {
+        id: 'daily_activities-1',
+        title: 'Daily Routine',
+        sentences: [
+          { text: 'I wake up early', hint: 'Stress on "wake up"' },
+          { text: 'I eat breakfast', hint: 'Clear "breakfast"' },
+          { text: 'I go to work', hint: 'Simple and clear' },
+          { text: 'I study English', hint: 'Emphasize "study"' },
+          { text: 'I have lunch', hint: 'Casual tone' },
+          { text: 'I go home', hint: 'Relaxed pronunciation' },
+          { text: 'I watch TV', hint: 'Clear "TV"' },
+          { text: 'I go to sleep', hint: 'Soft tone' }
+        ]
+      }
+    ]
+  },
+
+  {
+    id: 'common_phrases',
+    title: 'Common Phrases',
+    description: 'Essential phrases useful in daily conversations.',
+    builtIn: true,
+    lessons: [
+      {
+        id: 'common_phrases-1',
+        title: 'Essential Phrases',
+        sentences: [
+          { text: 'Thank you', hint: 'Sincere and clear' },
+          { text: 'You are welcome', hint: 'Friendly response' },
+          { text: 'Excuse me', hint: 'Polite and clear' },
+          { text: 'I am sorry', hint: 'Apologetic tone' },
+          { text: 'I do not understand', hint: 'Clearly state confusion' },
+          { text: 'Please help me', hint: 'Polite request' }
+        ]
+      }
+    ]
+  },
+
+  {
+    id: 'numbers_time',
+    title: 'Numbers & Time',
+    description: 'Learn to talk about numbers and time.',
+    builtIn: true,
+    lessons: [
+      {
+        id: 'numbers_time-1',
+        title: 'Numbers and Time',
+        sentences: [
+          { text: 'One, two, three', hint: 'Count clearly' },
+          { text: 'What time is it?', hint: 'Rising intonation' },
+          { text: 'Today is Monday', hint: 'Clear day name' },
+          { text: 'It is morning', hint: 'Simple statement' }
         ]
       }
     ]
   }
 ];
+
+
 
 const DB_NAME = 'justSpeakDB';
 const DB_VERSION = 1;

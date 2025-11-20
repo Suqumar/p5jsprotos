@@ -1,0 +1,77 @@
+{
+  "generatedAt": "2024-01-01T00:00:00.000Z",
+  "themes": [
+    {
+      "id": "travel-ready",
+      "title": "Travel Ready",
+      "description": "Practical requests for flights, hotels, and arrival.",
+      "builtIn": false,
+      "lessons": [
+        {
+          "id": "custom_lesson_001",
+          "title": "Airport Check-in",
+          "level": 1,
+          "sentences": [
+            { "text": "I have a reservation", "hint": "State it calmly" },
+            { "text": "Can I see your passport?", "hint": "Practice both roles" },
+            { "text": "Where is gate twelve?", "hint": "Focus on the number" }
+          ]
+        },
+        {
+          "id": "custom_lesson_002",
+          "title": "Hotel Basics",
+          "level": 1,
+          "sentences": [
+            { "text": "I booked a room", "hint": "Clear past tense" },
+            { "text": "Do you have wifi?", "hint": "Soft question" },
+            { "text": "Can I get a late checkout?", "hint": "Polite request" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dining-out",
+      "title": "Dining Out",
+      "description": "Order food and handle restaurant conversations.",
+      "builtIn": false,
+      "lessons": [
+        {
+          "id": "custom_lesson_003",
+          "title": "Ordering Food",
+          "level": 1,
+          "sentences": [
+            { "text": "Can I see the menu?", "hint": "Friendly tone" },
+            { "text": "I would like some water", "hint": "Soften 'would'" },
+            { "text": "That is all, thank you", "hint": "End with gratitude" }
+          ]
+        },
+        {
+          "id": "custom_lesson_004",
+          "title": "Paying the Bill",
+          "level": 1,
+          "sentences": [
+            { "text": "Can I have the bill?", "hint": "Even pace" },
+            { "text": "Do you take cards?", "hint": "Clear consonants" },
+            { "text": "Keep the change", "hint": "Confident delivery" }
+          ]
+        }
+      ]
+    }
+  ],
+  "progress": {},
+  "stats": {
+    "attempts": 0,
+    "successes": 0,
+    "minutes": 0,
+    "streak": 0,
+    "history": []
+  },
+  "settings": {
+    "voiceRate": 1,
+    "voice": "",
+    "autoAdvance": false,
+    "autoHint": false,
+    "soundEffects": true,
+    "defaultInput": "text"
+  }
+}

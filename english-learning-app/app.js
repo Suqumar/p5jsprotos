@@ -135,8 +135,8 @@ const state = {
   settings: {
     voiceRate: 1,
     voice: '',
-    autoAdvance: false,
-    autoHint: false,
+    autoAdvance: true,
+    autoHint: true,
     soundEffects: true,
     defaultInput: 'voice'
   },
@@ -589,13 +589,12 @@ function submitSentence() {
   const normalizedAnswer = sentence.text.replace(/[^a-z]/gi, '').toLowerCase();
   const normalizedInput = userInput.replace(/[^a-z]/gi, '').toLowerCase();
 
-  const similarity = stringSimilarity(normalizedInput, normalizedAnswer);
+ const similarity = wordSimilarity(sentence.text, userInput);
 
-// Voice mode gets a lower threshold
-const threshold = isVoiceMode ? 0.75 : 0.85;
+// Voice mode threshold can be lower
+const threshold = isVoiceMode ? 0.65 : 0.80;
 
 const correct = similarity >= threshold;
-
 
   if (correct) {
     state.stats.successes += 1;
@@ -934,5 +933,23 @@ function stringSimilarity(a, b) {
   const distance = levenshtein(a, b);
   const maxLen = Math.max(a.length, b.length);
   return maxLen === 0 ? 1 : 1 - distance / maxLen;
+}
+
+function wordSimilarity(expected, actual) {
+  const clean = (s) =>
+    s.toLowerCase().replace(/[^a-z\s]/g, '').split(/\s+/).filter(Boolean);
+
+  const expWords = clean(expected);
+  const actWords = clean(actual);
+
+  let matches = 0;
+
+  expWords.forEach((w, i) => {
+    if (actWords[i] && levenshtein(w, actWords[i]) <= 2) {
+      matches++;
+    }
+  });
+
+  return matches / expWords.length;
 }
 

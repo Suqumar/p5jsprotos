@@ -583,4 +583,319 @@ function submitSentence() {
   }
 
   state.stats.attempts += 1;
-  state.stats.minutes = (state.stats.minutes ||
+  state.stats.minutes = (state.stats.minutes || 0) + 1;
+  state.stats.streak = Math.max(state.stats.streak || 0, 1);
+
+  const normalizedAnswer = sentence.text.replace(/[^a-z]/gi, '').toLowerCase();
+  const normalizedInput = userInput.replace(/[^a-z]/gi, '').toLowerCase();
+  const correct = normalizedInput === normalizedAnswer;
+
+  if (correct) {
+    state.stats.successes += 1;
+    markSentenceComplete();
+    toast('Great job!');
+    if (state.settings.autoAdvance) {
+      setTimeout(nextSentence, 600);
+    }
+  } else {
+    toast('Keep trying – compare with the sentence.');
+  }
+
+  persistStats();
+  renderPractice();
+  renderStatistics();
+  updateDashboard();
+}
+
+function markSentenceComplete() {
+  const lesson = state.currentLesson;
+  const index = state.currentSentenceIndex;
+  const progress = getLessonProgress(state.currentTheme.id, lesson.id);
+
+  if (!progress.sentences) progress.sentences = {};
+  progress.sentences[index] = true;
+
+  if (Object.keys(progress.sentences).length === lesson.sentences.length) {
+    progress.completed = true;
+    openCelebration();
+  }
+  setLessonProgress(state.currentTheme.id, lesson.id, progress);
+}
+
+function nextSentence() {
+  const lesson = state.currentLesson;
+  if (!lesson) return;
+
+  if (state.currentSentenceIndex < lesson.sentences.length - 1) {
+    state.currentSentenceIndex += 1;
+    renderPractice();
+  } else {
+    completeLesson();
+  }
+}
+
+function prevSentence() {
+  if (state.currentSentenceIndex === 0) return;
+  state.currentSentenceIndex -= 1;
+  renderPractice();
+}
+
+function skipSentence() {
+  nextSentence();
+}
+
+function completeLesson() {
+  openCelebration();
+}
+
+function openCelebration() {
+  const modal = document.getElementById('celebrationModal');
+  const lesson = state.currentLesson;
+  if (!lesson) return;
+  modal.classList.remove('hidden');
+  document.getElementById('celebrationText').textContent = `${lesson.title} complete! We will load the next lesson automatically.`;
+}
+
+function closeCelebration() {
+  document.getElementById('celebrationModal').classList.add('hidden');
+}
+
+function loadNextLesson() {
+  closeCelebration();
+  const { theme, lesson } = findNextLessonAfter(state.currentTheme.id, state.currentLesson.id);
+  openPractice(theme.id, lesson.id);
+}
+
+function findNextLessonAfter(themeId, lessonId) {
+  const themeIndex = state.themes.findIndex((t) => t.id === themeId);
+  const theme = state.themes[themeIndex];
+  const lessonIndex = theme.lessons.findIndex((l) => l.id === lessonId);
+  if (lessonIndex < theme.lessons.length - 1) {
+    return { theme, lesson: theme.lessons[lessonIndex + 1] };
+  }
+  const nextTheme = state.themes[(themeIndex + 1) % state.themes.length];
+  return { theme: nextTheme, lesson: nextTheme.lessons[0] };
+}
+
+function persistStats() {
+  state.stats.history.push({ value: state.stats.successes, timestamp: Date.now() });
+  // Trim history to avoid unbounded growth
+  if (state.stats.history.length > 500) {
+    state.stats.history = state.stats.history.slice(-500);
+  }
+  store.set(STORES.stats, 'main', state.stats);
+}
+
+function handleNav(e) {
+  const navTarget = e.target.closest('[data-nav]');
+  if (!navTarget) return;
+  const target = navTarget.dataset.nav;
+  switch (target) {
+    case 'practice':
+      if (state.currentTheme && state.currentLesson) {
+        openPractice(state.currentTheme.id, state.currentLesson.id);
+      } else {
+        const { theme, lesson } = nextUnfinishedLesson();
+        openPractice(theme.id, lesson.id);
+      }
+      break;
+    case 'themes':
+      openThemes();
+      break;
+    case 'dashboard':
+      openDashboard();
+      break;
+    case 'settings':
+      renderSettings();
+      showView('settingsView');
+      break;
+    case 'statistics':
+      renderStatistics();
+      showView('statisticsView');
+      break;
+    case 'lessonManager':
+      renderLessonManager();
+      showView('lessonManagerView');
+      break;
+    default:
+      break;
+  }
+}
+
+document.addEventListener('click', handleNav);
+
+document.getElementById('themeSearch').addEventListener('input', (e) =>
+  renderThemes(e.target.value)
+);
+
+document.getElementById('lessonSearch').addEventListener('input', (e) => {
+  if (!state.currentTheme) return;
+  renderLessons(state.currentTheme, e.target.value);
+});
+
+document.getElementById('listenBtn').addEventListener('click', () => {
+  const sentence = state.currentLesson.sentences[state.currentSentenceIndex];
+  speakSentence(sentence.text);
+});
+
+const toggleBtn = document.getElementById('toggleInputBtn');
+toggleBtn.addEventListener('click', () => {
+  const voicePanel = document.getElementById('voiceInput');
+  const useVoice = voicePanel.classList.contains('hidden');
+  toggleInput(useVoice);
+});
+
+document.getElementById('hintBtn').addEventListener('click', handleHint);
+
+document.getElementById('submitSentence').addEventListener('click', submitSentence);
+
+document.getElementById('skipSentence').addEventListener('click', skipSentence);
+
+document.getElementById('prevSentence').addEventListener('click', prevSentence);
+
+document.getElementById('micBtn').addEventListener('click', () => {
+  const recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!recognition) {
+    toast('Speech recognition is unavailable in this browser.');
+    return;
+  }
+  const recognizer = new recognition();
+  recognizer.lang = 'en-US';
+  recognizer.start();
+  recognizer.onresult = (event) => {
+    document.getElementById('textInput').value = event.results[0][0].transcript;
+    toggleInput(false);
+    toast('Voice captured! Review and submit.');
+  };
+  recognizer.onerror = () => toast('Voice capture failed. Please try again.');
+});
+
+document.getElementById('nextLessonBtn').addEventListener('click', loadNextLesson);
+
+document.getElementById('closeModalBtn').addEventListener('click', closeCelebration);
+
+document.getElementById('voiceRate').addEventListener('input', (e) => {
+  state.settings.voiceRate = Number(e.target.value);
+  store.set(STORES.settings, 'user', state.settings);
+});
+
+document.getElementById('voiceVariant').addEventListener('change', (e) => {
+  state.settings.voice = e.target.value;
+  store.set(STORES.settings, 'user', state.settings);
+});
+
+document.getElementById('autoAdvance').addEventListener('change', (e) => {
+  state.settings.autoAdvance = e.target.checked;
+  store.set(STORES.settings, 'user', state.settings);
+});
+
+document.getElementById('autoHint').addEventListener('change', (e) => {
+  state.settings.autoHint = e.target.checked;
+  store.set(STORES.settings, 'user', state.settings);
+  renderPractice();
+});
+
+document.getElementById('soundEffects').addEventListener('change', (e) => {
+  state.settings.soundEffects = e.target.checked;
+  store.set(STORES.settings, 'user', state.settings);
+});
+
+document.getElementById('defaultInput').addEventListener('change', (e) => {
+  state.settings.defaultInput = e.target.value;
+  store.set(STORES.settings, 'user', state.settings);
+  toggleInput(e.target.value === 'voice');
+});
+
+document.getElementById('previewVoiceBtn').addEventListener('click', () => {
+  speakSentence('This is how your lessons will sound.');
+});
+
+function exportData(type = 'all') {
+  const payload = {
+    generatedAt: new Date().toISOString(),
+    themes: state.themes,
+    progress: state.progress,
+    stats: state.stats,
+    settings: state.settings
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {
+    type: 'application/json'
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `just-speak-${type}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(files) {
+  const file = files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      const payload = JSON.parse(event.target.result);
+      if (payload.themes) state.themes = payload.themes;
+      if (payload.progress) state.progress = payload.progress;
+      if (payload.stats) state.stats = payload.stats;
+      if (payload.settings) state.settings = payload.settings;
+      store.set(STORES.themes, 'all', state.themes);
+      store.set(STORES.progress, 'all', state.progress);
+      store.set(STORES.stats, 'main', state.stats);
+      store.set(STORES.settings, 'user', state.settings);
+      toast('Import successful.');
+      renderThemes();
+      renderLessonManager();
+      renderSettings();
+      renderStatistics();
+    } catch (error) {
+      toast('Import failed: invalid JSON');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function resetProgress() {
+  state.progress = {};
+  state.stats = { attempts: 0, successes: 0, minutes: 0, streak: 0, history: [] };
+  store.set(STORES.progress, 'all', state.progress);
+  store.set(STORES.stats, 'main', state.stats);
+  toast('Progress reset. Start fresh!');
+  renderThemes();
+  renderStatistics();
+  updateDashboard();
+}
+
+document.getElementById('exportAllBtn').addEventListener('click', () => exportData('all'));
+
+document
+  .getElementById('exportProgressBtn')
+  .addEventListener('click', () => exportData('progress'));
+
+document.getElementById('exportDataBtn').addEventListener('click', () => exportData('backup'));
+
+document.getElementById('importInput').addEventListener('change', (e) => importData(e.target.files));
+
+document.getElementById('resetProgressBtn').addEventListener('click', resetProgress);
+
+async function init() {
+  await bootstrapThemes();
+  await bootstrapProgress();
+  const { theme, lesson } = nextUnfinishedLesson();
+  state.currentTheme = theme;
+  state.currentLesson = lesson;
+  renderThemes();
+  renderDashboard();
+  renderSettings();
+  renderStatistics();
+  renderLessonManager();
+  openPractice(theme.id, lesson.id);
+}
+
+window.addEventListener('load', () => {
+  if (window.speechSynthesis && speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = renderSettings;
+  }
+  init();
+});

@@ -846,7 +846,7 @@ document.getElementById('micBtn').addEventListener('click', () => {
   textInput.value = transcript;
 
   // ⭐ Show what was recognized ⭐
-  document.getElementById('voiceTranscript').textContent = transcript;
+ document.getElementById('voiceTranscript').textContent = normalizeTextForSimilarity(transcript);
 
   if (transcript.length < 3) {
     toast("Didn't catch that, please try again.");

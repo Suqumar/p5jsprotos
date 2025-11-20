@@ -997,6 +997,58 @@ window.addEventListener('load', () => {
   init();
 });
 
+function normalizeNumbers(str) {
+  const numberWords = {
+    0:  "zero",
+    1:  "one",
+    2:  "two",
+    3:  "three",
+    4:  "four",
+    5:  "five",
+    6:  "six",
+    7:  "seven",
+    8:  "eight",
+    9:  "nine",
+    10: "ten",
+    11: "eleven",
+    12: "twelve",
+    13: "thirteen",
+    14: "fourteen",
+    15: "fifteen",
+    16: "sixteen",
+    17: "seventeen",
+    18: "eighteen",
+    19: "nineteen",
+    20: "twenty",
+    30: "thirty",
+    40: "forty",
+    50: "fifty",
+    60: "sixty",
+    70: "seventy",
+    80: "eighty",
+    90: "ninety",
+    100: "hundred"
+  };
+
+  // Convert standalone numbers up to 100
+  return str.replace(/\b\d+\b/g, num => {
+    num = parseInt(num, 10);
+
+    if (num <= 20) return numberWords[num];
+
+    if (num < 100) {
+      const tens = Math.floor(num / 10) * 10;
+      const ones = num % 10;
+      if (ones === 0) return numberWords[tens];
+      return numberWords[tens] + " " + numberWords[ones];
+    }
+
+    // For > 100 leave unchanged
+    return num.toString();
+  });
+}
+
+
 function normalizeContractions(str) {
   return str
     .toLowerCase()
@@ -1023,12 +1075,23 @@ function normalizeContractions(str) {
 }
 
 function normalizeTextForSimilarity(str) {
-  return normalizeContractions(str)   // convert it's → it is
-    .replace(/[^a-z\s]/gi, '')        // remove non-letters except space
-    .replace(/\s+/g, ' ')             // collapse multiple spaces
-    .trim()
-    .toLowerCase();
+  if (!str) return "";
+
+  // Step 1: convert numbers to words
+  str = normalizeNumbers(str);
+
+  // Step 2: lowercase
+  str = str.toLowerCase();
+
+  // Step 3: remove punctuation except spaces
+  str = str.replace(/[^a-z\s]/g, "");
+
+  // Step 4: collapse double spaces
+  str = str.replace(/\s+/g, " ").trim();
+
+  return str;
 }
+
 
 function levenshtein(a, b) {
   const matrix = [];
